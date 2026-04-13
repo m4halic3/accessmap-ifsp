@@ -23,15 +23,15 @@ Atualmente, o projeto encontra-se na Versão 0 (v0), consistindo na interface in
 ## Tecnologias Utilizadas
 
 * HTML5: Estrutura semântica e acessível.
-* SASS (SCSS): Estilização avançada com arquitetura modular e design responsivo com estética Neobrutalista.
-* JavaScript (Vanilla): Lógica para interatividade de componentes como carrossel, menus, plugins de acessibilidade e navegação.
+* SASS (SCSS): Estilização avançada com arquitetura modular e design responsivo.
+* JavaScript: Lógica para interatividade de componentes como carrossel, menus e navegação.
 
 ## Autoria e Desenvolvimento
 
 Ambas autoras são estudantes de Tecnologia em Sistemas para Internet no IFSP Campus Itapetininga:
 
 * Mariana Alice: Proprietária inicial, responsável pela arquitetura de software, codificação completa da v0 (HTML, SCSS, JS) e co-autora da prototipagem.
-* Yasmim Vitória: Co-autora da etapa de prototipagem e design inicial do projeto.
+* Yasmim Vitória: Autora da etapa de prototipagem e design inicial do projeto.
 
 ## Visão de Futuro
 
