@@ -1,0 +1,221 @@
+@use 'variables' as *;
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stats-section {
+    padding: 80px 8%;
+    background-color: $color-white;
+    text-align: center;
+    overflow: hidden;
+
+    .stats-title {
+        font-family: $font-primary;
+        color: $color-purple;
+        font-size: 2.2rem;
+        margin-bottom: 60px;
+        font-weight: 800;
+        animation: fadeInUp 0.8s ease forwards;
+        transition: color 0.3s ease;
+
+        &:hover {
+            color: $color-pink;
+        }
+    }
+
+    .stats-container {
+        display: flex;
+        gap: 50px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .stats-cards {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+
+        .stat-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 35px;
+            border-radius: 20px;
+            color: $color-white;
+            border: 1px solid rgba(0,0,0,0.1); // Borda leve para definir o card
+            
+            // --- NOVA SOMBRA DO CONTATO APLICADA AQUI ---
+            box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.05); 
+            
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+
+            &:nth-child(1) { animation-delay: 0.2s; background-color: $color-teal; }
+            &:nth-child(2) { animation-delay: 0.4s; background-color: $color-purple; }
+            &:nth-child(3) { animation-delay: 0.6s; background-color: $color-pink; }
+
+            &:hover {
+                // Ajustei o hover para não "quebrar" a sombra sólida
+                transform: translate(-5px, -5px); 
+                box-shadow: 20px 20px 0px rgba(0, 0, 0, 0.08);
+                filter: brightness(1.1);
+
+                .card-icon {
+                    transform: rotate(15deg) scale(1.1);
+                }
+            }
+
+            .card-content {
+                text-align: left;
+            }
+
+            .card-number {
+                font-size: 2.8rem;
+                font-weight: 800;
+                display: block;
+                line-height: 1;
+            }
+            
+            .card-label {
+                font-weight: 600;
+                font-size: 1rem;
+                display: block;
+            }
+
+            .card-icon {
+                width: 60px;
+                height: 60px;
+                background: rgba(255, 255, 255, 0.2);
+                backdrop-filter: blur(5px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                transition: transform 0.4s ease;
+
+                img {
+                    width: 60%;
+                    height: auto;
+                    filter: brightness(0) invert(1);
+                }
+            }
+        }
+    }
+
+    .stats-chart {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        opacity: 0;
+        animation: fadeInUp 0.8s ease forwards 0.5s;
+
+        .chart-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            padding: 20px;
+            background: $color-white;
+            border-radius: 30px;
+            border: 1px solid rgba(0,0,0,0.05);
+            
+            // Apliquei a mesma sombra no container do gráfico para harmonizar
+            box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.05); 
+            
+            transition: transform 0.5s ease;
+
+            &:hover {
+                transform: translate(-5px, -5px);
+                box-shadow: 20px 20px 0px rgba(0, 0, 0, 0.08);
+            }
+        }
+
+        .chart-ring {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                $color-teal 0% 65%, 
+                $color-pink 65% 90%, 
+                #f0f0f0 90% 100%
+            );
+            display: flex;
+            justify-content: center;
+            align-items: center;
+    
+            &::after {
+                content: "";
+                position: absolute;
+                width: 70%; 
+                height: 70%;
+                background-color: $color-white;
+                border-radius: 50%;
+            }
+        }
+
+        .chart-legend-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            text-align: center;
+            pointer-events: none; 
+
+            .main-stat {
+                display: block;
+                font-size: 3.5rem;
+                font-weight: 800;
+                color: $color-dark;
+                line-height: 1;
+            }
+
+            .sub-text {
+                font-size: 0.9rem;
+                color: #777;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+        }
+    }
+}
+
+@media (max-width: 992px) {
+    .stats-section {
+        padding: 40px 5%;
+    }
+
+    .stats-container {
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .stats-cards {
+        width: 100%;
+        order: 1;
+
+        .stat-card {
+            box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.05); // Sombra menor no mobile
+            &:hover { transform: none; }
+        }
+    }
+
+    .stats-chart {
+        order: 2;
+        .chart-container {
+            width: 260px;
+            height: 260px;
+            box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.05);
+        }
+    }
+}

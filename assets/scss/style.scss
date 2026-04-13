@@ -1,0 +1,34 @@
+@use 'variables' as *;
+@use 'nav';
+@use 'carousel';
+@use 'map'; 
+@use 'stats';
+@use 'contact';
+@use 'footer';
+@use 'accessibility';
+
+
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// --- CONFIGURAÇÕES GERAIS DA PÁGINA ---
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    font-family: $font-secondary;
+    background-color: $color-white;
+}

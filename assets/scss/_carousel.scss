@@ -1,0 +1,122 @@
+@use 'variables' as *;
+
+.secao-carrossel {
+    margin-top: 20px; 
+    padding: 40px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.carousel-container {
+    width: 90%;
+    max-width: 1100px;
+    height: 500px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 25px;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.05);
+    transition: all 0.5s ease;
+
+    &:hover {
+        transform: translate(-3px, -3px);
+        box-shadow: 18px 18px 0px rgba(0, 0, 0, 0.08);
+
+        .seta {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+    }
+
+    .slides-wrapper {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        transition: transform 1.2s cubic-bezier(0.2, 1, 0.3, 1);
+    }
+
+    .slide {
+        min-width: 100%;
+        height: 100%;
+        
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            backface-visibility: hidden;
+        }
+    }
+
+    .seta {
+        position: absolute;
+        top: 50%;
+        opacity: 0;
+        transform: translateY(-50%) scale(0.8);
+        background: $color-pink;
+        border: none;
+        color: white;
+        width: 40px; 
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        cursor: pointer;
+        border-radius: 50%;
+        transition: all 0.4s ease;
+        z-index: 10;
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+
+        &:hover {
+            background: $color-purple;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        &.esquerda { left: 20px; }
+        &.direita { right: 20px; } 
+    }
+}
+
+.indicadores {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 10;
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.4);
+        border: 1.5px solid white;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.5s ease;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+
+        &.active {
+            background: $color-pink;
+            border-color: $color-pink;
+            width: 30px;
+            border-radius: 20px;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .carousel-container {
+        height: 300px;
+        border-radius: 15px;
+        box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.05);
+
+        .seta {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+            width: 35px;
+            height: 35px;
+        }
+    }
+}

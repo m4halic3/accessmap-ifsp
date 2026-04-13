@@ -1,0 +1,35 @@
+@use 'variables' as *;
+
+#userwayAccessibilityIcon, 
+.uai,
+div[id^="userway"] {
+    top: 38% !important;
+    right: 20px !important;
+    position: fixed !important;
+    z-index: 2147483647 !important;
+    filter: hue-rotate(310deg) saturate(1.5) brightness(1.1) !important;
+}
+
+div[vw].enabled {
+    top: 50% !important;
+    right: 20px !important;
+    position: fixed !important;
+    z-index: 2147483647 !important;
+}
+
+div[vw] [vw-access-button],
+.vw-access-button {
+    background-color: $color-teal !important; 
+}
+
+div[vw] [vw-access-button] img {
+    filter: hue-rotate(310deg) saturate(1.5) !important;
+}
+
+@media (max-width: 768px) {
+    #userwayAccessibilityIcon, 
+    div[vw].enabled {
+        right: 10px !important;
+        transform: scale(0.8);
+    }
+}
