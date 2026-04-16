@@ -4,10 +4,11 @@
     padding: 100px 8%;
     background-color: $color-white;
     overflow: hidden;
+    text-align: left;
 
     .contact-container {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 60px;
         justify-content: space-between;
         max-width: 100%;
@@ -40,20 +41,42 @@
                 margin-bottom: 8px;
             }
 
-            input, textarea {
-                width: 100%;
-                padding: 12px 15px;
-                border: 2px solid #e0e0e0;
-                border-radius: 10px;
-                font-family: $font-secondary;
-                outline: none;
-                transition: border-color 0.3s;
-                box-sizing: border-box;
+            .input-wrapper {
+                position: relative;
+                display: flex;
+                align-items: center;
 
-                &:focus { border-color: $color-teal; }
+                i {
+                    position: absolute;
+                    left: 15px;
+                    color: $color-purple;
+                    opacity: 0.6;
+                    pointer-events: none;
+                }
+
+                input, textarea {
+                    width: 100%;
+                    padding: 12px 15px 12px 45px;
+                    border: 2px solid #e0e0e0;
+                    border-radius: 10px;
+                    font-family: $font-secondary;
+                    outline: none;
+                    transition: border-color 0.3s;
+                    box-sizing: border-box;
+
+                    &:focus { border-color: $color-teal; }
+                }
+
+                textarea { 
+                    height: 120px; 
+                    resize: none; 
+                    padding-top: 15px;
+                }
+                
+                i.fa-comment-dots {
+                    top: 18px; 
+                }
             }
-
-            textarea { height: 120px; resize: none; }
         }
     }
 
@@ -91,7 +114,7 @@
         font-weight: 800;
         cursor: pointer;
         transition: 0.3s;
-        max-width: 100%;
+        width: 100%;
 
         &:hover { background-color: darken($color-pink, 10%); }
     }
@@ -99,6 +122,7 @@
     .contact-info {
         flex: 1;
         min-width: 0;
+        text-align: left;
 
         h2 {
             font-family: $font-primary;
@@ -124,6 +148,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            padding: 0;
             
             li {
                 display: flex;
@@ -132,6 +157,7 @@
                 font-weight: 600;
                 color: $color-dark;
                 min-width: 0;
+                justify-content: flex-start;
 
                 i {
                     color: white;
@@ -162,7 +188,6 @@
 
     .contact-container {
         flex-direction: column; 
-        text-align: center;
         gap: 40px;
     }
 
@@ -177,16 +202,15 @@
         width: 100%;
         
         h2, p {
-            text-align: center;
+            text-align: left;
         }
 
         .info-list {
-            align-items: center;
+            align-items: flex-start;
             
             li {
-                justify-content: flex-start;
                 width: 100%;
-                max-width: 350px;
+                max-width: 100%;
             }
         }
     }
