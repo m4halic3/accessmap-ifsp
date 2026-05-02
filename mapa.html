@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <title>Mapa - AcessMap</title>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="assets/images/logo-branca.png" alt="Logo AccessMap" class="logo-img">
+            <span class="logo-text">ACCESSMAP</span>
+        </div>
+
+        <ul class="nav-links-desktop desktop-only">
+            <li><a href="#">Home</a></li>
+            <li><a href="#mapa">Map</a></li>
+            <li><a href="#estatisticas">Stats</a></li>
+            <li><a href="#contato">Contact</a></li>
+            <li><a href="#sobre">About Us</a></li>
+        </ul>
+
+        <div class="nav-right desktop-only">
+            <a href="login.html" class="btn-login-destaque">Log In</a> <!--Modifiquei rapinho!-->
+            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+        </div>
+
+        <div id="menu" class="mobile-only">
+            <div id="menu-bar" onclick="menuOnClick()">
+                <div id="bar1" class="bar"></div>
+                <div id="bar2" class="bar"></div>
+                <div id="bar3" class="bar"></div>
+            </div>
+            <nav class="nav-mobile" id="nav">
+                <ul>
+                    <li><a href="#" onclick="menuOnClick()">Home</a></li>
+                    <li><a href="#mapa" onclick="menuOnClick()">Map</a></li>
+                    <li><a href="#estatisticas" onclick="menuOnClick()">Stats</a></li>
+                    <li><a href="#contato" onclick="menuOnClick()">Contact</a></li>
+                    <li><a href="#sobre" onclick="menuOnClick()">About Us</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="menu-bg mobile-only" id="menu-bg"></div>
+    </nav>
+    <div class="container-mapa">
+
+        <!-- LADO ESQUERDO -->
+        <div class="sidebar">
+
+            <h2>Resultados (geral)</h2>
+
+            <h3>Selecionar</h3>
+
+            <div class="filtros">
+                <div class="filtros">
+                    <div class="filtro" onclick="filtrar('fisica', this)">
+                        <img src="assets/images/simbolo-fisica.png">
+                    </div>
+
+                    <div class="filtro" onclick="filtrar('auditiva', this)">
+                        <img src="assets/images/simbolo-auditiva.png">
+                    </div>
+
+                    <div class="filtro" onclick="filtrar('visual', this)">
+                        <img src="assets/images/simbolo-visual.png">
+                    </div>
+                </div>
+            </div>
+
+            <div id="lista-lugares"></div>
+
+        </div>
+
+        <!-- MAPA -->
+        <div id="map" class="mapa"></div>
+
+    </div>
+
+    <!-- ✅ Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script src="assets/js/mapa.js"></script>
+
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+</body>
+
+</html>

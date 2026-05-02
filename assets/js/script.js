@@ -66,3 +66,13 @@ function reiniciarTimer() {
         btnMove(1);
     }, 5000);
 }
+
+/*Parte Login*/
+
+function toggleAuth() {
+  const login = document.getElementById("loginCard");
+  const signup = document.getElementById("signupCard");
+
+  login.classList.toggle("active");
+  signup.classList.toggle("active");
+}

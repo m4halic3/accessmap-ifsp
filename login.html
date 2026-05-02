@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <title>Login / Sign Up usuário</title>
+</head>
+<body class="autenticação">
+    <div class="auth-container">
+
+    <!-- Login -->
+    <div class="auth-card active" id="loginCard">
+      <h2>Log in</h2>
+
+      <div class="input-group">
+        <input type="text" placeholder="Nome de usuário">
+      </div>
+
+      <div class="input-group">
+        <input type="password" placeholder="Senha">
+      </div>
+
+      <div class="options">
+        <label><input type="checkbox"> Lembre-me</label>
+        <a href="#">Esqueceu a senha?</a>
+      </div>
+
+      <button>Log in</button>
+
+      <p class="switch">ou <span onclick="toggleAuth()">Cadastre-se</span></p>
+    </div>
+
+    <!-- Sign Up -->
+    <div class="auth-card" id="signupCard">
+      <h2>Cadastre-se</h2>
+
+      <div class="input-group">
+        <input type="text" placeholder="Nome completo">
+      </div>
+
+      <div class="input-group">
+        <input type="email" placeholder="Endereço de Email">
+      </div>
+
+      <div class="input-row">
+        <input type="password" placeholder="Senha">
+        <input type="password" placeholder="Confirme sua senha">
+      </div>
+
+      <button>Criar conta</button>
+
+      <p class="switch">ou <span onclick="toggleAuth()">Log in</span></p>
+    </div>
+
+  </div>
+
+  <script src="assets/js/script.js"></script>
+
+  <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+</body>
+</html>

@@ -238,6 +238,7 @@ body {
   height: 100%;
   object-fit: contain;
   backface-visibility: hidden;
+  
 }
 .carousel-container .seta {
   position: absolute;
@@ -905,7 +906,8 @@ body {
 html body #userwayAccessibilityIcon,
 html body .uai,
 html body div[id^="userway"] {
-  top: 60px !important;
+  top: auto !important;
+  bottom: 120px !important;
   right: 10px !important; /* mais afastado no desktop */
   position: fixed !important;
   z-index: 999999999 !important;
@@ -918,4 +920,252 @@ html body div[id^="userway"] {
   html body div[id^="userway"] {
     right: -10px !important; /* mais colado no celular */
   }
+}
+
+/*CSS da Página de Login*/
+
+@charset "UTF-8";
+.auth-page {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(180deg, #f0f0f0, #dcdcdc);
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Container central */
+.auth-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Card */
+.auth-card {
+  width: 365px;
+  padding: 40px;
+  background: #fff;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+  display: none;
+  z-index: 2;
+}
+.auth-card h2 {
+  color: #5a2a83;
+  margin-bottom: 30px;
+  font-size: 28px;
+}
+.auth-card button {
+  width: 100%;
+  padding: 12px;
+  background: #ff4b6e;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: 0.3s;
+}
+.auth-card button:hover {
+  background: #e63e5f;
+}
+
+.auth-card.active {
+  display: block;
+}
+
+/* Inputs */
+.input-group {
+  margin-bottom: 20px;
+}
+.input-group input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #aaa;
+  padding: 10px;
+  outline: none;
+  font-size: 14px;
+  background: transparent;
+}
+
+/*Senha + Confirmar */
+.input-row {
+  display: flex;
+  gap: 10px;
+}
+.input-row input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #aaa;
+  padding: 10px;
+  outline: none;
+}
+
+/* Opções */
+.options {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-top: 5px;
+}
+.options a {
+  text-decoration: none;
+  color: #333;
+}
+.options a:hover {
+  text-decoration: underline;
+}
+
+.switch {
+  margin-top: 20px;
+  font-size: 14px;
+}
+.switch span {
+  color: #5a2a83;
+  cursor: pointer;
+  font-weight: bold;
+}
+.switch span:hover {
+  text-decoration: underline;
+}/*# sourceMappingURL=login.css.map */
+
+/*Parte do Mapa*/
+
+.container-mapa {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 30%;
+    padding: 20px;
+    background: #f4f4f4;
+    overflow-y: auto;
+}
+
+.mapa {
+    width: 70%;
+    height: 100%;
+}
+
+.container-mapa {
+    display: flex;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+/* ===== LAYOUT ===== */
+.container-mapa {
+    display: flex;
+    height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f5f6fa;
+}
+
+/* ===== LAYOUT GERAL ===== */
+body {
+    background: #f4f6fb;
+}
+
+.logo-img {
+    width: 35px;
+}
+
+.logo-text {
+    font-weight: bold;
+}
+
+/* ===== CONTAINER ===== */
+.container-mapa {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    height: calc(100vh - 70px);
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    width: 300px;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* títulos */
+.sidebar h2 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.sidebar h3 {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 15px;
+}
+
+/* filtros */
+.filtros {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filtro {
+    flex: 1;
+    padding: 10px;
+    border-radius: 12px;
+    background: #f1f3f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.filtro img {
+    width: 28px;
+}
+
+.filtro:hover {
+    background: #e4e6eb;
+}
+
+/* ativo */
+.filtro.ativo {
+    background: #5b2cff;
+}
+
+.filtro.ativo img {
+    filter: brightness(0) invert(1);
+}
+
+/* lista */
+#lista-lugares {
+    margin-top: 10px;
+}
+
+.item {
+    padding: 12px;
+    border-radius: 12px;
+    background: #f7f8fb;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.item:hover {
+    background: #eceefe;
+}
+
+/* ===== MAPA ===== */
+.mapa {
+    flex: 1;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
