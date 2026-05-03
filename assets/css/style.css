@@ -434,10 +434,6 @@ body {
 }
 .stats-section .stats-cards .stat-card:nth-child(2) {
   animation-delay: 0.4s;
-  background-color: #540D6E;
-}
-.stats-section .stats-cards .stat-card:nth-child(3) {
-  animation-delay: 0.6s;
   background-color: #EE4266;
 }
 .stats-section .stats-cards .stat-card:hover {
@@ -504,7 +500,7 @@ body {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: conic-gradient(#3BCEAC 0% 65%, #EE4266 65% 90%, #f0f0f0 90% 100%);
+  background: conic-gradient(#3BCEAC 0% 82%, #EE4266 82% 95%, #f0f0f0 95% 100%);
   display: flex;
   justify-content: center;
   align-items: center;

@@ -51,21 +51,23 @@
             padding: 25px 35px;
             border-radius: 20px;
             color: $color-white;
-            border: 1px solid rgba(0,0,0,0.1); // Borda leve para definir o card
-            
-            // --- NOVA SOMBRA DO CONTATO APLICADA AQUI ---
+            border: 1px solid rgba(0,0,0,0.1);
             box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.05); 
-            
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0;
             animation: fadeInUp 0.6s ease forwards;
 
-            &:nth-child(1) { animation-delay: 0.2s; background-color: $color-teal; }
-            &:nth-child(2) { animation-delay: 0.4s; background-color: $color-purple; }
-            &:nth-child(3) { animation-delay: 0.6s; background-color: $color-pink; }
+            // Ajustado para apenas 2 cards (Física e Auditiva)
+            &:nth-child(1) { 
+                animation-delay: 0.2s; 
+                background-color: $color-teal; 
+            }
+            &:nth-child(2) { 
+                animation-delay: 0.4s; 
+                background-color: $color-pink; 
+            }
 
             &:hover {
-                // Ajustei o hover para não "quebrar" a sombra sólida
                 transform: translate(-5px, -5px); 
                 box-shadow: 20px 20px 0px rgba(0, 0, 0, 0.08);
                 filter: brightness(1.1);
@@ -107,7 +109,6 @@
                 img {
                     width: 60%;
                     height: 60%;
-                    //filter: brightness(0) invert(1);
                 }
             }
         }
@@ -128,10 +129,7 @@
             background: $color-white;
             border-radius: 30px;
             border: 1px solid rgba(0,0,0,0.05);
-            
-            // Apliquei a mesma sombra no container do gráfico para harmonizar
             box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.05); 
-            
             transition: transform 0.5s ease;
 
             &:hover {
@@ -144,10 +142,11 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
+            // Gráfico ajustado para refletir a proporção de 2 categorias
             background: conic-gradient(
-                $color-teal 0% 65%, 
-                $color-pink 65% 90%, 
-                #f0f0f0 90% 100%
+                $color-teal 0% 82%, 
+                $color-pink 82% 95%, 
+                #f0f0f0 95% 100%
             );
             display: flex;
             justify-content: center;
@@ -190,14 +189,15 @@
     }
 }
 
+// Responsividade
 @media (max-width: 992px) {
     .stats-section {
-        padding: 60px 20px; // Aumentei a margem lateral da seção (bordas da tela)
+        padding: 60px 20px;
         
         .stats-title {
             font-size: 1.8rem;
             margin-bottom: 40px;
-            padding: 0 10px; // Evita que o título encoste nas bordas
+            padding: 0 10px;
         }
     }
 
@@ -209,34 +209,34 @@
     .stats-cards {
         width: 100%;
         order: 1;
-        padding: 0 10px; // Margem de segurança lateral para os cards
+        padding: 0 10px;
 
         .stat-card {
-            padding: 20px; // Padding interno mais compacto para dar mais espaço ao texto
+            padding: 20px;
             box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.05);
-            min-height: 100px; // Garante uma altura mínima estável
+            min-height: 100px;
             
             &:hover { transform: none; }
 
             .card-content {
-                max-width: 70%; // Garante que o texto não atropele o ícone
+                max-width: 70%;
             }
 
             .card-number {
-                font-size: 2.2rem; // Fonte menor para não quebrar a linha
+                font-size: 2.2rem;
                 overflow-wrap: break-word;
             }
             
             .card-label {
                 font-size: 0.9rem;
                 line-height: 1.2;
-                white-space: normal; // Garante que o texto possa quebrar linha se necessário
+                white-space: normal;
             }
 
             .card-icon {
-                width: 50px; // Ícone um pouco menor no mobile
+                width: 50px;
                 height: 50px;
-                flex-shrink: 0; // Impede o ícone de amassar se o texto for grande
+                flex-shrink: 0;
             }
         }
     }
@@ -246,7 +246,7 @@
         width: 100%;
         
         .chart-container {
-            width: 280px; // Tamanho fixo seguro para a maioria dos celulares
+            width: 280px;
             height: 280px;
             margin: 0 auto;
             box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.05);
@@ -263,7 +263,6 @@
     }
 }
 
-// Ajuste extra para telas muito pequenas (iPhone SE / Fold)
 @media (max-width: 380px) {
     .stats-section .stats-cards .stat-card {
         padding: 15px;
