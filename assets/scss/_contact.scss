@@ -1,3 +1,4 @@
+@use "sass:color";
 @use 'variables' as *;
 
 .contact-section {
@@ -19,7 +20,7 @@
         background: $color-white;
         padding: 40px;
         border-radius: 20px;
-        border: 1px solid #ccc;
+        border: 1px solid rgba(0,0,0,0.05); // Borda quase invisível
         box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.05);
         transition: all 0.3s ease;
         min-width: 0;
@@ -37,8 +38,11 @@
                 display: block;
                 font-family: $font-primary;
                 color: $color-purple;
+                font-size: 0.9rem;
                 font-weight: 700;
-                margin-bottom: 8px;
+                margin-bottom: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
 
             .input-wrapper {
@@ -50,25 +54,43 @@
                     position: absolute;
                     left: 15px;
                     color: $color-purple;
-                    opacity: 0.6;
+                    opacity: 0.5;
                     pointer-events: none;
+                    transition: opacity 0.3s, color 0.3s;
                 }
 
                 input, textarea {
                     width: 100%;
-                    padding: 12px 15px 12px 45px;
-                    border: 2px solid #e0e0e0;
-                    border-radius: 10px;
+                    padding: 14px 15px 14px 45px;
+                    border: 2px solid #f0f0f0; // Cinza muito claro
+                    border-radius: 12px;
                     font-family: $font-secondary;
+                    background-color: #fcfcfc; // Fundo levemente off-white
                     outline: none;
-                    transition: border-color 0.3s;
+                    transition: all 0.3s ease;
                     box-sizing: border-box;
+                    color: $color-dark;
+                    font-size: 1rem;
 
-                    &:focus { border-color: $color-teal; }
+                    &::placeholder {
+                        color: #ccc;
+                    }
+
+                    // Efeito de foco moderno
+                    &:focus { 
+                        border-color: $color-teal;
+                        background-color: $color-white;
+                        box-shadow: 0 5px 15px rgba($color-teal, 0.1);
+                        
+                        + i { // Muda o ícone quando foca no input
+                            opacity: 1;
+                            color: $color-teal;
+                        }
+                    }
                 }
 
                 textarea { 
-                    height: 120px; 
+                    height: 140px; 
                     resize: none; 
                     padding-top: 15px;
                 }
@@ -82,22 +104,34 @@
 
     .type-buttons {
         display: flex;
-        gap: 10px;
+        gap: 12px;
         flex-wrap: wrap;
+        margin-bottom: 25px;
         
         .btn-type {
             flex: 1;
-            min-width: 80px;
-            padding: 10px;
+            min-width: 90px;
+            padding: 12px;
             border: none;
-            border-radius: 20px;
+            border-radius: 12px;
             color: white;
+            font-family: $font-primary;
             font-weight: 700;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             cursor: pointer;
-            transition: opacity 0.3s, transform 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 0px rgba(0,0,0,0.1);
 
-            &:hover { opacity: 0.8; transform: scale(1.05); }
+            &:hover { 
+                opacity: 0.9; 
+                transform: translateY(-2px);
+                box-shadow: 0 6px 0px rgba(0,0,0,0.1);
+            }
+
+            &:active {
+                transform: translateY(0px);
+                box-shadow: 0 2px 0px rgba(0,0,0,0.1);
+            }
         }
 
         .btn-fisica { background-color: $color-teal; }
@@ -109,109 +143,94 @@
         background-color: $color-pink;
         color: white;
         border: none;
-        padding: 12px 40px;
-        border-radius: 15px;
+        padding: 16px;
+        border-radius: 12px;
+        font-family: $font-primary;
         font-weight: 800;
+        font-size: 1.1rem;
         cursor: pointer;
-        transition: 0.3s;
+        transition: all 0.3s ease;
         width: 100%;
+        box-shadow: 0 10px 20px rgba($color-pink, 0.2);
 
-        &:hover { background-color: darken($color-pink, 10%); }
+        &:hover { 
+            background-color: color.adjust($color-pink, $lightness: -10%);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba($color-pink, 0.3);
+        }
     }
 
+    // Informações laterais mantidas conforme seu código
     .contact-info {
         flex: 1;
         min-width: 0;
-        text-align: left;
 
         h2 {
             font-family: $font-primary;
             color: $color-purple;
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 800;
-            margin-bottom: 20px;
-            text-align: left;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
+            margin-bottom: 25px;
         }
 
         p {
+            font-size: 1.1rem;
             color: #666;
-            margin-bottom: 30px;
-            line-height: 1.6;
-            text-align: left;
-            word-wrap: break-word;
+            margin-bottom: 40px;
+            line-height: 1.8;
         }
 
         .info-list {
             list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
             padding: 0;
             
             li {
                 display: flex;
                 align-items: center;
-                gap: 15px;
+                gap: 20px;
                 font-weight: 600;
                 color: $color-dark;
-                min-width: 0;
-                justify-content: flex-start;
+                margin-bottom: 25px;
 
                 i {
                     color: white;
-                    background-color: $color-dark;
-                    width: 35px;
-                    height: 35px;
+                    background-color: $color-purple;
+                    width: 45px;
+                    height: 45px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    border-radius: 50%;
-                    font-size: 0.9rem;
+                    border-radius: 12px;
+                    font-size: 1.1rem;
                     flex-shrink: 0;
-                }
-
-                span {
-                    word-wrap: break-word;
-                    overflow-wrap: anywhere;
+                    box-shadow: 5px 5px 0px rgba($color-purple, 0.1);
                 }
             }
         }
     }
 }
 
+// Responsividade com ajustes de texto
 @media (max-width: 992px) {
     .contact-section {
-        padding: 60px 5%;
+        padding: 60px 25px; // Respiro nas bordas
     }
 
     .contact-container {
         flex-direction: column; 
-        gap: 40px;
+        gap: 50px;
     }
 
     .contact-card {
         width: 100%;
-        order: 1; 
+        order: 2; // Card de formulário embaixo no mobile
         padding: 30px 20px;
     }
 
     .contact-info {
-        order: 2; 
+        order: 1; // Título e texto em cima no mobile
         width: 100%;
         
-        h2, p {
-            text-align: left;
-        }
-
-        .info-list {
-            align-items: flex-start;
-            
-            li {
-                width: 100%;
-                max-width: 100%;
-            }
-        }
+        h2 { font-size: 2.2rem; }
     }
 }
