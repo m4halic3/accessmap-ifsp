@@ -1,7 +1,7 @@
 @use "sass:color";
 @use 'variables' as *;
 
-.autenticação {
+.autenticacao {
     background: linear-gradient(180deg, $color-white 0%, #E0E0E0 100%);
     min-height: 100vh;
     display: flex;
@@ -131,7 +131,7 @@
 
 // Responsividade
 @media (max-width: 650px) {
-    .autenticação {
+    .autenticacao {
         padding-top: 100px;
 
         .auth-header {

@@ -10,7 +10,7 @@
 
 <header class="auth-header">
     <a href="index.html" class="logo-link">
-        <img src="assets/images/logo-branca.png" alt="Logo AccessMap" class="logo-img-auth">
+        <img src="assets/images/logo-roxa.png" alt="Logo AccessMap" class="logo-img-auth">
     </a>
     <a href="index.html" class="back-link">Voltar</a>
 </header>
@@ -41,6 +41,21 @@
             <p class="switch">Já tem uma conta? <a href="login.html">Log in</a></p>
         </div>
     </div>
+    <!-- Widgets de Acessibilidade -->
 
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
+    <script src="https://cdn.userway.org/widget.js" data-account="YOUR_ACCOUNT_ID"></script>
+
+    <script src="assets/js/script.js"></script>
     </body>
 </html>
