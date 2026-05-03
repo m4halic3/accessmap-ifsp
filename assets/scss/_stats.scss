@@ -192,30 +192,89 @@
 
 @media (max-width: 992px) {
     .stats-section {
-        padding: 40px 5%;
+        padding: 60px 20px; // Aumentei a margem lateral da seção (bordas da tela)
+        
+        .stats-title {
+            font-size: 1.8rem;
+            margin-bottom: 40px;
+            padding: 0 10px; // Evita que o título encoste nas bordas
+        }
     }
 
     .stats-container {
         flex-direction: column;
-        gap: 40px;
+        gap: 30px;
     }
 
     .stats-cards {
         width: 100%;
         order: 1;
+        padding: 0 10px; // Margem de segurança lateral para os cards
 
         .stat-card {
-            box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.05); // Sombra menor no mobile
+            padding: 20px; // Padding interno mais compacto para dar mais espaço ao texto
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.05);
+            min-height: 100px; // Garante uma altura mínima estável
+            
             &:hover { transform: none; }
+
+            .card-content {
+                max-width: 70%; // Garante que o texto não atropele o ícone
+            }
+
+            .card-number {
+                font-size: 2.2rem; // Fonte menor para não quebrar a linha
+                overflow-wrap: break-word;
+            }
+            
+            .card-label {
+                font-size: 0.9rem;
+                line-height: 1.2;
+                white-space: normal; // Garante que o texto possa quebrar linha se necessário
+            }
+
+            .card-icon {
+                width: 50px; // Ícone um pouco menor no mobile
+                height: 50px;
+                flex-shrink: 0; // Impede o ícone de amassar se o texto for grande
+            }
         }
     }
 
     .stats-chart {
         order: 2;
+        width: 100%;
+        
         .chart-container {
-            width: 260px;
-            height: 260px;
-            box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.05);
+            width: 280px; // Tamanho fixo seguro para a maioria dos celulares
+            height: 280px;
+            margin: 0 auto;
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-legend-inner {
+            .main-stat {
+                font-size: 2.8rem;
+            }
+            .sub-text {
+                font-size: 0.8rem;
+            }
+        }
+    }
+}
+
+// Ajuste extra para telas muito pequenas (iPhone SE / Fold)
+@media (max-width: 380px) {
+    .stats-section .stats-cards .stat-card {
+        padding: 15px;
+        
+        .card-number {
+            font-size: 1.8rem;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
         }
     }
 }

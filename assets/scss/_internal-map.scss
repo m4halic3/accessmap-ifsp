@@ -1,0 +1,163 @@
+@use 'variables' as *; // Assume que você tem cores e fontes definidas
+
+// Configurações Globais do Container
+.container-mapa {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 80px); // Ajusta para a altura da sua navbar
+    background-color: #f4f4f4;
+    overflow: hidden;
+
+    // Lado Esquerdo - Painel de Controle e Resultados
+    .sidebar {
+        width: 380px;
+        height: 100%;
+        background: $color-white;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+        z-index: 10;
+        padding: 25px;
+
+        h2 {
+            font-family: $font-primary;
+            font-size: 1.5rem;
+            color: $color-dark;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        // Seção de Filtros de Acessibilidade
+        .filtros {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+
+            .filtro {
+                width: 60px;
+                height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 12px;
+                background: #f8f9fa;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                border: 2px solid transparent;
+
+                img {
+                    width: 35px;
+                    height: 35px;
+                    object-fit: contain;
+                }
+
+                &:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                }
+
+                &.ativo {
+                    background: rgba($color-pink, 0.1);
+                    border-color: $color-pink;
+                    
+                    img {
+                        filter: drop-shadow(0 0 2px $color-pink);
+                    }
+                }
+            }
+        }
+
+        // Lista Dinâmica de Lugares (Indoor)
+        #lista-lugares {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+
+            // Custom Scrollbar para a lista
+            &::-webkit-scrollbar {
+                width: 6px;
+            }
+            &::-webkit-scrollbar-thumb {
+                background: #ddd;
+                border-radius: 10px;
+            }
+
+            .item-lugar {
+                padding: 15px;
+                background: #fff;
+                border: 1px solid #eee;
+                border-radius: 10px;
+                margin-bottom: 12px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &:hover {
+                    background: #fdfdfd;
+                    border-color: $color-pink;
+                    transform: translateX(5px);
+                }
+
+                p {
+                    margin: 0;
+                    font-weight: 600;
+                    color: $color-dark;
+                }
+
+                span {
+                    font-size: 0.8rem;
+                    color: #777;
+                }
+            }
+        }
+    }
+
+    // Lado Direito - Visualização da Planta (Leaflet)
+    #map {
+        flex: 1;
+        height: 100%;
+        background-color: #e5e5e5; // Cor de fundo neutra para a planta
+        
+        // Estilização customizada dos Popups do Leaflet
+        .leaflet-popup-content-wrapper {
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        .leaflet-popup-content {
+            font-family: $font-primary;
+            b { color: $color-pink; }
+        }
+
+        // Estilo para o cursor ao navegar na planta
+        cursor: crosshair; 
+    }
+}
+
+// Responsividade Mobile
+@media (max-width: 992px) {
+    .container-mapa {
+        flex-direction: column !important; // Força o mapa a ir para baixo 
+        height: auto !important; // Permite que a página cresça verticalmente
+        overflow-y: auto; 
+    }
+
+    .sidebar {
+        width: 100% !important; // Ocupa a largura total no celular
+        height: auto !important;
+        max-height: 50vh; // Limita a lista para não esconder o mapa totalmente
+        padding: 15px !important;
+    }
+
+    #map {
+        width: 100% !important;
+        height: 400px !important; // Altura mínima para o mapa aparecer embaixo
+        flex: none !important;
+    }
+}

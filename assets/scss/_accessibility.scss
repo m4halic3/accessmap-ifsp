@@ -1,35 +1,51 @@
 @use 'variables' as *;
 
-#userwayAccessibilityIcon, 
-.uai,
-div[id^="userway"] {
-    top: 38% !important;
-    right: 20px !important;
+// Mixin para garantir que o estilo vença qualquer resistência
+@mixin force-position($top-value) {
     position: fixed !important;
+    top: $top-value !important;
+    bottom: auto !important; // Reset fundamental
+    right: 20px !important;
+    left: auto !important;
     z-index: 2147483647 !important;
+}
+
+/* 1. V-LIBRAS */
+div[vw].enabled {
+    @include force-position(50%);
+    
+    [vw-access-button], .vw-access-button {
+        background-color: $color-teal !important; 
+        
+        img {
+            filter: hue-rotate(310deg) saturate(1.5) !important;
+        }
+    }
+}
+
+/* 2. USERWAY */
+// Usamos o seletor de ID direto para máxima força no SCSS
+#userwayAccessibilityIcon, 
+.uai, 
+div[id^="userway"] {
+    // Se o V-Libras está em 50%, o UserWay precisa estar em ~60%
+    @include force-position(60%);
+    
+    // Filtros de cor
     filter: hue-rotate(310deg) saturate(1.5) brightness(1.1) !important;
 }
 
-div[vw].enabled {
-    top: 50% !important;
-    right: 20px !important;
-    position: fixed !important;
-    z-index: 2147483647 !important;
-}
-
-div[vw] [vw-access-button],
-.vw-access-button {
-    background-color: $color-teal !important; 
-}
-
-div[vw] [vw-access-button] img {
-    filter: hue-rotate(310deg) saturate(1.5) !important;
-}
-
+/* 3. RESPONSIVO */
 @media (max-width: 768px) {
-    #userwayAccessibilityIcon, 
     div[vw].enabled {
+        top: 45% !important;
         right: 10px !important;
         transform: scale(0.8);
+    }
+
+    #userwayAccessibilityIcon, div[id^="userway"] {
+        top: 55% !important; // Ajuste para ficar logo abaixo no mobile
+        right: 10px !important;
+        transform: scale(0.8) !important;
     }
 }

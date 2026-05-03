@@ -1,31 +1,41 @@
-// 📍 Coordenada REAL do IFSP (a que você pegou)
-const centroIFSP = [-23.5936109, -48.0185491];
+// 🖼️ Configurações da Planta (Ajustadas para a proporção da imagem real)
+const plantaDimensoes = {
+    largura: 1500,
+    altura: 1056, // Ajustado para a proporção real do arquivo enviado
+    url: 'assets/images/planta-campus.jpg' 
+};
 
-// 📍 Lugares distribuídos pelo campus
+// 📍 Lugares mapeados com base na geometria da Planta Baixa [cite: 20]
 const lugares = [
     {
-        nome: "Biblioteca",
+        nome: "Bloco de Salas (Acesso Norte)",
         tipo: "fisica",
-        lat: centroIFSP[0] + 0.0005,
-        lng: centroIFSP[1] + 0.0005
+        y: 720, // Posicionado sobre as salas hachuradas
+        x: 750
     },
     {
-        nome: "Auditório",
-        tipo: "auditiva",
-        lat: centroIFSP[0] - 0.0005,
-        lng: centroIFSP[1] - 0.0005
-    },
-    {
-        nome: "Laboratório de Informática",
+        nome: "Entrada Principal (Piso Tátil)",
         tipo: "visual",
-        lat: centroIFSP[0] + 0.0002,
-        lng: centroIFSP[1] - 0.0004
+        y: 350, // Próximo à guarita/entrada principal
+        x: 620
     },
     {
-        nome: "Bloco A",
+        nome: "Estacionamento Ônibus e Vans",
         tipo: "fisica",
-        lat: centroIFSP[0] - 0.0005,
-        lng: centroIFSP[1] + 0.0003
+        y: 200, // Sobre a área identificada no PDF [cite: 13]
+        x: 880
+    },
+    {
+        nome: "Bloco Administrativo (Sinalização)",
+        tipo: "auditiva",
+        y: 680,
+        x: 1050
+    },
+    {
+        nome: "Área da Caixa D'água",
+        tipo: "visual",
+        y: 450, // Próximo ao círculo da caixa d'água [cite: 16]
+        x: 1250
     }
 ];
 
@@ -33,11 +43,8 @@ let mapa;
 let marcadores = [];
 let filtroAtual = null;
 
-
-// 🎨 Ícones dos marcadores
 function getIcon(tipo) {
     let cor = "blue";
-
     if (tipo === "fisica") cor = "green";
     if (tipo === "visual") cor = "blue";
     if (tipo === "auditiva") cor = "red";
@@ -50,135 +57,83 @@ function getIcon(tipo) {
     });
 }
 
-
-// 🎯 Ícone exclusivo do IFSP (não confundir com acessibilidade)
-function getIconIF() {
-    return L.icon({
-        iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png",
-        shadowUrl: "https://unpkg.com/leaflet/dist/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41]
-    });
-}
-
-
-// 🚀 Inicializa o mapa
 function initMap() {
-    mapa = L.map('map').setView(centroIFSP, 18);
+    mapa = L.map('map', {
+        crs: L.CRS.Simple,
+        minZoom: -1,
+        maxZoom: 3
+    });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
-    }).addTo(mapa);
+    const limites = [[0, 0], [plantaDimensoes.altura, plantaDimensoes.largura]];
+    L.imageOverlay(plantaDimensoes.url, limites).addTo(mapa);
+    mapa.fitBounds(limites);
 
-    // 📍 Marcador fixo do IFSP
-    L.marker(centroIFSP, {
-        icon: getIconIF()
-    })
-    .addTo(mapa)
-    .openPopup();
+    // LOG DE AUXÍLIO: Use isso para refinar os pontos clicando na tela
+    mapa.on('click', function(e) {
+        console.log(`y: ${e.latlng.lat.toFixed(0)}, x: ${e.latlng.lng.toFixed(0)}`);
+    });
 
     mostrarLugares(lugares);
 }
 
-
-// 📍 Mostrar lugares
 function mostrarLugares(lista) {
     limparMarcadores();
-
     lista.forEach(lugar => {
-        const marcador = L.marker([lugar.lat, lugar.lng], {
+        const marcador = L.marker([lugar.y, lugar.x], {
             icon: getIcon(lugar.tipo)
         }).addTo(mapa);
 
         marcador.bindPopup(`
-            <b>${lugar.nome}</b><br>
-            Acessibilidade: ${lugar.tipo}
+            <div style="text-align:center;">
+                <b style="font-size:14px;">${lugar.nome}</b><br>
+                <span style="color:#666;">Acessibilidade: ${lugar.tipo.toUpperCase()}</span>
+            </div>
         `);
-
-        marcador.on("click", () => {
-            mapa.setView([lugar.lat, lugar.lng], 19);
-        });
-
         marcadores.push(marcador);
     });
-
     atualizarLista(lista);
 }
 
-
-// 🧹 Limpar marcadores
 function limparMarcadores() {
     marcadores.forEach(m => mapa.removeLayer(m));
     marcadores = [];
 }
 
-
-// 🎯 Filtro com toggle (clicar de novo volta tudo)
 function filtrar(tipo, elemento) {
-
     if (filtroAtual === tipo) {
         mostrarTodos();
         filtroAtual = null;
-
-        document.querySelectorAll(".filtro").forEach(el => {
-            el.classList.remove("ativo");
-        });
-
+        document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
         return;
     }
-
     filtroAtual = tipo;
-
     const filtrados = lugares.filter(l => l.tipo === tipo);
     mostrarLugares(filtrados);
-
-    document.querySelectorAll(".filtro").forEach(el => {
-        el.classList.remove("ativo");
-    });
-
+    document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
     elemento.classList.add("ativo");
 }
 
-
-// 🔄 Mostrar todos
 function mostrarTodos() {
     mostrarLugares(lugares);
-
-    document.querySelectorAll(".filtro").forEach(el => {
-        el.classList.remove("ativo");
-    });
+    document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
 }
 
-
-// 📋 Lista lateral
 function atualizarLista(lista) {
     const container = document.getElementById("lista-lugares");
     container.innerHTML = "";
-
     if (lista.length === 0) {
-        container.innerHTML = "<p>Nenhum local encontrado.</p>";
+        container.innerHTML = "<p style='padding:10px;'>Nenhum local nesta categoria.</p>";
         return;
     }
-
     lista.forEach(lugar => {
         const item = document.createElement("div");
         item.classList.add("item");
-
-        item.innerHTML = `
-            <p><strong>${lugar.nome}</strong></p>
-            <span style="font-size:12px; color:#666;">
-                ${lugar.tipo}
-            </span>
-        `;
-
+        item.innerHTML = `<p><strong>${lugar.nome}</strong></p><small>${lugar.tipo}</small>`;
         item.addEventListener("click", () => {
-            mapa.setView([lugar.lat, lugar.lng], 19);
+            mapa.setView([lugar.y, lugar.x], 1);
         });
-
         container.appendChild(item);
     });
 }
 
-
-// 🚀 Inicializa
 window.onload = initMap;

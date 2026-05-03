@@ -1,0 +1,152 @@
+@use "sass:color";
+@use 'variables' as *;
+
+.autenticação {
+    background: linear-gradient(180deg, $color-white 0%, #E0E0E0 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+
+    // Logo e link "Voltar" ALINHADOS LADO A LADO
+    .auth-header {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        display: flex;
+        flex-direction: row; // Alinha horizontalmente
+        align-items: center; // Centraliza verticalmente o texto com a logo
+        gap: 15px; // Espaço entre a logo e o texto
+        z-index: 10;
+
+        .logo-img-auth {
+            width: 100px; // Um pouco menor para não carregar o visual
+            height: auto;
+        }
+
+        .back-link {
+            font-family: $font-accessible;
+            font-size: 1rem;
+            color: $color-purple;
+            text-decoration: none; // Sem sublinhado
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent; // Previne "pulo" no hover
+
+            &:hover {
+                color: $color-pink;
+                text-decoration: none;
+                border-bottom-color: $color-pink; // Linha bonita só no hover
+            }
+        }
+    }
+
+    .auth-card {
+        background: $color-white;
+        width: 100%;
+        max-width: 480px;
+        padding: 50px 40px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        margin-top: 20px;
+
+        h2 {
+            font-family: $font-primary;
+            font-size: 2.2rem;
+            margin-bottom: 35px;
+            font-weight: 700;
+            color: $color-dark;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            width: 100%;
+
+            input {
+                width: 100%;
+                padding: 12px 0;
+                border: none;
+                border-bottom: 2px solid #EEE;
+                background: transparent;
+                font-family: $font-secondary;
+                font-size: 1rem;
+                outline: none;
+                transition: border-color 0.3s;
+
+                &:focus {
+                    border-bottom-color: $color-pink;
+                }
+            }
+        }
+
+        // Senhas lado a lado
+        .input-row {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+
+            .input-group {
+                flex: 1;
+            }
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 16px;
+            background-color: $color-pink;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: $font-primary;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba($color-pink, 0.2);
+            transition: all 0.3s ease;
+            margin: 25px 0;
+
+            &:hover {
+                background-color: color.adjust($color-pink, $lightness: -10%);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba($color-pink, 0.3);
+            }
+        }
+
+        .switch {
+            font-size: 0.9rem;
+            color: #666;
+            
+            a {
+                color: $color-purple;
+                font-weight: 700;
+                text-decoration: none;
+                &:hover { color: $color-pink; }
+            }
+        }
+    }
+}
+
+// Responsividade
+@media (max-width: 650px) {
+    .autenticação {
+        padding-top: 100px;
+
+        .auth-header {
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
+        }
+
+        .auth-card {
+            padding: 30px 20px;
+            
+            .input-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    }
+}
