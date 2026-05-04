@@ -2,151 +2,164 @@
 @use 'variables' as *;
 
 .autenticacao {
-    background: linear-gradient(180deg, $color-white 0%, #E0E0E0 100%);
-    min-height: 100vh;
+  margin: 0;
+  font-family: $font-primary;
+  background: linear-gradient(180deg, #f0f0f0, #dcdcdc);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+  overflow-x: hidden;
+
+  /* Header com Logo e Voltar - Fixado no canto superior esquerdo */
+  .auth-header {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 10;
+
+    .logo-img-auth {
+      width: 100px;  /* Define um tamanho fixo para não "bugar" */
+      height: auto;  /* Mantém a proporção */
+      display: block;
+    }
+
+    .back-link {
+      text-decoration: none;
+      color: $color-purple;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: 0.3s;
+
+      &:hover {
+        color: $color-pink;
+      }
+    }
+  }
+
+  /* Container do Card */
+  .auth-container {
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
-    position: relative;
+    z-index: 2;
+  }
 
-    // Logo e link "Voltar" ALINHADOS LADO A LADO
+  /* Card de Cadastro */
+  .auth-card {
+    width: 100%;
+    max-width: 450px; /* Cadastro costuma ser um pouco mais largo que login */
+    padding: 40px;
+    background: #fff;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+
+    h2 {
+      color: $color-purple;
+      margin-bottom: 30px;
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    /* Campos de Input */
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+
+      input {
+        width: 100%;
+        border: none;
+        border-bottom: 2px solid #ddd;
+        padding: 10px 5px;
+        outline: none;
+        font-size: 15px;
+        background: transparent;
+        transition: border-color 0.3s;
+
+        &:focus {
+          border-bottom-color: $color-pink;
+        }
+      }
+    }
+
+    /* Nome e Sobrenome na mesma linha */
+    .input-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+
+      .input-group {
+        flex: 1;
+        margin-bottom: 0;
+      }
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: $color-pink;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.3s;
+
+      &:hover {
+        background: darken($color-pink, 10%);
+        transform: translateY(-2px);
+      }
+    }
+
+    .switch {
+      margin-top: 25px;
+      font-size: 14px;
+      color: #666;
+
+      a {
+        color: $color-purple;
+        text-decoration: none;
+        font-weight: bold;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+/* Ajustes para Celular */
+@media (max-width: 600px) {
+  .autenticacao {
+    padding-top: 100px; /* Abre espaço para a logo no topo */
+    align-items: flex-start;
+
     .auth-header {
-        position: absolute;
-        top: 30px;
-        left: 30px;
-        display: flex;
-        flex-direction: row; // Alinha horizontalmente
-        align-items: center; // Centraliza verticalmente o texto com a logo
-        gap: 15px; // Espaço entre a logo e o texto
-        z-index: 10;
-
-        .logo-img-auth {
-            width: 100px; // Um pouco menor para não carregar o visual
-            height: auto;
-        }
-
-        .back-link {
-            font-family: $font-accessible;
-            font-size: 1rem;
-            color: $color-purple;
-            text-decoration: none; // Sem sublinhado
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border-bottom: 2px solid transparent; // Previne "pulo" no hover
-
-            &:hover {
-                color: $color-pink;
-                text-decoration: none;
-                border-bottom-color: $color-pink; // Linha bonita só no hover
-            }
-        }
+      left: 20px;
+      top: 20px;
+      
+      .logo-img-auth {
+        width: 80px; /* Diminui a logo no celular */
+      }
     }
 
     .auth-card {
-        background: $color-white;
-        width: 100%;
-        max-width: 480px;
-        padding: 50px 40px;
-        border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-        text-align: center;
-        margin-top: 20px;
+      padding: 30px 20px;
 
-        h2 {
-            font-family: $font-primary;
-            font-size: 2.2rem;
-            margin-bottom: 35px;
-            font-weight: 700;
-            color: $color-dark;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            width: 100%;
-
-            input {
-                width: 100%;
-                padding: 12px 0;
-                border: none;
-                border-bottom: 2px solid #EEE;
-                background: transparent;
-                font-family: $font-secondary;
-                font-size: 1rem;
-                outline: none;
-                transition: border-color 0.3s;
-
-                &:focus {
-                    border-bottom-color: $color-pink;
-                }
-            }
-        }
-
-        // Senhas lado a lado
-        .input-row {
-            display: flex;
-            gap: 20px;
-            width: 100%;
-
-            .input-group {
-                flex: 1;
-            }
-        }
-
-        .btn-auth {
-            width: 100%;
-            padding: 16px;
-            background-color: $color-pink;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-family: $font-primary;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba($color-pink, 0.2);
-            transition: all 0.3s ease;
-            margin: 25px 0;
-
-            &:hover {
-                background-color: color.adjust($color-pink, $lightness: -10%);
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba($color-pink, 0.3);
-            }
-        }
-
-        .switch {
-            font-size: 0.9rem;
-            color: #666;
-            
-            a {
-                color: $color-purple;
-                font-weight: 700;
-                text-decoration: none;
-                &:hover { color: $color-pink; }
-            }
-        }
+      .input-row {
+        flex-direction: column; /* Nome e Sobrenome um sob o outro no celular */
+        gap: 0;
+      }
     }
-}
-
-// Responsividade
-@media (max-width: 650px) {
-    .autenticacao {
-        padding-top: 100px;
-
-        .auth-header {
-            left: 50%;
-            transform: translateX(-50%);
-            width: auto;
-        }
-
-        .auth-card {
-            padding: 30px 20px;
-            
-            .input-row {
-                flex-direction: column;
-                gap: 0;
-            }
-        }
-    }
+  }
 }

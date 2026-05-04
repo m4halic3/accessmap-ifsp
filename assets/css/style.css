@@ -1089,258 +1089,283 @@ div[id^=userway] {
     flex: none !important;
   }
 }
-.autenticação {
-  background: linear-gradient(180deg, #FFFFFF 0%, #E0E0E0 100%);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: "Open Sans", sans-serif;
-}
-.autenticação .auth-container {
-  width: 100%;
-  max-width: 400px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.autenticação .auth-header {
-  width: 100%;
-  margin-bottom: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-.autenticação .auth-header .logo-img-auth {
-  width: 150px;
-  margin-bottom: 10px;
-}
-.autenticação .auth-header .back-link {
-  font-size: 0.8rem;
-  color: #333;
-  text-decoration: none;
-  opacity: 0.7;
-}
-.autenticação .auth-header .back-link:hover {
-  opacity: 1;
-}
-.autenticação .auth-card {
-  background: #FFFFFF;
-  width: 100%;
-  padding: 60px 40px;
-  border-radius: 10px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-.autenticação .auth-card h2 {
-  font-size: 2.2rem;
-  margin-bottom: 40px;
-  color: #000;
-  font-weight: 700;
-}
-.autenticação .auth-card .input-group {
+/* Página de Login */
+.auth-page {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(180deg, #f0f0f0, #dcdcdc);
+  height: 100vh;
+  overflow: hidden;
   position: relative;
-  margin-bottom: 25px;
-}
-.autenticação .auth-card .input-group i {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #000;
-}
-.autenticação .auth-card .input-group input {
-  width: 100%;
-  padding: 10px 10px 10px 30px;
-  border: none;
-  border-bottom: 1px solid #CCC;
-  background: transparent;
-  font-size: 1rem;
-  outline: none;
-  transition: border-color 0.3s;
-}
-.autenticação .auth-card .input-group input:focus {
-  border-bottom-color: #EE4266;
-}
-.autenticação .auth-card .input-group input::placeholder {
-  color: #666;
-  font-size: 0.9rem;
-}
-.autenticação .auth-card .options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  font-size: 0.85rem;
-}
-.autenticação .auth-card .options label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  color: #444;
-  cursor: pointer;
-}
-.autenticação .auth-card .options a {
-  color: #000;
-  text-decoration: none;
-  font-style: italic;
-}
-.autenticação .auth-card button, .autenticação .auth-card .btn-auth {
-  width: 100%;
-  padding: 15px;
-  background-color: #EE4266;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s;
-  margin-bottom: 30px;
-}
-.autenticação .auth-card button:hover, .autenticação .auth-card .btn-auth:hover {
-  background-color: rgb(232.1213592233, 20.8786407767, 65.0922330097);
-}
-.autenticação .auth-card .switch {
-  font-size: 0.9rem;
-  color: #333;
-}
-.autenticação .auth-card .switch a, .autenticação .auth-card .switch span {
-  color: #000;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  margin-left: 5px;
 }
 
-.autenticação {
-  background: linear-gradient(180deg, #fff 0%, #E0E0E0 100%);
+/* Ondas de fundo */
+.auth-page::before,
+.auth-page::after {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 300px;
+  background: #e6e6e6;
+  border-radius: 50%;
+  left: -50%;
+}
+
+.auth-page::before {
+  bottom: 120px;
+}
+
+.auth-page::after {
+  bottom: 0;
+  background: #dcdcdc;
+}
+
+/* Container central */
+.auth-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Card */
+.auth-card {
+  width: 350px;
+  padding: 40px;
+  background: #fff;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+  display: none;
+  z-index: 2;
+}
+.auth-card h2 {
+  color: #5a2a83;
+  margin-bottom: 30px;
+  font-size: 28px;
+}
+.auth-card button {
+  width: 100%;
+  padding: 12px;
+  background: #ff4b6e;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: 0.3s;
+}
+.auth-card button:hover {
+  background: #e63e5f;
+}
+
+.auth-card.active {
+  display: block;
+}
+
+/* Inputs */
+.input-group {
+  margin-bottom: 20px;
+}
+.input-group input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #aaa;
+  padding: 10px;
+  outline: none;
+  font-size: 14px;
+  background: transparent;
+}
+
+/* Linha dupla (senha + confirmar) */
+.input-row {
+  display: flex;
+  gap: 10px;
+}
+.input-row input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #aaa;
+  padding: 10px;
+  outline: none;
+}
+
+/* Opções */
+.options {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-top: 5px;
+}
+.options a {
+  text-decoration: none;
+  color: #333;
+}
+.options a:hover {
+  text-decoration: underline;
+}
+
+/* Alternância */
+.switch {
+  margin-top: 20px;
+  font-size: 14px;
+}
+.switch span {
+  color: #5a2a83;
+  cursor: pointer;
+  font-weight: bold;
+}
+.switch span:hover {
+  text-decoration: underline;
+}
+
+.autenticacao {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  background: linear-gradient(180deg, #f0f0f0, #dcdcdc);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
   position: relative;
+  overflow-x: hidden;
+  /* Header com Logo e Voltar - Fixado no canto superior esquerdo */
 }
-.autenticação .auth-header {
+.autenticacao .auth-header {
   position: absolute;
   top: 30px;
   left: 30px;
   display: flex;
-  flex-direction: row;
   align-items: center;
   gap: 15px;
   z-index: 10;
 }
-.autenticação .auth-header .logo-img-auth {
-  width: 100px;
-  height: auto;
+.autenticacao .auth-header .logo-img-auth {
+  width: 100px; /* Define um tamanho fixo para não "bugar" */
+  height: auto; /* Mantém a proporção */
+  display: block;
 }
-.autenticação .auth-header .back-link {
-  font-family: "Atkinson Hyperlegible", sans-serif;
-  font-size: 1rem;
+.autenticacao .auth-header .back-link {
+  text-decoration: none;
   color: #540D6E;
-  text-decoration: none;
   font-weight: 600;
-  transition: all 0.3s ease;
-  border-bottom: 2px solid transparent;
+  font-size: 0.9rem;
+  transition: 0.3s;
 }
-.autenticação .auth-header .back-link:hover {
+.autenticacao .auth-header .back-link:hover {
   color: #EE4266;
-  text-decoration: none;
-  border-bottom-color: #EE4266;
 }
-.autenticação .auth-card {
+.autenticacao {
+  /* Container do Card */
+}
+.autenticacao .auth-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+}
+.autenticacao {
+  /* Card de Cadastro */
+}
+.autenticacao .auth-card {
+  width: 100%;
+  max-width: 450px; /* Cadastro costuma ser um pouco mais largo que login */
+  padding: 40px;
   background: #fff;
-  width: 100%;
-  max-width: 480px;
-  padding: 50px 40px;
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
   text-align: center;
-  margin-top: 20px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
 }
-.autenticação .auth-card h2 {
-  font-family: "Montserrat", sans-serif;
-  font-size: 2.2rem;
-  margin-bottom: 35px;
-  font-weight: 700;
-  color: #333;
+.autenticacao .auth-card h2 {
+  color: #540D6E;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 800;
 }
-.autenticação .auth-card .input-group {
+.autenticacao .auth-card {
+  /* Campos de Input */
+}
+.autenticacao .auth-card .input-group {
   margin-bottom: 20px;
-  width: 100%;
+  text-align: left;
 }
-.autenticação .auth-card .input-group input {
+.autenticacao .auth-card .input-group input {
   width: 100%;
-  padding: 12px 0;
   border: none;
-  border-bottom: 2px solid #EEE;
-  background: transparent;
-  font-family: "Open Sans", sans-serif;
-  font-size: 1rem;
+  border-bottom: 2px solid #ddd;
+  padding: 10px 5px;
   outline: none;
+  font-size: 15px;
+  background: transparent;
   transition: border-color 0.3s;
 }
-.autenticação .auth-card .input-group input:focus {
+.autenticacao .auth-card .input-group input:focus {
   border-bottom-color: #EE4266;
 }
-.autenticação .auth-card .input-row {
+.autenticacao .auth-card {
+  /* Nome e Sobrenome na mesma linha */
+}
+.autenticacao .auth-card .input-row {
   display: flex;
-  gap: 20px;
-  width: 100%;
+  gap: 15px;
+  margin-bottom: 20px;
 }
-.autenticação .auth-card .input-row .input-group {
+.autenticacao .auth-card .input-row .input-group {
   flex: 1;
+  margin-bottom: 0;
 }
-.autenticação .auth-card .btn-auth {
+.autenticacao .auth-card button {
   width: 100%;
-  padding: 16px;
-  background-color: #EE4266;
-  color: white;
+  padding: 14px;
+  background: #EE4266;
   border: none;
-  border-radius: 12px;
-  font-family: "Montserrat", sans-serif;
-  font-size: 1.1rem;
-  font-weight: 700;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(238, 66, 102, 0.2);
-  transition: all 0.3s ease;
-  margin: 25px 0;
+  margin-top: 10px;
+  transition: 0.3s;
 }
-.autenticação .auth-card .btn-auth:hover {
-  background-color: rgb(232.1213592233, 20.8786407767, 65.0922330097);
+.autenticacao .auth-card button:hover {
+  background: rgb(232.1213592233, 20.8786407767, 65.0922330097);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(238, 66, 102, 0.3);
 }
-.autenticação .auth-card .switch {
-  font-size: 0.9rem;
+.autenticacao .auth-card .switch {
+  margin-top: 25px;
+  font-size: 14px;
   color: #666;
 }
-.autenticação .auth-card .switch a {
+.autenticacao .auth-card .switch a {
   color: #540D6E;
-  font-weight: 700;
   text-decoration: none;
+  font-weight: bold;
 }
-.autenticação .auth-card .switch a:hover {
-  color: #EE4266;
+.autenticacao .auth-card .switch a:hover {
+  text-decoration: underline;
 }
 
-@media (max-width: 650px) {
-  .autenticação {
-    padding-top: 100px;
+/* Ajustes para Celular */
+@media (max-width: 600px) {
+  .autenticacao {
+    padding-top: 100px; /* Abre espaço para a logo no topo */
+    align-items: flex-start;
   }
-  .autenticação .auth-header {
-    left: 50%;
-    transform: translateX(-50%);
-    width: auto;
+  .autenticacao .auth-header {
+    left: 20px;
+    top: 20px;
   }
-  .autenticação .auth-card {
+  .autenticacao .auth-header .logo-img-auth {
+    width: 80px; /* Diminui a logo no celular */
+  }
+  .autenticacao .auth-card {
     padding: 30px 20px;
   }
-  .autenticação .auth-card .input-row {
-    flex-direction: column;
+  .autenticacao .auth-card .input-row {
+    flex-direction: column; /* Nome e Sobrenome um sob o outro no celular */
     gap: 0;
   }
 }
