@@ -1,10 +1,10 @@
-@use 'variables' as *; // Assume que você tem cores e fontes definidas
+@use 'variables' as *; 
 
 // Configurações Globais do Container
 .container-mapa {
     display: flex;
     width: 100%;
-    height: calc(100vh - 80px); // Ajusta para a altura da sua navbar
+    height: calc(100vh - 80px); 
     background-color: #f4f4f4;
     overflow: hidden;
 
@@ -26,15 +26,47 @@
             margin-bottom: 20px;
         }
 
-        h3 {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #888;
+        // --- CABEÇALHO DOS FILTROS (Novo) ---
+        .header-filtros {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 15px;
+
+            h3 {
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: #888;
+                margin-bottom: 0; // Alinhado com o botão
+            }
+
+            .btn-reset {
+                background: $color-pink;
+                color: white;
+                border: none;
+                padding: 6px 14px;
+                border-radius: 20px;
+                font-size: 0.7rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 5px rgba($color-pink, 0.2);
+
+                &:hover {
+                    background: darken($color-pink, 10%);
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 8px rgba($color-pink, 0.3);
+                }
+
+                &:active {
+                    transform: translateY(0);
+                }
+            }
         }
 
-        // Seção de Filtros de Acessibilidade
+        // Seção de Ícones de Acessibilidade
         .filtros {
             display: flex;
             gap: 15px;
@@ -64,23 +96,22 @@
                 }
 
                 &.ativo {
-                    background: rgba($color-pink, 0.1);
+                    background: rgba($color-pink, 0.05);
                     border-color: $color-pink;
                     
                     img {
-                        filter: drop-shadow(0 0 2px $color-pink);
+                        filter: drop-shadow(0 0 2px rgba($color-pink, 0.5));
                     }
                 }
             }
         }
 
-        // Lista Dinâmica de Lugares (Indoor)
+        // Lista Dinâmica de Lugares
         #lista-lugares {
             flex: 1;
             overflow-y: auto;
             padding-right: 5px;
 
-            // Custom Scrollbar para a lista
             &::-webkit-scrollbar {
                 width: 6px;
             }
@@ -105,59 +136,66 @@
                 }
 
                 p {
-                    margin: 0;
+                    margin: 0 0 5px 0;
                     font-weight: 600;
                     color: $color-dark;
+                    font-size: 0.95rem;
                 }
 
                 span {
                     font-size: 0.8rem;
                     color: #777;
+                    display: block;
                 }
             }
         }
     }
 
-    // Lado Direito - Visualização da Planta (Leaflet)
+    // Lado Direito - Mapa
     #map {
         flex: 1;
         height: 100%;
-        background-color: #e5e5e5; // Cor de fundo neutra para a planta
-        
-        // Estilização customizada dos Popups do Leaflet
+        background-color: #e5e5e5;
+        cursor: crosshair; 
+
+        // Estilização dos Popups do Leaflet
         .leaflet-popup-content-wrapper {
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 5px;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.2);
         }
 
         .leaflet-popup-content {
             font-family: $font-primary;
-            b { color: $color-pink; }
+            line-height: 1.4;
+            
+            strong { 
+                color: $color-purple; 
+                display: block;
+                margin-bottom: 2px;
+            }
         }
-
-        // Estilo para o cursor ao navegar na planta
-        cursor: crosshair; 
     }
 }
 
-// Responsividade Mobile
+// Responsividade
 @media (max-width: 992px) {
     .container-mapa {
-        flex-direction: column !important; // Força o mapa a ir para baixo 
-        height: auto !important; // Permite que a página cresça verticalmente
+        flex-direction: column !important;
+        height: auto !important;
         overflow-y: auto; 
     }
 
     .sidebar {
-        width: 100% !important; // Ocupa a largura total no celular
+        width: 100% !important;
         height: auto !important;
-        max-height: 50vh; // Limita a lista para não esconder o mapa totalmente
-        padding: 15px !important;
+        max-height: 45vh;
+        padding: 20px !important;
     }
 
     #map {
         width: 100% !important;
-        height: 400px !important; // Altura mínima para o mapa aparecer embaixo
+        height: 400px !important;
         flex: none !important;
     }
 }
