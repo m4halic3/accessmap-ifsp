@@ -72,6 +72,13 @@ const lugares = [
         tipo: "fisica", 
         categoria: "estacionamento", 
         y: 320, x: 890
+    },
+    {
+        nome: "Estacionamento interno",
+        tipo: "fisica", 
+        categoria: "estacionamento", 
+        y: 520, 
+        x: 750
     }
 ];
 
@@ -92,7 +99,7 @@ function getIcon(categoria) {
     if (categoria === "estacionamento") cor = "green"; 
     if (categoria === "entrada") cor = "orange";
     if (categoria === "informatica") cor = "black"; // Tom de Rosa
-    if (categoria === "geral") cor = "green";    // Verde conforme pedido
+    if (categoria === "geral") cor = "grey";    // Verde conforme pedido
 
     return L.icon({
         iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${cor}.png`,
@@ -100,7 +107,7 @@ function getIcon(categoria) {
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34]
-    });
+});
 }
 
 /**
