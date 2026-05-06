@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use 'variables' as *; 
 
 // Configurações Globais do Container
@@ -26,7 +27,48 @@
             margin-bottom: 20px;
         }
 
-        // --- CABEÇALHO DOS FILTROS (Novo) ---
+        // --- BARRA DE PESQUISA (Nova Seção) ---
+        .search-container {
+            position: relative;
+            margin-bottom: 25px;
+
+            #search-input {
+                width: 100%;
+                padding: 12px 15px 12px 40px; 
+                border: 2px solid #f0f0f0;
+                border-radius: 12px;
+                font-family: $font-primary;
+                font-size: 0.9rem;
+                color: $color-dark;
+                transition: all 0.3s ease;
+                background-color: #f9f9f9;
+
+                &::placeholder {
+                    color: #aaa;
+                }
+
+                &:focus {
+                    outline: none;
+                    border-color: $color-pink;
+                    background-color: $color-white;
+                    box-shadow: 0 4px 12px rgba($color-pink, 0.1);
+                }
+            }
+
+            // Ícone de lupa posicionado via CSS
+            &::before {
+                content: '🔍'; 
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 0.9rem;
+                opacity: 0.5;
+                pointer-events: none;
+            }
+        }
+
+        // --- CABEÇALHO DOS FILTROS ---
         .header-filtros {
             display: flex;
             justify-content: space-between;
@@ -34,11 +76,11 @@
             margin-bottom: 15px;
 
             h3 {
-                font-size: 0.9rem;
+                font-size: 0.85rem;
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 color: #888;
-                margin-bottom: 0; // Alinhado com o botão
+                margin: 0;
             }
 
             .btn-reset {
@@ -189,7 +231,7 @@
     .sidebar {
         width: 100% !important;
         height: auto !important;
-        max-height: 45vh;
+        max-height: 60vh; // Aumentado levemente para acomodar a barra de pesquisa
         padding: 20px !important;
     }
 

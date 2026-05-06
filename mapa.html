@@ -16,9 +16,13 @@
         </nav>
 
     <div class="container-mapa">
-        <div class="sidebar">
+<div class="sidebar">
     <h2>Resultados (geral)</h2>
     
+    <div class="search-container">
+        <i class="fas fa-search search-icon"></i> <input type="text" id="search-input" placeholder="Pesquisar local..." onkeyup="pesquisarLugares()">
+    </div>
+
     <div class="header-filtros">
         <h3>Filtrar por Acessibilidade</h3>
         <button class="btn-reset" onclick="mostrarTodos()">Ver Todos</button>

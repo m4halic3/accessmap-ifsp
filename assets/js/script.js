@@ -76,3 +76,32 @@ function toggleAuth() {
   login.classList.toggle("active");
   signup.classList.toggle("active");
 }
+
+function pesquisarLugares() {
+    // Pega o valor digitado e converte para minúsculo
+    let input = document.getElementById('search-input').value.toLowerCase();
+    
+    // Pega todos os cards de lugares na lista
+    let lista = document.getElementById('lista-lugares');
+    let itens = lista.getElementsByClassName('item-lugar');
+
+    for (let i = 0; i < itens.length; i++) {
+        // Pega o nome do lugar (geralmente dentro da tag <p> no seu SCSS)
+        let nomeLugar = itens[i].getElementsByTagName('p')[0].innerText.toLowerCase();
+        
+        // Verifica se o texto pesquisado está contido no nome do lugar
+        if (nomeLugar.includes(input)) {
+            itens[i].style.display = ""; // Mostra o item
+        } else {
+            itens[i].style.display = "none"; // Esconde o item
+        }
+    }
+}
+
+// DICA: No seu botão "Ver Todos" (mostrarTodos), 
+// limpe também o campo de busca:
+function mostrarTodos() {
+    document.getElementById('search-input').value = '';
+    // ... restante da sua lógica de mostrar todos os marcadores no mapa
+    pesquisarLugares(); // Reseta a lista visual
+}

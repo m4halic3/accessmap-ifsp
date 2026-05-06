@@ -977,6 +977,40 @@ div[id^=userway] {
   color: #333;
   margin-bottom: 20px;
 }
+.container-mapa .sidebar .search-container {
+  position: relative;
+  margin-bottom: 25px;
+}
+.container-mapa .sidebar .search-container #search-input {
+  width: 100%;
+  padding: 12px 15px 12px 40px;
+  border: 2px solid #f0f0f0;
+  border-radius: 12px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+  color: #333;
+  transition: all 0.3s ease;
+  background-color: #f9f9f9;
+}
+.container-mapa .sidebar .search-container #search-input::placeholder {
+  color: #aaa;
+}
+.container-mapa .sidebar .search-container #search-input:focus {
+  outline: none;
+  border-color: #EE4266;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(238, 66, 102, 0.1);
+}
+.container-mapa .sidebar .search-container::before {
+  content: "🔍";
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  opacity: 0.5;
+  pointer-events: none;
+}
 .container-mapa .sidebar .header-filtros {
   display: flex;
   justify-content: space-between;
@@ -984,11 +1018,11 @@ div[id^=userway] {
   margin-bottom: 15px;
 }
 .container-mapa .sidebar .header-filtros h3 {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #888;
-  margin-bottom: 0;
+  margin: 0;
 }
 .container-mapa .sidebar .header-filtros .btn-reset {
   background: #EE4266;
@@ -1111,7 +1145,7 @@ div[id^=userway] {
   .sidebar {
     width: 100% !important;
     height: auto !important;
-    max-height: 45vh;
+    max-height: 60vh;
     padding: 20px !important;
   }
   #map {
