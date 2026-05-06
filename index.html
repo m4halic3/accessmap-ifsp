@@ -50,25 +50,23 @@
 
     <!-- Carrossel -->
     <section class="secao-carrossel">
-        <div class="carousel-container">
-            <div class="slides-wrapper" id="slider">
-                <div class="slide"><img src="assets/images/acess-auditiva.png" alt="Slide 1"></div>
-                <div class="slide"><img src="assets/images/acess-fisica.png" alt="Slide 2"></div>
-                <div class="slide"><img src="assets/images/acess-visual.png" alt="Slide 3"></div>
-                <div class="slide"><img src="assets/images/motivacao.png" alt="Slide 4"></div>
-            </div>
-
-            <button class="seta esquerda" onclick="btnMove(-1)" aria-label="Slide Anterior">&#10094;</button>
-            <button class="seta direita" onclick="btnMove(1)" aria-label="Próximo Slide">&#10095;</button>
-
-            <div class="indicadores">
-                <span class="dot active" onclick="jumpToSlide(0)"></span>
-                <span class="dot" onclick="jumpToSlide(1)"></span>
-                <span class="dot" onclick="jumpToSlide(2)"></span>
-                <span class="dot" onclick="jumpToSlide(3)"></span>
-            </div>
+    <div class="carousel-container">
+        <div class="slides-wrapper" id="slider">
+            <div class="slide"><img src="assets/images/acess-auditiva.png" alt="Slide 1"></div>
+            <div class="slide"><img src="assets/images/acess-fisica.png" alt="Slide 2"></div>
+            <div class="slide"><img src="assets/images/motivacao.png" alt="Slide 3"></div>
         </div>
-    </section>
+
+        <button class="seta esquerda" onclick="btnMove(-1)" aria-label="Slide Anterior">❮</button>
+        <button class="seta direita" onclick="btnMove(1)" aria-label="Próximo Slide">❯</button>
+
+        <div class="indicadores">
+            <span class="dot active" onclick="jumpToSlide(0)"></span>
+            <span class="dot" onclick="jumpToSlide(1)"></span>
+            <span class="dot" onclick="jumpToSlide(2)"></span>
+            </div>
+    </div>
+</section>
 
     <!-- Seção MAPA -->
     <section id="mapa" class="map-section">
