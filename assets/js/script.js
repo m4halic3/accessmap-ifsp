@@ -97,11 +97,3 @@ function pesquisarLugares() {
         }
     }
 }
-
-// DICA: No seu botão "Ver Todos" (mostrarTodos), 
-// limpe também o campo de busca:
-function mostrarTodos() {
-    document.getElementById('search-input').value = '';
-    // ... restante da sua lógica de mostrar todos os marcadores no mapa
-    pesquisarLugares(); // Reseta a lista visual
-}

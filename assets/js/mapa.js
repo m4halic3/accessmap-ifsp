@@ -205,9 +205,22 @@ function atualizarListaLateral(lista) {
 }
 
 function mostrarTodos() {
+    // 1. Reset do filtro lógico
     filtroAtual = null;
+
+    // 2. Remove o destaque visual dos botões de filtro
     document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
+
+    // 3. Limpa o campo de busca de texto
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+
+    // 4. Mostra todos os lugares no mapa e na lista lateral
     mostrarLugares(lugares);
+
+    // 5. Ajusta o zoom do mapa para ver tudo
     const limites = [[0, 0], [plantaDimensoes.altura, plantaDimensoes.largura]];
     mapa.fitBounds(limites);
 }
