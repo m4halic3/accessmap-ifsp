@@ -20,7 +20,7 @@
         background: $color-white;
         padding: 40px;
         border-radius: 20px;
-        border: 1px solid rgba(0,0,0,0.05); // Borda quase invisível
+        border: 1px solid rgba(0,0,0,0.05); 
         box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.05);
         transition: all 0.3s ease;
         min-width: 0;
@@ -30,6 +30,28 @@
             box-shadow: 20px 20px 0px rgba(0, 0, 0, 0.08);
         }
 
+        // --- RESET DO FIELDSET (Sume com o contorno padrão) ---
+        .fieldset-reset {
+            border: none !important;
+            outline: none !important;
+            margin: 0 0 25px 0;
+            padding: 0;
+            display: block;
+            width: 100%;
+        }
+
+        // --- ESTILO DO LEGEND E LABEL ---
+        .label-style, label {
+            display: block;
+            font-family: $font-primary;
+            color: #000000; // Alterado para preto puro
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .form-group {
             margin-bottom: 25px;
             text-align: left;
@@ -37,7 +59,7 @@
             label {
                 display: block;
                 font-family: $font-primary;
-                color: $color-purple;
+                color: #000000; // Alterado para preto puro
                 font-size: 0.9rem;
                 font-weight: 700;
                 margin-bottom: 10px;
@@ -53,7 +75,7 @@
                 i {
                     position: absolute;
                     left: 15px;
-                    color: $color-purple;
+                    color: #000000; // Alterado para preto puro
                     opacity: 0.5;
                     pointer-events: none;
                     transition: opacity 0.3s, color 0.3s;
@@ -62,27 +84,27 @@
                 input, textarea {
                     width: 100%;
                     padding: 14px 15px 14px 45px;
-                    border: 2px solid #f0f0f0; // Cinza muito claro
+                    border: 2px solid #f0f0f0; 
                     border-radius: 12px;
                     font-family: $font-secondary;
-                    background-color: #fcfcfc; // Fundo levemente off-white
+                    background-color: #fcfcfc; 
                     outline: none;
                     transition: all 0.3s ease;
                     box-sizing: border-box;
-                    color: $color-dark;
+                    color: #000000; // Escrita digitada alterada para preto puro
                     font-size: 1rem;
 
                     &::placeholder {
-                        color: #ccc;
+                        color: #000000; // Placeholder em preto puro
+                        opacity: 0.4;   // Opacidade leve para manter a identidade de exemplo
                     }
 
-                    // Efeito de foco moderno
                     &:focus { 
                         border-color: $color-teal;
                         background-color: $color-white;
                         box-shadow: 0 5px 15px rgba($color-teal, 0.1);
                         
-                        + i { // Muda o ícone quando foca no input
+                        + i { 
                             opacity: 1;
                             color: $color-teal;
                         }
@@ -106,7 +128,7 @@
         display: flex;
         gap: 12px;
         flex-wrap: wrap;
-        margin-bottom: 25px;
+        margin-bottom: 0px; // Zerado aqui pois o margin-bottom agora é controlado pelo fieldset-reset
         
         .btn-type {
             flex: 1;
@@ -160,14 +182,13 @@
         }
     }
 
-    // Informações laterais mantidas conforme seu código
     .contact-info {
         flex: 1;
         min-width: 0;
 
         h2 {
             font-family: $font-primary;
-            color: $color-purple;
+            color: #000000; // Alterado título lateral para preto puro
             font-size: 3rem;
             font-weight: 800;
             margin-bottom: 25px;
@@ -175,7 +196,7 @@
 
         p {
             font-size: 1.1rem;
-            color: #666;
+            color: #000000; // Descrição alterada para preto puro
             margin-bottom: 40px;
             line-height: 1.8;
         }
@@ -189,12 +210,12 @@
                 align-items: center;
                 gap: 20px;
                 font-weight: 600;
-                color: $color-dark;
+                color: #000000; // Ícones textuais em preto puro
                 margin-bottom: 25px;
 
                 i {
                     color: white;
-                    background-color: $color-purple;
+                    background-color: #000000; // Fundo do círculo do ícone alterado para preto
                     width: 45px;
                     height: 45px;
                     display: flex;
@@ -203,17 +224,17 @@
                     border-radius: 12px;
                     font-size: 1.1rem;
                     flex-shrink: 0;
-                    box-shadow: 5px 5px 0px rgba($color-purple, 0.1);
+                    box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.1);
                 }
             }
         }
     }
 }
 
-// Responsividade com ajustes de texto
+// Responsividade
 @media (max-width: 992px) {
     .contact-section {
-        padding: 60px 25px; // Respiro nas bordas
+        padding: 60px 25px; 
     }
 
     .contact-container {
@@ -223,12 +244,12 @@
 
     .contact-card {
         width: 100%;
-        order: 2; // Card de formulário embaixo no mobile
+        order: 2; 
         padding: 30px 20px;
     }
 
     .contact-info {
-        order: 1; // Título e texto em cima no mobile
+        order: 1; 
         width: 100%;
         
         h2 { font-size: 2.2rem; }

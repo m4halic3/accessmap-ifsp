@@ -531,7 +531,7 @@ body {
 }
 .stats-section .stats-chart .chart-legend-inner .sub-text {
   font-size: 0.9rem;
-  color: #777;
+  color: #000000;
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -635,6 +635,24 @@ body {
   transform: translate(-5px, -5px);
   box-shadow: 20px 20px 0px rgba(0, 0, 0, 0.08);
 }
+.contact-section .contact-card .fieldset-reset {
+  border: none !important;
+  outline: none !important;
+  margin: 0 0 25px 0;
+  padding: 0;
+  display: block;
+  width: 100%;
+}
+.contact-section .contact-card .label-style, .contact-section .contact-card label {
+  display: block;
+  font-family: "Montserrat", sans-serif;
+  color: #000000;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 .contact-section .contact-card .form-group {
   margin-bottom: 25px;
   text-align: left;
@@ -642,7 +660,7 @@ body {
 .contact-section .contact-card .form-group label {
   display: block;
   font-family: "Montserrat", sans-serif;
-  color: #44025c;
+  color: #000000;
   font-size: 0.9rem;
   font-weight: 700;
   margin-bottom: 10px;
@@ -657,7 +675,7 @@ body {
 .contact-section .contact-card .form-group .input-wrapper i {
   position: absolute;
   left: 15px;
-  color: #44025c;
+  color: #000000;
   opacity: 0.5;
   pointer-events: none;
   transition: opacity 0.3s, color 0.3s;
@@ -676,7 +694,8 @@ body {
   font-size: 1rem;
 }
 .contact-section .contact-card .form-group .input-wrapper input::placeholder, .contact-section .contact-card .form-group .input-wrapper textarea::placeholder {
-  color: #ccc;
+  color: #000000;
+  opacity: 0.4;
 }
 .contact-section .contact-card .form-group .input-wrapper input:focus, .contact-section .contact-card .form-group .input-wrapper textarea:focus {
   border-color: #006850;
@@ -699,7 +718,7 @@ body {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 25px;
+  margin-bottom: 0px;
 }
 .contact-section .type-buttons .btn-type {
   flex: 1;
@@ -758,14 +777,14 @@ body {
 }
 .contact-section .contact-info h2 {
   font-family: "Montserrat", sans-serif;
-  color: #44025c;
+  color: #000000;
   font-size: 3rem;
   font-weight: 800;
   margin-bottom: 25px;
 }
 .contact-section .contact-info p {
   font-size: 1.1rem;
-  color: #666;
+  color: #000000;
   margin-bottom: 40px;
   line-height: 1.8;
 }
@@ -783,7 +802,7 @@ body {
 }
 .contact-section .contact-info .info-list li i {
   color: white;
-  background-color: #44025c;
+  background-color: #000000;
   width: 45px;
   height: 45px;
   display: flex;
@@ -792,7 +811,7 @@ body {
   border-radius: 12px;
   font-size: 1.1rem;
   flex-shrink: 0;
-  box-shadow: 5px 5px 0px rgba(68, 2, 92, 0.1);
+  box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 992px) {
