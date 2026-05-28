@@ -62,7 +62,7 @@ body {
         font-family: $font-primary;
         font-size: 0.85rem;
         transition: 0.3s;
-        &:hover { color: $color-pink; }
+        &:hover { color: $color-grey }
     }
 }
 
@@ -79,7 +79,7 @@ body {
         font-weight: 800;
         font-family: $font-primary;
         font-size: 0.85rem;
-        &:hover { color: $color-pink; }
+        &:hover { color: $color-grey; }
     }
 }
 
@@ -152,7 +152,7 @@ body {
                     transition: 0.3s;
 
                     &:hover { 
-                        color: $color-pink;
+                        color: $color-grey;
                         letter-spacing: 1.5px;
                     }
                 }
