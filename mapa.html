@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <title>Mapa - AccessMap</title>
 </head>
 <body>
@@ -13,32 +14,34 @@
             <a href="./index.html"><img src="assets/images/logo-branca.png" alt="Logo AccessMap" class="logo-img"></a>
             <span class="logo-text">ACCESSMAP</span>
         </div>
-        </nav>
+    </nav>
 
     <div class="container-mapa">
-<div class="sidebar">
-    <h2>Resultados (geral)</h2>
-    
-    <div class="search-container">
-        <i class="fas fa-search search-icon"></i> <input type="text" id="search-input" placeholder="Pesquisar local..." onkeyup="pesquisarLugares()">
-    </div>
+        <div class="sidebar">
+            <h2>Resultados (geral)</h2>
+            
+            <div class="search-container">
+                <label for="search-input" class="sr-only">Pesquisar local no campus</label>
+                <i class="fas fa-search search-icon" aria-hidden="true"></i> 
+                <input type="text" id="search-input" placeholder="Pesquisar local..." onkeyup="pesquisarLugares()">
+            </div>
 
-    <div class="header-filtros">
-        <h3>Filtrar por Acessibilidade</h3>
-        <button class="btn-reset" onclick="mostrarTodos()">Ver Todos</button>
-    </div>
+            <div class="header-filtros">
+                <h3>Filtrar por Acessibilidade</h3>
+                <button class="btn-reset" onclick="mostrarTodos()">Ver Todos</button>
+            </div>
 
-    <div class="filtros">
-        <div class="filtro" id="filtro-fisica" onclick="filtrar('fisica', this)">
-            <img src="assets/images/simbolo-fisica.png" alt="Física">
+            <div class="filtros" role="group" aria-label="Filtros de acessibilidade">
+                <div class="filtro" id="filtro-fisica" onclick="filtrar('fisica', this)" role="button" tabindex="0" aria-label="Filtrar por Acessibilidade Física">
+                    <img src="assets/images/simbolo-fisica.png" alt="" aria-hidden="true">
+                </div>
+                <div class="filtro" id="filtro-auditiva" onclick="filtrar('auditiva', this)" role="button" tabindex="0" aria-label="Filtrar por Acessibilidade Auditiva">
+                    <img src="assets/images/simbolo-auditiva.png" alt="" aria-hidden="true">
+                </div>
+            </div>
+
+            <div id="lista-lugares"></div>
         </div>
-        <div class="filtro" id="filtro-auditiva" onclick="filtrar('auditiva', this)">
-            <img src="assets/images/simbolo-auditiva.png" alt="Auditiva">
-        </div>
-    </div>
-
-    <div id="lista-lugares"></div>
-</div>
 
         <div id="map"></div>
     </div>
@@ -46,9 +49,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="assets/js/mapa.js"></script>
 
-     <!-- Widgets de Acessibilidade -->
-
-    <div vw class="enabled">
+     <div vw class="enabled">
         <div vw-access-button class="active"></div>
         <div vw-plugin-wrapper>
             <div class="vw-plugin-top-wrapper"></div>
@@ -60,7 +61,6 @@
     </script>
 
     <script src="https://cdn.userway.org/widget.js" data-account="YOUR_ACCOUNT_ID"></script>
-
     <script src="assets/js/script.js"></script>
 </body>
 </html>

@@ -23,28 +23,42 @@
         h2 {
             font-family: $font-primary;
             font-size: 1.5rem;
-            color: $color-dark;
+            color: #000000; // Todo texto em preto puro
             margin-bottom: 20px;
         }
 
-        // --- BARRA DE PESQUISA (Nova Seção) ---
+        // --- BARRA DE PESQUISA ---
         .search-container {
             position: relative;
             margin-bottom: 25px;
 
+            // Elemento de ícone FontAwesome alinhado perfeitamente dentro da caixinha
+            .search-icon {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #000000;
+                opacity: 0.6;
+                pointer-events: none;
+                font-size: 0.9rem;
+                z-index: 5;
+            }
+
             #search-input {
                 width: 100%;
-                padding: 12px 15px 12px 40px; 
+                padding: 12px 15px 12px 40px; // Espaço reservado para a lupa na esquerda
                 border: 2px solid #f0f0f0;
                 border-radius: 12px;
                 font-family: $font-primary;
                 font-size: 0.9rem;
-                color: $color-dark;
+                color: #000000; // Texto digitado em preto puro
                 transition: all 0.3s ease;
                 background-color: #f9f9f9;
 
                 &::placeholder {
-                    color: #aaa;
+                    color: #000000;
+                    opacity: 0.5; // Placeholder legível em tom de contraste acessível
                 }
 
                 &:focus {
@@ -54,20 +68,9 @@
                     box-shadow: 0 4px 12px rgba($color-pink, 0.1);
                 }
             }
-
-            // Ícone de lupa posicionado via CSS
-            &::before {
-                content: '🔍'; 
-                position: absolute;
-                left: 15px;
-                top: 50%;
-                transform: translateY(-50%);
-                font-size: 0.9rem;
-                opacity: 0.5;
-                pointer-events: none;
-            }
         }
 
+        // --- CABEÇALHO DOS FILTROS ---
         // --- CABEÇALHO DOS FILTROS ---
         .header-filtros {
             display: flex;
@@ -79,13 +82,13 @@
                 font-size: 0.85rem;
                 text-transform: uppercase;
                 letter-spacing: 1px;
-                color: #888;
+                color: #000000; 
                 margin: 0;
             }
 
             .btn-reset {
                 background: $color-pink;
-                color: white;
+                color: white; // Corrigido aqui: Letra branca para dar contraste com o fundo rosa!
                 border: none;
                 padding: 6px 14px;
                 border-radius: 20px;
@@ -97,7 +100,7 @@
                 box-shadow: 0 2px 5px rgba($color-pink, 0.2);
 
                 &:hover {
-                    background: darken($color-pink, 10%);
+                    background: color.adjust($color-pink, $lightness: -10%);
                     transform: translateY(-1px);
                     box-shadow: 0 4px 8px rgba($color-pink, 0.3);
                 }
@@ -180,13 +183,13 @@
                 p {
                     margin: 0 0 5px 0;
                     font-weight: 600;
-                    color: $color-dark;
+                    color: #000000; // Título do card em preto puro
                     font-size: 0.95rem;
                 }
 
                 span {
                     font-size: 0.8rem;
-                    color: #777;
+                    color: #000000; // Descrição do card em preto puro
                     display: block;
                 }
             }
@@ -210,9 +213,10 @@
         .leaflet-popup-content {
             font-family: $font-primary;
             line-height: 1.4;
+            color: #000000; // Todo o texto de detalhes em preto puro
             
             strong { 
-                color: $color-purple; 
+                color: #000000; // Título em negrito do popup em preto puro (removendo referências roxas antigas)
                 display: block;
                 margin-bottom: 2px;
             }
@@ -231,7 +235,7 @@
     .sidebar {
         width: 100% !important;
         height: auto !important;
-        max-height: 60vh; // Aumentado levemente para acomodar a barra de pesquisa
+        max-height: 60vh; 
         padding: 20px !important;
     }
 
