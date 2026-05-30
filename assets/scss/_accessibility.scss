@@ -35,17 +35,21 @@ div[id^="userway"] {
     filter: hue-rotate(310deg) saturate(1.5) brightness(1.1) !important;
 }
 
-/* 3. RESPONSIVO */
-@media (max-width: 768px) {
-    div[vw].enabled {
-        top: 45% !important;
-        right: 10px !important;
-        transform: scale(0.8);
+/* 2. USERWAY */
+// Adicionamos os seletores alternativos que o widget assume no carregamento inicial
+#userwayAccessibilityIcon, 
+.uai,
+userway-accessibility-widget,
+[data-widget-placeholder],
+div[id^="userway"] {
+    @include force-position(60%);
+    
+    // Força o posicionamento na tag root injetada pelo script do widget
+    &, & * {
+        top: 60% !important;
+        bottom: auto !important;
     }
-
-    #userwayAccessibilityIcon, div[id^="userway"] {
-        top: 55% !important; // Ajuste para ficar logo abaixo no mobile
-        right: 10px !important;
-        transform: scale(0.8) !important;
-    }
+    
+    // Filtros de cor aplicados
+    filter: hue-rotate(310deg) saturate(1.5) brightness(1.1) !important;
 }
