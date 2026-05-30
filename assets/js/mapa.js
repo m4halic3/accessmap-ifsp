@@ -9,36 +9,37 @@ const plantas = {
         url: 'assets/images/planta-campus.jpg' 
     },
     edificacoes: {
-        largura: 1200, // Ajuste se a imagem da ala edif tiver tamanho diferente
+        largura: 1200, 
         altura: 800,
-        url: 'assets/images/planta-edificacoes.jpg' // Caminho da planta de Edificações
+        url: 'assets/images/planta-edificacoes.jpg' 
     },
     mecanica: {
-        largura: 1200, // Ajuste se a imagem da ala mec tiver tamanho diferente
+        largura: 1200, 
         altura: 800,
-        url: 'assets/images/planta-mecanica.jpg' // Caminho da planta de Mecânica
+        url: 'assets/images/planta-mecanica.jpg' 
     }
 };
 
 /**
- * DATABASE DE LUGARES ORIGINAL (Mantido intacto)
+ * DATABASE DE LUGARES ORIGINAL (Pontos naturais limpos do filtro de acessibilidade)
  */
 const lugares = [
-    { nome: "Ala de Informática (Laboratórios)", tipo: "fisica", categoria: "informatica", y: 705, x: 1040 },
+    // Alterados para tipo: "geral" para não sumirem e não responderem ao botão de acessibilidade física antes da hora
+    { nome: "Ala de Informática (Laboratórios)", tipo: "geral", categoria: "informatica", y: 705, x: 1040 },
     { nome: "Secretaria / Atendimento", tipo: "auditiva", categoria: "secretaria", y: 637, x: 1100 },
-    { nome: "Bloco de Salas (Edificações)", tipo: "fisica", categoria: "edificacoes", y: 720, x: 640 },
-    { nome: "Bloco de Salas (Mecânica)", tipo: "fisica", categoria: "mecanica", y: 720, x: 780 },
-    { nome: "Bloco de Salas de Aula (Geral)", tipo: "fisica", categoria: "geral", y: 700, x: 950 },
-    { nome: "Biblioteca", tipo: "fisica", categoria: "biblioteca", y: 500, x: 1000 },
-    { nome: "Entrada (Ala da biblioteca)", tipo: "fisica", categoria: "entrada", y: 540, x: 1000 },
-    { nome: "Entrada Principal", tipo: "fisica", categoria: "entrada", y: 350, x: 620 },
-    { nome: "Estacionamento de Ônibus", tipo: "fisica", categoria: "estacionamento", y: 320, x: 890 },
-    { nome: "Estacionamento interno", tipo: "fisica", categoria: "estacionamento", y: 520, x: 750 }
+    { nome: "Bloco de Salas (Edificações)", tipo: "geral", categoria: "edificacoes", y: 720, x: 640 },
+    { nome: "Bloco de Salas (Mecânica)", tipo: "geral", categoria: "mecanica", y: 720, x: 780 },
+    { nome: "Bloco de Salas de Aula (Geral)", tipo: "geral", categoria: "geral", y: 700, x: 950 },
+    { nome: "Biblioteca", tipo: "geral", categoria: "biblioteca", y: 500, x: 1000 },
+    { nome: "Entrada (Ala da biblioteca)", tipo: "geral", categoria: "entrada", y: 540, x: 1000 },
+    { nome: "Entrada Principal", tipo: "geral", categoria: "entrada", y: 350, x: 620 },
+    { nome: "Estacionamento de Ônibus", tipo: "geral", categoria: "estacionamento", y: 320, x: 890 },
+    { nome: "Estacionamento interno", tipo: "geral", categoria: "estacionamento", y: 520, x: 750 }
 ];
 
 let mapa;
 let marcadores = [];
-let camadaImagem = null; // Guarda a referência da imagem de fundo atual
+let camadaImagem = null; 
 let filtroAtual = null;
 let alaAtual = "todos"; 
 
@@ -76,7 +77,6 @@ function initMap() {
         maxZoom: 3
     });
 
-    // Carrega a primeira planta (Geral)
     atualizarPlantaDeFundo();
 
     mapa.on('click', function(e) {
@@ -85,10 +85,9 @@ function initMap() {
 }
 
 /**
- * NOVO: ATUALIZA A IMAGEM DE FUNDO DO LEAFLET DINAMICAMENTE
+ * ATUALIZA A IMAGEM DE FUNDO DO LEAFLET DINAMICAMENTE
  */
 function atualizarPlantaDeFundo() {
-    // Se já existir uma imagem no mapa, remove para colocar a nova
     if (camadaImagem) {
         mapa.removeLayer(camadaImagem);
     }
@@ -96,11 +95,9 @@ function atualizarPlantaDeFundo() {
     const dadosPlanta = plantas[alaAtual];
     const limites = [[0, 0], [dadosPlanta.altura, dadosPlanta.largura]];
 
-    // Cria e adiciona o novo overlay de imagem correspondente à ala
     camadaImagem = L.imageOverlay(dadosPlanta.url, limites).addTo(mapa);
     mapa.fitBounds(limites);
 
-    // Reaplica os filtros e renderiza os pins corretos sobre a nova imagem
     aplicarFiltrosCombinados();
 }
 
@@ -132,7 +129,6 @@ function aplicarFiltrosCombinados() {
 
 /**
  * FUNÇÃO DE FILTRAGEM DOS BOTÕES DE ALA
- * Troca a planta de fundo e gerencia a classe CSS active de forma limpa.
  */
 function filtrarAla(ala, elemento) {
     document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
@@ -142,7 +138,6 @@ function filtrarAla(ala, elemento) {
     alaAtual = ala;
     elemento.classList.add("active"); 
 
-    // Altera o mapa de fundo e roda os filtros para os novos pins
     atualizarPlantaDeFundo();
 }
 
@@ -153,16 +148,17 @@ function mostrarLugares(lista) {
     limparMarcadores();
 
     lista.forEach(lugar => {
-        // Se você precisar que um pin mude de posição dependendo do mapa da ala, 
-        // você pode mapear coordenadas específicas aqui no futuro.
         const marcador = L.marker([lugar.y, lugar.x], {
             icon: getIcon(lugar.categoria) 
         }).addTo(mapa);
 
+        // Ajustado para exibir o rótulo de acessibilidade condizente com a nova estrutura limpa
+        const textoAcessibilidade = lugar.tipo === "geral" ? "Verificar local" : lugar.tipo.toUpperCase();
+
         marcador.bindPopup(`
             <div style="text-align:center;">
                 <strong style="font-size:14px; color:#5a2a83;">${lugar.nome}</strong><br>
-                <span style="color:#666; font-size:12px;">Acessibilidade: ${lugar.tipo.toUpperCase()}</span>
+                <span style="color:#666; font-size:12px;">Filtro: ${textoAcessibilidade}</span>
             </div>
         `);
         
@@ -211,9 +207,12 @@ function atualizarListaLateral(lista) {
     lista.forEach(lugar => {
         const item = document.createElement("div");
         item.className = "item-lugar"; 
+        
+        const labelAcessibilidade = lugar.tipo === "geral" ? "Ponto de Interesse" : `Acessibilidade ${lugar.tipo}`;
+
         item.innerHTML = `
             <p><strong>${lugar.nome}</strong></p>
-            <span>Acessibilidade ${lugar.tipo}</span>
+            <span>${labelAcessibilidade}</span>
         `;
         
         item.onclick = () => {
@@ -248,7 +247,6 @@ function mostrarTodos() {
         searchInput.value = '';
     }
 
-    // Carrega o mapa geral de volta
     atualizarPlantaDeFundo();
 }
 
