@@ -134,15 +134,12 @@ function mudarFonte(direcao) {
 }
 
 function toggleContraste() {
-    // Alterna a classe no body que o SCSS está monitorando
     document.body.classList.toggle("alto-contraste");
     
-    // Armazena no LocalStorage para manter a preferência ativa entre navegações de páginas
     const estadoAtivo = document.body.classList.contains("alto-contraste");
     localStorage.setItem("altoContrasteState", estadoAtivo);
 }
 
-// Verifica o estado salvo do Alto Contraste assim que o documento HTML carrega
 window.addEventListener("DOMContentLoaded", () => {
     if (localStorage.getItem("altoContrasteState") === "true") {
         document.body.classList.add("alto-contraste");

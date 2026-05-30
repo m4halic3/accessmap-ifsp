@@ -20,10 +20,9 @@ div[vw].enabled {
     [vw-access-button], .vw-access-button {
         background-color: $color-teal !important; 
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-        border-radius: 50% !important;
         
         img {
-            filter: hue-rotate(310deg) saturate(1.5) !important; // Ajuste do tom de azul/verde
+            filter: hue-rotate(310deg) saturate(1.5) !important; // Mantém o ajuste do tom de cor
         }
     }
 }
@@ -40,13 +39,13 @@ div[vw].enabled {
     button {
         width: 44px;
         height: 44px; // Tamanho ideal da WCAG/eMAG para alvos de clique em telas touch
-        background-color: $color-purple;
+        background-color: $color-teal; // Alterado para a cor teal padrão
         color: $color-white;
         border: none;
         border-radius: 50%;
         font-family: $font-primary;
         font-weight: 700;
-        font-size: 0.9rem;
+        font-size: 14px !important; // Fixado em px para nunca sofrer alteração do script de zoom
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -55,7 +54,7 @@ div[vw].enabled {
         transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
         &:hover {
-            background-color: color.adjust($color-purple, $lightness: -8%);
+            background-color: color.adjust($color-teal, $lightness: -8%); // Ajuste dinâmico baseado na cor teal
             transform: scale(1.08);
         }
 
@@ -85,7 +84,6 @@ div[vw].enabled {
         button {
             width: 38px;
             height: 38px;
-            font-size: 0.8rem;
         }
     }
 }
@@ -135,7 +133,7 @@ body.alto-contraste {
         }
     }
 
-    // Força o nosso próprio painel de botões a respeitar o Alto Contraste
+    // Força o nosso próprio painel de botões a respeitar o Alto Contraste (sobrescreve o teal temporariamente)
     .widget-acessibilidade-nativo button {
         background-color: #000000 !important;
         color: #ffff00 !important;

@@ -1001,7 +1001,6 @@ div[vw].enabled {
 div[vw].enabled [vw-access-button], div[vw].enabled .vw-access-button {
   background-color: #028264 !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  border-radius: 50% !important;
 }
 div[vw].enabled [vw-access-button] img, div[vw].enabled .vw-access-button img {
   filter: hue-rotate(310deg) saturate(1.5) !important;
@@ -1024,13 +1023,13 @@ div[vw].enabled [vw-access-button] img, div[vw].enabled .vw-access-button img {
 .widget-acessibilidade-nativo button {
   width: 44px;
   height: 44px;
-  background-color: #44025c;
+  background-color: #028264;
   color: #fff;
   border: none;
   border-radius: 50%;
   font-family: "Montserrat", sans-serif;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 14px !important;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1039,7 +1038,7 @@ div[vw].enabled [vw-access-button] img, div[vw].enabled .vw-access-button img {
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .widget-acessibilidade-nativo button:hover {
-  background-color: rgb(38.485106383, 1.1319148936, 52.0680851064);
+  background-color: rgb(1.3818181818, 89.8181818182, 69.0909090909);
   transform: scale(1.08);
 }
 .widget-acessibilidade-nativo button:focus-visible {
@@ -1064,7 +1063,6 @@ div[vw].enabled [vw-access-button] img, div[vw].enabled .vw-access-button img {
   .widget-acessibilidade-nativo button {
     width: 38px;
     height: 38px;
-    font-size: 0.8rem;
   }
 }
 /* ==========================================================================
