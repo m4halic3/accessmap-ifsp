@@ -12,7 +12,7 @@
   width: 100%;
   box-sizing: border-box;
   z-index: 100;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 .navbar .logo {
   flex: 1;
