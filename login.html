@@ -22,22 +22,25 @@
         <main class="auth-card active" id="form-login">
             <h2>Log in</h2>
             
-            <div class="input-group">
-                <label for="user-login" class="sr-only">Nome de usuário</label>
-                <input type="text" id="user-login" placeholder="Nome de usuário" required>
-            </div>
+            <form action="#" method="POST">
+                <div class="input-group">
+                    <label for="user-login" class="sr-only">Nome de usuário</label>
+                    <input type="text" id="user-login" placeholder="Nome de usuário" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="pass-login" class="sr-only">Senha</label>
+                    <input type="password" id="pass-login" placeholder="Senha" required>
+                </div>
+                
+                <div class="options">
+                    <label><input type="checkbox"> Lembre-me</label>
+                    <a href="#">Esqueceu a senha?</a>
+                </div>
+                
+                <button type="submit" class="btn-auth">Log in</button>
+            </form>
             
-            <div class="input-group">
-                <label for="pass-login" class="sr-only">Senha</label>
-                <input type="password" id="pass-login" placeholder="Senha" required>
-            </div>
-            
-            <div class="options">
-                <label><input type="checkbox"> Lembre-me</label>
-                <a href="#">Esqueceu a senha?</a>
-            </div>
-            
-            <button type="submit" class="btn-auth">Log in</button>
             <p class="switch">ou <a href="cadastro.html">Cadastre-se</a></p>
         </main>
     </div>

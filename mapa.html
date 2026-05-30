@@ -9,14 +9,16 @@
     <title>Mapa - AccessMap</title>
 </head>
 <body>
-    <nav class="navbar">
+    <a href="#container-mapa-conteudo" class="skip-link">Pular para o conteúdo do mapa e filtros</a>
+
+    <nav class="navbar" aria-label="Navegação Principal">
         <div class="logo">
             <a href="./index.html"><img src="assets/images/logo-branca.png" alt="Logo AccessMap" class="logo-img"></a>
             <span class="logo-text">ACCESSMAP</span>
         </div>
     </nav>
 
-    <div class="container-mapa">
+    <main class="container-mapa" id="container-mapa-conteudo">
         <div class="sidebar">
             <h2>Resultados (geral)</h2>
             
@@ -52,18 +54,27 @@
             <div id="lista-lugares"></div>
         </div>
 
-        <div id="map"></div>
-    </div>
+        <div id="map" aria-label="Mapa interativo do campus"></div>
+    </main>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="assets/js/mapa.js"></script>
 
-     <div vw class="enabled">
+    <div vw class="enabled">
         <div vw-access-button class="active"></div>
         <div vw-plugin-wrapper>
             <div class="vw-plugin-top-wrapper"></div>
         </div>
     </div>
+    
+    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles manuais de acessibilidade">
+        <button type="button" id="btn-aumentar" onclick="mudarFonte(1)" aria-label="Aumentar tamanho do texto">A+</button>
+        <button type="button" id="btn-diminuir" onclick="mudarFonte(-1)" aria-label="Diminuir tamanho do texto">A-</button>
+        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alternar alto contraste">
+            <i class="fas fa-adjust" aria-hidden="true"></i>
+        </button>
+    </div>
+
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>
         new window.VLibras.Widget('https://vlibras.gov.br/app');

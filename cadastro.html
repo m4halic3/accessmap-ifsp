@@ -3,45 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <title>Cadastro - AccessMap</title>
 </head>
 <body class="autenticacao">
 
-<header class="auth-header">
-    <a href="index.html" class="logo-link">
-        <img src="assets/images/logo-roxa.png" alt="Logo AccessMap" class="logo-img-auth">
-    </a>
-    <a href="index.html" class="back-link">Voltar</a>
-</header>
+    <a href="#form-cadastro" class="skip-link">Pular para o formulário de cadastro</a>
 
     <div class="auth-container">
-        <div class="auth-card active">
+        <header class="auth-header">
+            <a href="index.html" aria-label="Voltar para a página inicial Home">
+                <img src="assets/images/logo-roxa.png" alt="Logotipo AccessMap" class="logo-img-auth">
+            </a>
+            <a href="index.html" class="back-link">Voltar</a>
+        </header>
+
+        <main class="auth-card active" id="form-cadastro">
             <h2>Cadastre-se</h2>
 
-            <div class="input-group">
-                <input type="text" placeholder="Nome completo" required>
-            </div>
-
-            <div class="input-group">
-                <input type="email" placeholder="Endereço de Email" required>
-            </div>
-
-            <div class="input-row">
+            <form action="#" method="POST">
                 <div class="input-group">
-                    <input type="password" placeholder="Senha" required>
+                    <label for="reg-name" class="sr-only">Nome completo</label>
+                    <input type="text" id="reg-name" placeholder="Nome completo" required>
                 </div>
-                <div class="input-group">
-                    <input type="password" placeholder="Confirme sua senha" required>
-                </div>
-            </div>
 
-            <button class="btn-auth">Criar conta</button>
+                <div class="input-group">
+                    <label for="reg-email" class="sr-only">Endereço de Email</label>
+                    <input type="email" id="reg-email" placeholder="Endereço de Email" required>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="reg-pass" class="sr-only">Senha</label>
+                        <input type="password" id="reg-pass" placeholder="Senha" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="reg-pass-confirm" class="sr-only">Confirme sua senha</label>
+                        <input type="password" id="reg-pass-confirm" placeholder="Confirme sua senha" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-auth">Criar conta</button>
+            </form>
 
             <p class="switch">Já tem uma conta? <a href="login.html">Log in</a></p>
-        </div>
+        </main>
     </div>
-    <!-- Widgets de Acessibilidade -->
 
     <div vw class="enabled">
         <div vw-access-button class="active"></div>
@@ -49,11 +57,20 @@
             <div class="vw-plugin-top-wrapper"></div>
         </div>
     </div>
+    
+    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles manuais de acessibilidade">
+        <button type="button" id="btn-aumentar" onclick="mudarFonte(1)" aria-label="Aumentar tamanho do texto">A+</button>
+        <button type="button" id="btn-diminuir" onclick="mudarFonte(-1)" aria-label="Diminuir tamanho do texto">A-</button>
+        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alternar alto contraste">
+            <i class="fas fa-adjust" aria-hidden="true"></i>
+        </button>
+    </div>
+
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
 
     <script src="assets/js/script.js"></script>
-    </body>
+</body>
 </html>
