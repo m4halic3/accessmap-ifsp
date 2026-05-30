@@ -8,83 +8,25 @@ const plantaDimensoes = {
 };
 
 /**
- * DATABASE DE LUGARES
- * Cores atualizadas conforme pedido:
- * - Secretaria (Auditivo): Azul (blue)
- * - Mecânica: Vermelho (red) <-- Alterado
- * - Edificações: Vermelho (red) 
- * - Estacionamento: Verde (green)
- * - Entradas: Laranja (orange)
- * - Informática: Violeta/Rosa (violet)
- * - Salas Aula Geral: Verde (green) <-- Alterado
+ * DATABASE DE LUGARES ORIGINAL (Mantido intacto)
  */
 const lugares = [
-    {
-        nome: "Ala de Informática (Laboratórios)",
-        tipo: "fisica",
-        categoria: "informatica", 
-        y: 705, x: 1040
-    },
-    {
-        nome: "Secretaria / Atendimento",
-        tipo: "auditiva",
-        categoria: "secretaria", 
-        y: 637, x: 1100
-    },
-    {
-        nome: "Bloco de Salas (Edificações)",
-        tipo: "fisica",
-        categoria: "edificacoes",
-        y: 720, x: 640 
-    },
-    {
-        nome: "Bloco de Salas (Mecânica)",
-        tipo: "fisica",
-        categoria: "mecanica", 
-        y: 720, x: 780 
-    },
-    {
-        nome: "Bloco de Salas de Aula (Geral)",
-        tipo: "fisica",
-        categoria: "geral", 
-        y: 700, x: 950
-    },
-    {
-        nome: "Biblioteca",
-        tipo: "fisica",
-        categoria: "biblioteca",
-        y: 500, x: 1000
-    },
-    {
-        nome: "Entrada (Ala da biblioteca)",
-        tipo: "fisica",
-        categoria: "entrada", 
-        y: 540, x: 1000
-    },
-    {
-        nome: "Entrada Principal",
-        tipo: "fisica", 
-        categoria: "entrada", 
-        y: 350, x: 620
-    },
-    {
-        nome: "Estacionamento de Ônibus",
-        tipo: "fisica", 
-        categoria: "estacionamento", 
-        y: 320, x: 890
-    },
-    {
-        nome: "Estacionamento interno",
-        tipo: "fisica", 
-        categoria: "estacionamento", 
-        y: 520, 
-        x: 750
-    }
+    { nome: "Ala de Informática (Laboratórios)", tipo: "fisica", categoria: "informatica", y: 705, x: 1040 },
+    { nome: "Secretaria / Atendimento", tipo: "auditiva", categoria: "secretaria", y: 637, x: 1100 },
+    { nome: "Bloco de Salas (Edificações)", tipo: "fisica", categoria: "edificacoes", y: 720, x: 640 },
+    { nome: "Bloco de Salas (Mecânica)", tipo: "fisica", categoria: "mecanica", y: 720, x: 780 },
+    { nome: "Bloco de Salas de Aula (Geral)", tipo: "fisica", categoria: "geral", y: 700, x: 950 },
+    { nome: "Biblioteca", tipo: "fisica", categoria: "biblioteca", y: 500, x: 1000 },
+    { nome: "Entrada (Ala da biblioteca)", tipo: "fisica", categoria: "entrada", y: 540, x: 1000 },
+    { nome: "Entrada Principal", tipo: "fisica", categoria: "entrada", y: 350, x: 620 },
+    { nome: "Estacionamento de Ônibus", tipo: "fisica", categoria: "estacionamento", y: 320, x: 890 },
+    { nome: "Estacionamento interno", tipo: "fisica", categoria: "estacionamento", y: 520, x: 750 }
 ];
 
 let mapa;
 let marcadores = [];
 let filtroAtual = null;
+let alaAtual = "todos"; // Nova variável de controle para o filtro de ala
 
 /**
  * DEFINE A COR DO ÍCONE BASEADO NA CATEGORIA
@@ -93,13 +35,13 @@ function getIcon(categoria) {
     let cor = "grey"; 
 
     if (categoria === "secretaria") cor = "blue";
-    if (categoria === "mecanica") cor = "violet";    // Roxo para Mecânica
-    if (categoria === "biblioteca") cor = "yellow";    // Dourado para Biblioteca
-    if (categoria === "edificacoes") cor = "red";    // Vermelho para Edificações
+    if (categoria === "mecanica") cor = "violet";    
+    if (categoria === "biblioteca") cor = "yellow";    
+    if (categoria === "edificacoes") cor = "red";    
     if (categoria === "estacionamento") cor = "green"; 
     if (categoria === "entrada") cor = "orange";
-    if (categoria === "informatica") cor = "black"; // Tom de Rosa
-    if (categoria === "geral") cor = "grey";    // Verde conforme pedido
+    if (categoria === "informatica") cor = "black"; 
+    if (categoria === "geral") cor = "grey";    
 
     return L.icon({
         iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${cor}.png`,
@@ -107,7 +49,7 @@ function getIcon(categoria) {
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34]
-});
+    });
 }
 
 /**
@@ -128,7 +70,54 @@ function initMap() {
         console.log(`y: ${e.latlng.lat.toFixed(0)}, x: ${e.latlng.lng.toFixed(0)}`);
     });
 
-    mostrarLugares(lugares);
+    aplicarFiltrosCombinados();
+}
+
+/**
+ * UNIFICAÇÃO LÓGICA DE FILTRAGEM (Cruza busca por texto + acessibilidade + ala selecionada)
+ */
+function aplicarFiltrosCombinados() {
+    let filtrados = lugares;
+
+    // 1. Filtragem por Ala
+    if (alaAtual !== "todos") {
+        filtrados = filtrados.filter(l => l.categoria === alaAtual);
+    }
+
+    // 2. Filtragem por Tipo de Acessibilidade
+    if (filtroAtual) {
+        filtrados = filtrados.filter(l => l.tipo === filtroAtual);
+    }
+
+    // 3. Filtragem por Barra de Pesquisa Texto
+    const searchInput = document.getElementById('search-input');
+    const termo = searchInput ? searchInput.value.toLowerCase() : "";
+    if (termo) {
+        filtrados = filtrados.filter(l => l.nome.toLowerCase().includes(termo));
+    }
+
+    mostrarLugares(filtrados);
+}
+
+/**
+ * NOVO: FUNÇÃO DE FILTRAGEM DOS BOTÕES DE ALA
+ */
+function filtrarAla(ala, elemento) {
+    // Gerencia o visual ativo dos botões de ala
+    document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
+        btn.classList.remove("active");
+        btn.style.backgroundColor = "";
+        btn.style.color = "#000";
+    });
+    
+    alaAtual = ala;
+    elemento.classList.add("active");
+    
+    // Cor de destaque opcional para feedback visual no clique
+    elemento.style.backgroundColor = ala === 'todos' ? '#666' : (ala === 'edificacoes' ? '#red' : '#5a2a83');
+    elemento.style.color = "#fff";
+
+    aplicarFiltrosCombinados();
 }
 
 /**
@@ -160,18 +149,26 @@ function limparMarcadores() {
     marcadores = [];
 }
 
+/**
+ * MUDADO: FILTRAR AGORA CHAMA A FUNÇÃO UNIFICADA
+ */
 function filtrar(tipo, elemento) {
     document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
 
     if (filtroAtual === tipo) {
         filtroAtual = null;
-        mostrarLugares(lugares);
     } else {
         filtroAtual = tipo;
         elemento.classList.add("ativo");
-        const filtrados = lugares.filter(l => l.tipo === tipo);
-        mostrarLugares(filtrados);
     }
+    aplicarFiltrosCombinados();
+}
+
+/**
+ * MUDADO: PESQUISAR AGORA CHAMA A FUNÇÃO UNIFICADA
+ */
+function pesquisarLugares() {
+    aplicarFiltrosCombinados();
 }
 
 function atualizarListaLateral(lista) {
@@ -204,23 +201,30 @@ function atualizarListaLateral(lista) {
     });
 }
 
+/**
+ * MOSTRAR TODOS (Limpa tudo e volta ao estado geral nativo)
+ */
 function mostrarTodos() {
-    // 1. Reset do filtro lógico
     filtroAtual = null;
+    alaAtual = "todos";
 
-    // 2. Remove o destaque visual dos botões de filtro
     document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
+    
+    // Reseta visualmente as abas de ala
+    document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
+        btn.classList.remove("active");
+        btn.style.backgroundColor = "";
+        btn.style.color = "#000";
+    });
+    document.querySelectorAll("#seletor-alas .btn-type")[0].classList.add("active");
 
-    // 3. Limpa o campo de busca de texto
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
         searchInput.value = '';
     }
 
-    // 4. Mostra todos os lugares no mapa e na lista lateral
-    mostrarLugares(lugares);
+    aplicarFiltrosCombinados();
 
-    // 5. Ajusta o zoom do mapa para ver tudo
     const limites = [[0, 0], [plantaDimensoes.altura, plantaDimensoes.largura]];
     mapa.fitBounds(limites);
 }

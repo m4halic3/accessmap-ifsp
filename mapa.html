@@ -26,6 +26,15 @@
                 <input type="text" id="search-input" placeholder="Pesquisar local..." onkeyup="pesquisarLugares()">
             </div>
 
+            <div class="fieldset-reset" style="margin-bottom: 20px;">
+                <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px; color: #000;">Filtrar por Ala</span>
+                <div class="type-buttons" id="seletor-alas" style="display: flex; gap: 8px;">
+                    <button type="button" class="btn-type active" onclick="filtrarAla('todos', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Ver Tudo</button>
+                    <button type="button" class="btn-type" onclick="filtrarAla('edificacoes', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Ala Edif.</button>
+                    <button type="button" class="btn-type" onclick="filtrarAla('mecanica', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Ala Mec.</button>
+                </div>
+            </div>
+
             <div class="header-filtros">
                 <h3>Filtrar por Acessibilidade</h3>
                 <button class="btn-reset" onclick="mostrarTodos()">Ver Todos</button>

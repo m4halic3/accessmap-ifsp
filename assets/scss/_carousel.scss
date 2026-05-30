@@ -48,13 +48,13 @@
         }
     }
 
+    // --- BOTÕES DE SETA (Versão Clean) ---
     .seta {
         position: absolute;
         top: 50%;
         opacity: 0;
         transform: translateY(-50%) scale(0.8);
         background: $color-pink;
-        border: none;
         color: white;
         width: 40px; 
         height: 40px;
@@ -66,11 +66,19 @@
         border-radius: 50%;
         transition: all 0.4s ease;
         z-index: 10;
-        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+        
+        border: none; 
+        box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3); 
 
         &:hover {
             background: $color-purple;
             transform: translateY(-50%) scale(1.1);
+            box-shadow: 4px 6px 16px rgba(0, 0, 0, 0.4); 
+        }
+
+        &:focus-visible {
+            outline: 3px solid #000000;
+            outline-offset: 2px;
         }
 
         &.esquerda { left: 20px; }
@@ -90,22 +98,23 @@
     .dot {
         width: 10px;
         height: 10px;
-        background: rgba(255, 255, 255, 0.4);
-        border: 1.5px solid white;
+        background: rgba(0, 0, 0, 0.4); 
+        border: 2px solid #ffffff; 
         border-radius: 50%;
         cursor: pointer;
         transition: all 0.5s ease;
-        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
 
         &.active {
             background: $color-pink;
-            border-color: $color-pink;
+            border-color: #ffffff; 
             width: 30px;
             border-radius: 20px;
         }
     }
 }
 
+// --- RESPONSIVIDADE (Ajustes Mobile) ---
 @media (max-width: 768px) {
     .carousel-container {
         height: 300px;
@@ -113,10 +122,18 @@
         box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.05);
 
         .seta {
-            opacity: 1;
+            opacity: 1; 
             transform: translateY(-50%) scale(1);
-            width: 35px;
-            height: 35px;
+            
+            // Alterações para o celular ficar discreto e não cobrir a foto:
+            width: 28px;        // Reduzido o tamanho da caixa de 38px para 28px
+            height: 28px;       // Reduzido a altura para acompanhar o círculo
+            font-size: 0.85rem; // Diminuído o tamanho do caractere da seta interno
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3); // Sombra menor condizente com o botão
+
+            // Aproxima as setinhas da parede lateral para liberar espaço central
+            &.esquerda { left: 10px; }
+            &.direita { right: 10px; }
         }
     }
 }
