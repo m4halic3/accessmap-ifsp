@@ -1,10 +1,23 @@
 /**
- * CONFIGURAÇÕES TÉCNICAS DA PLANTA
+ * CONFIGURAÇÕES TÉCNICAS DAS PLANTAS (Geral e por Ala)
+ * Substitua os caminhos das imagens e dimensões conforme as suas novas plantas.
  */
-const plantaDimensoes = {
-    largura: 1500,
-    altura: 1056,
-    url: 'assets/images/planta-campus.jpg' 
+const plantas = {
+    todos: {
+        largura: 1500,
+        altura: 1056,
+        url: 'assets/images/planta-campus.jpg' 
+    },
+    edificacoes: {
+        largura: 1200, // Ajuste se a imagem da ala edif tiver tamanho diferente
+        altura: 800,
+        url: 'assets/images/planta-edificacoes.jpg' // Caminho da planta de Edificações
+    },
+    mecanica: {
+        largura: 1200, // Ajuste se a imagem da ala mec tiver tamanho diferente
+        altura: 800,
+        url: 'assets/images/planta-mecanica.jpg' // Caminho da planta de Mecânica
+    }
 };
 
 /**
@@ -25,8 +38,9 @@ const lugares = [
 
 let mapa;
 let marcadores = [];
+let camadaImagem = null; // Guarda a referência da imagem de fundo atual
 let filtroAtual = null;
-let alaAtual = "todos"; // Nova variável de controle para o filtro de ala
+let alaAtual = "todos"; 
 
 /**
  * DEFINE A COR DO ÍCONE BASEADO NA CATEGORIA
@@ -62,19 +76,36 @@ function initMap() {
         maxZoom: 3
     });
 
-    const limites = [[0, 0], [plantaDimensoes.altura, plantaDimensoes.largura]];
-    L.imageOverlay(plantaDimensoes.url, limites).addTo(mapa);
-    mapa.fitBounds(limites);
+    // Carrega a primeira planta (Geral)
+    atualizarPlantaDeFundo();
 
     mapa.on('click', function(e) {
         console.log(`y: ${e.latlng.lat.toFixed(0)}, x: ${e.latlng.lng.toFixed(0)}`);
     });
+}
 
+/**
+ * NOVO: ATUALIZA A IMAGEM DE FUNDO DO LEAFLET DINAMICAMENTE
+ */
+function atualizarPlantaDeFundo() {
+    // Se já existir uma imagem no mapa, remove para colocar a nova
+    if (camadaImagem) {
+        mapa.removeLayer(camadaImagem);
+    }
+
+    const dadosPlanta = plantas[alaAtual];
+    const limites = [[0, 0], [dadosPlanta.altura, dadosPlanta.largura]];
+
+    // Cria e adiciona o novo overlay de imagem correspondente à ala
+    camadaImagem = L.imageOverlay(dadosPlanta.url, limites).addTo(mapa);
+    mapa.fitBounds(limites);
+
+    // Reaplica os filtros e renderiza os pins corretos sobre a nova imagem
     aplicarFiltrosCombinados();
 }
 
 /**
- * UNIFICAÇÃO LÓGICA DE FILTRAGEM (Cruza busca por texto + acessibilidade + ala selecionada)
+ * UNIFICAÇÃO LÓGICA DE FILTRAGEM
  */
 function aplicarFiltrosCombinados() {
     let filtrados = lugares;
@@ -100,24 +131,19 @@ function aplicarFiltrosCombinados() {
 }
 
 /**
- * NOVO: FUNÇÃO DE FILTRAGEM DOS BOTÕES DE ALA
+ * FUNÇÃO DE FILTRAGEM DOS BOTÕES DE ALA
+ * Troca a planta de fundo e gerencia a classe CSS active de forma limpa.
  */
 function filtrarAla(ala, elemento) {
-    // Gerencia o visual ativo dos botões de ala
     document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
         btn.classList.remove("active");
-        btn.style.backgroundColor = "";
-        btn.style.color = "#000";
     });
     
     alaAtual = ala;
-    elemento.classList.add("active");
-    
-    // Cor de destaque opcional para feedback visual no clique
-    elemento.style.backgroundColor = ala === 'todos' ? '#666' : (ala === 'edificacoes' ? '#red' : '#5a2a83');
-    elemento.style.color = "#fff";
+    elemento.classList.add("active"); 
 
-    aplicarFiltrosCombinados();
+    // Altera o mapa de fundo e roda os filtros para os novos pins
+    atualizarPlantaDeFundo();
 }
 
 /**
@@ -127,6 +153,8 @@ function mostrarLugares(lista) {
     limparMarcadores();
 
     lista.forEach(lugar => {
+        // Se você precisar que um pin mude de posição dependendo do mapa da ala, 
+        // você pode mapear coordenadas específicas aqui no futuro.
         const marcador = L.marker([lugar.y, lugar.x], {
             icon: getIcon(lugar.categoria) 
         }).addTo(mapa);
@@ -150,7 +178,7 @@ function limparMarcadores() {
 }
 
 /**
- * MUDADO: FILTRAR AGORA CHAMA A FUNÇÃO UNIFICADA
+ * FILTRAR POR ACESSIBILIDADE
  */
 function filtrar(tipo, elemento) {
     document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
@@ -165,7 +193,7 @@ function filtrar(tipo, elemento) {
 }
 
 /**
- * MUDADO: PESQUISAR AGORA CHAMA A FUNÇÃO UNIFICADA
+ * BUSCA POR TEXTO
  */
 function pesquisarLugares() {
     aplicarFiltrosCombinados();
@@ -202,7 +230,7 @@ function atualizarListaLateral(lista) {
 }
 
 /**
- * MOSTRAR TODOS (Limpa tudo e volta ao estado geral nativo)
+ * MOSTRAR TODOS (Reseta para o mapa Geral / Ver Tudo)
  */
 function mostrarTodos() {
     filtroAtual = null;
@@ -210,11 +238,8 @@ function mostrarTodos() {
 
     document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
     
-    // Reseta visualmente as abas de ala
     document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
         btn.classList.remove("active");
-        btn.style.backgroundColor = "";
-        btn.style.color = "#000";
     });
     document.querySelectorAll("#seletor-alas .btn-type")[0].classList.add("active");
 
@@ -223,10 +248,8 @@ function mostrarTodos() {
         searchInput.value = '';
     }
 
-    aplicarFiltrosCombinados();
-
-    const limites = [[0, 0], [plantaDimensoes.altura, plantaDimensoes.largura]];
-    mapa.fitBounds(limites);
+    // Carrega o mapa geral de volta
+    atualizarPlantaDeFundo();
 }
 
 window.onload = initMap;

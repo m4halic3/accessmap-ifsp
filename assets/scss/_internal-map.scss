@@ -71,55 +71,71 @@
         }
 
         // --- NOVO: BLOCO FILTRAR POR ALA ---
-        .fieldset-reset {
-            border: none;
-            margin: 0 0 25px 0;
-            padding: 0;
+.fieldset-reset {
+    border: none;
+    margin: 0 0 25px 0;
+    padding: 0;
 
-            span {
-                display: block;
-                font-family: $font-primary;
-                font-size: 0.8rem;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                color: #000000;
-                margin-bottom: 8px;
+    span {
+        display: block;
+        font-family: $font-primary;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #000000;
+        margin-bottom: 8px;
+    }
+
+    .type-buttons {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+
+        .btn-type {
+            flex: 1;
+            padding: 10px 5px;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            color: #000000;
+            font-family: $font-primary;
+            font-weight: 700;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+
+            &:hover {
+                border-color: #ddd;
+                background-color: #f0f0f0;
             }
 
-            .type-buttons {
-                display: flex;
-                gap: 8px;
-                width: 100%;
+            // Configuração customizada para o estado ativo de cada botão
+            &.active {
+                color: #ffffff; // Texto branco padrão para contraste
 
-                .btn-type {
-                    flex: 1;
-                    padding: 10px 5px;
-                    border: 2px solid #f0f0f0;
-                    border-radius: 10px;
-                    background-color: #f9f9f9;
-                    color: #000000;
-                    font-family: $font-primary;
-                    font-weight: 700;
-                    font-size: 0.75rem;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    text-align: center;
+                // Botão 1: "Ver Tudo" -> Roxo
+                &:nth-child(1) {
+                    background-color: $color-orange;
+                    border-color: $color-orange;
+                }
 
-                    &:hover {
-                        border-color: #ddd;
-                        background-color: #f0f0f0;
-                    }
+                // Botão 2: "Ala Edif." -> Rosa
+                &:nth-child(2) {
+                    background-color: $color-pink;
+                    border-color: $color-pink;
+                }
 
-                    // Estado ativo quando a ala correspondente for clicada
-                    &.active {
-                        background-color: #000000;
-                        border-color: #000000;
-                        color: $color-white;
-                    }
+                // Botão 3: "Ala Mec." -> Laranja (Modificado aqui!)
+                &:nth-child(3) {
+                    background-color: $color-blue;
+                    border-color: $color-blue;
                 }
             }
         }
+    }
+}
 
         // --- CABEÇALHO DOS FILTROS ---
         .header-filtros {

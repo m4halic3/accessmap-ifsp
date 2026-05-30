@@ -1084,9 +1084,19 @@ div[id^=userway] {
   background-color: #f0f0f0;
 }
 .container-mapa .sidebar .fieldset-reset .type-buttons .btn-type.active {
-  background-color: #000000;
-  border-color: #000000;
-  color: #fff;
+  color: #ffffff;
+}
+.container-mapa .sidebar .fieldset-reset .type-buttons .btn-type.active:nth-child(1) {
+  background-color: #c95106;
+  border-color: #c95106;
+}
+.container-mapa .sidebar .fieldset-reset .type-buttons .btn-type.active:nth-child(2) {
+  background-color: #b40096;
+  border-color: #b40096;
+}
+.container-mapa .sidebar .fieldset-reset .type-buttons .btn-type.active:nth-child(3) {
+  background-color: #001774;
+  border-color: #001774;
 }
 .container-mapa .sidebar .header-filtros {
   display: flex;
