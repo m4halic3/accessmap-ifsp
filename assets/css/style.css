@@ -1020,35 +1020,17 @@ div[id^=userway] {
 #userwayAccessibilityIcon,
 .uai,
 userway-accessibility-widget,
-[data-widget-placeholder],
 div[id^=userway] {
-  position: fixed !important;
-  top: 60% !important;
-  bottom: auto !important;
-  right: 20px !important;
-  left: auto !important;
   z-index: 2147483647 !important;
-}
-#userwayAccessibilityIcon, #userwayAccessibilityIcon *,
-.uai,
-.uai *,
-userway-accessibility-widget,
-userway-accessibility-widget *,
-[data-widget-placeholder],
-[data-widget-placeholder] *,
-div[id^=userway],
-div[id^=userway] * {
-  top: 60% !important;
-  bottom: auto !important;
-}
-#userwayAccessibilityIcon,
-.uai,
-userway-accessibility-widget,
-[data-widget-placeholder],
-div[id^=userway] {
   filter: hue-rotate(310deg) saturate(1.5) brightness(1.1) !important;
 }
 
+/* 3. RESPONSIVO */
+@media (max-width: 768px) {
+  #userwayAccessibilityIcon, div[id^=userway], userway-accessibility-widget {
+    transform: scale(0.8) !important;
+  }
+}
 .container-mapa {
   display: flex;
   width: 100%;
