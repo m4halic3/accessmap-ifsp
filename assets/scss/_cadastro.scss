@@ -115,7 +115,8 @@
       transition: 0.3s;
 
       &:hover {
-        background: darken($color-pink, 10%);
+        // --- CORRIGIDO: Substituído darken() antigo por color.adjust() moderno ---
+        background: color.adjust($color-pink, $lightness: -10%);
         transform: translateY(-2px);
       }
     }

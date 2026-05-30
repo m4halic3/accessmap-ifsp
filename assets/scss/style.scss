@@ -1,4 +1,7 @@
+// 1. IMPORTAÇÃO CORE (Variáveis sempre no topo do arquivo principal)
 @use 'variables' as *;
+
+// 2. IMPORTAÇÕES DOS MÓDULOS DE COMPONENTES E PÁGINAS
 @use 'nav';
 @use 'carousel';
 @use 'map'; 
@@ -9,19 +12,6 @@
 @use 'internal-map';
 @use 'login';
 @use 'cadastro';
-
-
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
 // --- CONFIGURAÇÕES GERAIS DA PÁGINA ---
 * {
@@ -34,4 +24,22 @@ body {
     overflow-x: hidden;
     font-family: $font-secondary;
     background-color: $color-white;
+}
+
+// Reseta o contorno padrão feio do navegador para quem navega pelo mouse,
+// mas mantém o foco personalizado via teclado que configuramos nos outros arquivos.
+:focus:not(:focus-visible) {
+    outline: none !important;
+}
+
+// 3. ANIMAÇÕES GLOBAIS
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

@@ -8,9 +8,9 @@
 }
 
 .carousel-container {
-    width: 90%;
-    max-width: 1100px;
-    height: 500px;
+    width: 95%;              
+    max-width: 1300px;       
+    height: 650px;           
     position: relative;
     overflow: hidden;
     border-radius: 25px;
@@ -22,9 +22,9 @@
     &:hover {
         transform: translate(-3px, -3px);
         box-shadow: 18px 18px 0px rgba(0, 0, 0, 0.08);
-
+        
         .seta {
-            opacity: 1;
+            opacity: 1 !important;
             transform: translateY(-50%) scale(1);
         }
     }
@@ -48,41 +48,64 @@
         }
     }
 
-    // --- BOTÕES DE SETA (Versão Clean) ---
+    // --- BOTÕES DE SETA (Versão com Borda Branca de Alto Contraste) ---
     .seta {
+        appearance: none;
+        -webkit-appearance: none;
+        background: $color-pink;
+        color: #ffffff;
+        padding: 0;
+        margin: 0;
+        
         position: absolute;
         top: 50%;
-        opacity: 0;
-        transform: translateY(-50%) scale(0.8);
-        background: $color-pink;
-        color: white;
-        width: 40px; 
-        height: 40px;
+        opacity: 1 !important;                 
+        visibility: visible !important;        
+        transform: translateY(-50%) scale(1) !important; 
+        
+        width: 46px;         
+        height: 46px;        
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         cursor: pointer;
         border-radius: 50%;
-        transition: all 0.4s ease;
+        transition: all 0.3s ease;           
         z-index: 10;
         
-        border: none; 
-        box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3); 
+        // --- ALTERADO: Borda externa principal agora é sólida e branca ---
+        border: 3px solid #ffffff !important; 
+        
+        // Mantemos uma sombra externa um pouco mais marcante (0.45 de opacidade) 
+        // para que a borda branca se separe perfeitamente dos slides claros/brancos.
+        box-shadow: 
+            0px 4px 14px rgba(0, 0, 0, 0.45),
+            inset 0 0 0 1px rgba(0, 0, 0, 0.05) !important; 
 
         &:hover {
-            background: $color-purple;
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 4px 6px 16px rgba(0, 0, 0, 0.4); 
+            background: $color-purple !important;
+            color: #ffffff !important;
+            transform: translateY(-50%) scale(1.12) !important; 
+            
+            box-shadow: 
+                0px 6px 18px rgba(0, 0, 0, 0.55),
+                inset 0 0 0 1px rgba(0, 0, 0, 0.05) !important; 
         }
+
+        outline: none;
 
         &:focus-visible {
-            outline: 3px solid #000000;
-            outline-offset: 2px;
+            transform: translateY(-50%) scale(1.12) !important;
+            // Foco do teclado adaptado para a nova borda clara
+            box-shadow: 
+                0px 6px 18px rgba(0, 0, 0, 0.45), 
+                0 0 0 3px #ffffff, 
+                0 0 0 7px #000000;
         }
 
-        &.esquerda { left: 20px; }
-        &.direita { right: 20px; } 
+        &.esquerda { left: 25px !important; } 
+        &.direita { right: 25px !important; } 
     }
 }
 
@@ -117,23 +140,36 @@
 // --- RESPONSIVIDADE (Ajustes Mobile) ---
 @media (max-width: 768px) {
     .carousel-container {
-        height: 300px;
+        width: 90%;          
+        height: 350px;       
         border-radius: 15px;
         box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.05);
 
         .seta {
-            opacity: 1; 
-            transform: translateY(-50%) scale(1);
+            width: 38px; 
+            height: 38px;       
+            font-size: 0.95rem; 
             
-            // Alterações para o celular ficar discreto e não cobrir a foto:
-            width: 28px;        // Reduzido o tamanho da caixa de 38px para 28px
-            height: 28px;       // Reduzido a altura para acompanhar o círculo
-            font-size: 0.85rem; // Diminuído o tamanho do caractere da seta interno
-            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3); // Sombra menor condizente com o botão
+            // Ajuste da borda branca no mobile
+            border: 2px solid #ffffff !important;
+            
+            box-shadow: 
+                2px 2px 8px rgba(0, 0, 0, 0.4),
+                inset 0 0 0 1px rgba(0, 0, 0, 0.05) !important; 
 
-            // Aproxima as setinhas da parede lateral para liberar espaço central
-            &.esquerda { left: 10px; }
+            &.esquerda { left: 10px !important; }
             &.direita { right: 10px; }
+
+            &:hover {
+                transform: translateY(-50%) scale(1) !important; 
+            }
+
+            &:focus-visible {
+                box-shadow: 
+                    2px 2px 6px rgba(0, 0, 0, 0.3), 
+                    0 0 0 2px #ffffff, 
+                    0 0 0 4px #000000;
+            }
         }
     }
 }
