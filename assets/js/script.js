@@ -78,22 +78,73 @@ function toggleAuth() {
 }
 
 function pesquisarLugares() {
-    // Pega o valor digitado e converte para minúsculo
     let input = document.getElementById('search-input').value.toLowerCase();
-    
-    // Pega todos os cards de lugares na lista
     let lista = document.getElementById('lista-lugares');
     let itens = lista.getElementsByClassName('item-lugar');
 
     for (let i = 0; i < itens.length; i++) {
-        // Pega o nome do lugar (geralmente dentro da tag <p> no seu SCSS)
         let nomeLugar = itens[i].getElementsByTagName('p')[0].innerText.toLowerCase();
         
-        // Verifica se o texto pesquisado está contido no nome do lugar
         if (nomeLugar.includes(input)) {
-            itens[i].style.display = ""; // Mostra o item
+            itens[i].style.display = ""; 
         } else {
-            itens[i].style.display = "none"; // Esconde o item
+            itens[i].style.display = "none"; 
         }
     }
 }
+
+/* ==========================================================================
+   SISTEMA DE ACESSIBILIDADE NATIVA (Fontes e Alto Contraste)
+   ========================================================================== */
+
+let nivelFonte = 0; // 0 representa o tamanho padrão (100%)
+const maxNivel = 3;  // Limite máximo de aumento
+const minNivel = -2; // Limite mínimo de redução
+
+function mudarFonte(direcao) {
+    const novoNivel = nivelFonte + direcao;
+    
+    // Impede que ultrapasse as barreiras de legibilidade estabelecidas
+    if (novoNivel > maxNivel || novoNivel < minNivel) return;
+    
+    nivelFonte = novoNivel;
+    const htmlElement = document.documentElement;
+    
+    // Altera a raiz de dimensionamento proporcional (rem) da aplicação
+    switch (nivelFonte) {
+        case 0:
+            htmlElement.style.fontSize = "100%";
+            break;
+        case 1:
+            htmlElement.style.fontSize = "110%";
+            break;
+        case 2:
+            htmlElement.style.fontSize = "120%";
+            break;
+        case 3:
+            htmlElement.style.fontSize = "130%";
+            break;
+        case -1:
+            htmlElement.style.fontSize = "90%";
+            break;
+        case -2:
+            htmlElement.style.fontSize = "80%" ;
+            break;
+    }
+}
+
+function toggleContraste() {
+    // Alterna a classe no body que o SCSS está monitorando
+    document.body.classList.toggle("alto-contraste");
+    
+    // Armazena no LocalStorage para manter a preferência ativa entre navegações de páginas
+    const estadoAtivo = document.body.classList.contains("alto-contraste");
+    localStorage.setItem("altoContrasteState", estadoAtivo);
+}
+
+// Verifica o estado salvo do Alto Contraste assim que o documento HTML carrega
+window.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem("altoContrasteState") === "true") {
+        document.body.classList.add("alto-contraste");
+    }
+});

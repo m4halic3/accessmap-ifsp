@@ -987,7 +987,9 @@ body {
     text-align: center;
   }
 }
-/* 1. V-LIBRAS */
+/* ==========================================================================
+   1. V-LIBRAS (Customização do Botão de Libras)
+   ========================================================================== */
 div[vw].enabled {
   position: fixed !important;
   top: 50% !important;
@@ -998,39 +1000,122 @@ div[vw].enabled {
 }
 div[vw].enabled [vw-access-button], div[vw].enabled .vw-access-button {
   background-color: #028264 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 50% !important;
 }
 div[vw].enabled [vw-access-button] img, div[vw].enabled .vw-access-button img {
   filter: hue-rotate(310deg) saturate(1.5) !important;
 }
 
-/* 2. USERWAY */
-#userwayAccessibilityIcon,
-.uai,
-div[id^=userway] {
+/* ==========================================================================
+   2. WIDGET DE ACESSIBILIDADE NATIVO (A+, A-, Contraste)
+   ========================================================================== */
+.widget-acessibilidade-nativo {
   position: fixed !important;
-  top: 60% !important;
+  top: 62% !important;
   bottom: auto !important;
   right: 20px !important;
   left: auto !important;
   z-index: 2147483647 !important;
-  filter: hue-rotate(310deg) saturate(1.5) brightness(1.1) !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.widget-acessibilidade-nativo button {
+  width: 44px;
+  height: 44px;
+  background-color: #44025c;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.widget-acessibilidade-nativo button:hover {
+  background-color: rgb(38.485106383, 1.1319148936, 52.0680851064);
+  transform: scale(1.08);
+}
+.widget-acessibilidade-nativo button:focus-visible {
+  outline: 3px solid #b40096;
+  outline-offset: 2px;
+  transform: scale(1.08);
 }
 
-/* 2. USERWAY */
-#userwayAccessibilityIcon,
-.uai,
-userway-accessibility-widget,
-div[id^=userway] {
-  z-index: 2147483647 !important;
-  filter: hue-rotate(310deg) saturate(1.5) brightness(1.1) !important;
-}
-
-/* 3. RESPONSIVO */
+/* ==========================================================================
+   3. REGRAS DE RESPONSIVIDADE (Ajustes para Mobile)
+   ========================================================================== */
 @media (max-width: 768px) {
-  #userwayAccessibilityIcon, div[id^=userway], userway-accessibility-widget {
-    transform: scale(0.8) !important;
+  div[vw].enabled {
+    top: 45% !important;
+    right: 10px !important;
+    transform: scale(0.85);
+  }
+  .widget-acessibilidade-nativo {
+    top: 56% !important;
+    right: 10px !important;
+  }
+  .widget-acessibilidade-nativo button {
+    width: 38px;
+    height: 38px;
+    font-size: 0.8rem;
   }
 }
+/* ==========================================================================
+   4. ESTILOS GLOBAIS DE ALTO CONTRASTE (Injetado via JavaScript no body)
+   ========================================================================== */
+body.alto-contraste {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+body.alto-contraste h1, body.alto-contraste h2, body.alto-contraste h3, body.alto-contraste h4, body.alto-contraste p, body.alto-contraste span, body.alto-contraste li, body.alto-contraste a, body.alto-contraste label, body.alto-contraste legend, body.alto-contraste .logo-text, body.alto-contraste .back-link, body.alto-contraste .switch {
+  color: #ffff00 !important;
+}
+body.alto-contraste .navbar, body.alto-contraste .auth-card, body.alto-contraste .main-footer, body.alto-contraste .stats-section, body.alto-contraste .contact-card, body.alto-contraste .sidebar {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  border: 2px solid #ffff00 !important;
+  box-shadow: none !important;
+}
+body.alto-contraste .input-group input, body.alto-contraste .search-container input {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffff00 !important;
+}
+body.alto-contraste .input-group input::placeholder, body.alto-contraste .search-container input::placeholder {
+  color: #ffff00 !important;
+  opacity: 0.8;
+}
+body.alto-contraste button, body.alto-contraste .btn-auth, body.alto-contraste .btn-mapa, body.alto-contraste .btn-submit, body.alto-contraste .btn-type {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+  box-shadow: none !important;
+}
+body.alto-contraste button:hover, body.alto-contraste button:focus-visible, body.alto-contraste .btn-auth:hover, body.alto-contraste .btn-auth:focus-visible, body.alto-contraste .btn-mapa:hover, body.alto-contraste .btn-mapa:focus-visible, body.alto-contraste .btn-submit:hover, body.alto-contraste .btn-submit:focus-visible, body.alto-contraste .btn-type:hover, body.alto-contraste .btn-type:focus-visible {
+  background-color: #ffff00 !important;
+  color: #000000 !important;
+}
+body.alto-contraste .widget-acessibilidade-nativo button {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+  box-shadow: none !important;
+}
+body.alto-contraste .widget-acessibilidade-nativo button:hover {
+  background-color: #ffff00 !important;
+  color: #000000 !important;
+}
+body.alto-contraste #map, body.alto-contraste iframe, body.alto-contraste img, body.alto-contraste .slide img {
+  filter: grayscale(100%) contrast(140%) !important;
+}
+
 .container-mapa {
   display: flex;
   width: 100%;

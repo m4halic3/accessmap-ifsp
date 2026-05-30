@@ -1,55 +1,155 @@
+@use "sass:color";
 @use 'variables' as *;
 
-// Mixin para garantir que o estilo vença qualquer resistência
+// Mixin padrão para travar os elementos de acessibilidade na lateral direita
 @mixin force-position($top-value) {
     position: fixed !important;
     top: $top-value !important;
-    bottom: auto !important; // Reset fundamental
+    bottom: auto !important; // Evita conflitos com propriedades de bottom nativas
     right: 20px !important;
     left: auto !important;
-    z-index: 2147483647 !important;
+    z-index: 2147483647 !important; // Garante que fique acima de carrosséis e mapas
 }
 
-/* 1. V-LIBRAS */
+/* ==========================================================================
+   1. V-LIBRAS (Customização do Botão de Libras)
+   ========================================================================== */
 div[vw].enabled {
-    @include force-position(50%);
+    @include force-position(50%); // Centralizado verticalmente à direita
     
     [vw-access-button], .vw-access-button {
         background-color: $color-teal !important; 
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        border-radius: 50% !important;
         
         img {
-            filter: hue-rotate(310deg) saturate(1.5) !important;
+            filter: hue-rotate(310deg) saturate(1.5) !important; // Ajuste do tom de azul/verde
         }
     }
 }
 
-/* 2. USERWAY */
-// Usamos o seletor de ID direto para máxima força no SCSS
-#userwayAccessibilityIcon, 
-.uai, 
-div[id^="userway"] {
-    // Se o V-Libras está em 50%, o UserWay precisa estar em ~60%
-    @include force-position(60%);
-    
-    // Filtros de cor
-    filter: hue-rotate(310deg) saturate(1.5) brightness(1.1) !important;
+/* ==========================================================================
+   2. WIDGET DE ACESSIBILIDADE NATIVO (A+, A-, Contraste)
+   ========================================================================== */
+.widget-acessibilidade-nativo {
+    @include force-position(62%); // Posicionado perfeitamente abaixo do VLibras
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    button {
+        width: 44px;
+        height: 44px; // Tamanho ideal da WCAG/eMAG para alvos de clique em telas touch
+        background-color: $color-purple;
+        color: $color-white;
+        border: none;
+        border-radius: 50%;
+        font-family: $font-primary;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        &:hover {
+            background-color: color.adjust($color-purple, $lightness: -8%);
+            transform: scale(1.08);
+        }
+
+        // Foco de acessibilidade visível para quem navega por teclado (Tab)
+        &:focus-visible {
+            outline: 3px solid $color-pink;
+            outline-offset: 2px;
+            transform: scale(1.08);
+        }
+    }
 }
 
-/* 2. USERWAY */
-#userwayAccessibilityIcon, 
-.uai,
-userway-accessibility-widget,
-div[id^="userway"] {
-    // Força o elemento a ficar por cima do carrossel/mapa, sem mexer no top/left
-    z-index: 2147483647 !important;
-    
-    // Seu filtro de cores personalizado
-    filter: hue-rotate(310deg) saturate(1.5) brightness(1.1) !important;
-}
-
-/* 3. RESPONSIVO */
+/* ==========================================================================
+   3. REGRAS DE RESPONSIVIDADE (Ajustes para Mobile)
+   ========================================================================== */
 @media (max-width: 768px) {
-    #userwayAccessibilityIcon, div[id^="userway"], userway-accessibility-widget {
-        transform: scale(0.8) !important;
+    div[vw].enabled {
+        top: 45% !important;
+        right: 10px !important;
+        transform: scale(0.85); // Reduz levemente para não cobrir tanto conteúdo
+    }
+
+    .widget-acessibilidade-nativo {
+        top: 56% !important; // Acompanha a subida do VLibras proporcionalmente
+        right: 10px !important;
+        
+        button {
+            width: 38px;
+            height: 38px;
+            font-size: 0.8rem;
+        }
+    }
+}
+
+/* ==========================================================================
+   4. ESTILOS GLOBAIS DE ALTO CONTRASTE (Injetado via JavaScript no body)
+   ========================================================================== */
+body.alto-contraste {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+
+    // Títulos, parágrafos, inputs e links ganham cor amarela nítida sobre fundo preto
+    h1, h2, h3, h4, p, span, li, a, label, legend, .logo-text, .back-link, .switch {
+        color: #ffff00 !important;
+    }
+
+    // Estruturas de containers e cartões viram caixas pretas com contornos amarelos
+    .navbar, .auth-card, .main-footer, .stats-section, .contact-card, .sidebar {
+        background-color: #000000 !important;
+        background: #000000 !important;
+        border: 2px solid #ffff00 !important;
+        box-shadow: none !important;
+    }
+
+    // Campos de input do sistema de login e busca
+    .input-group input, .search-container input {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        border: 2px solid #ffff00 !important;
+
+        &::placeholder {
+            color: #ffff00 !important;
+            opacity: 0.8;
+        }
+    }
+
+    // Todos os botões do sistema se adaptam ao contraste estrito
+    button, .btn-auth, .btn-mapa, .btn-submit, .btn-type {
+        background-color: #000000 !important;
+        color: #ffff00 !important;
+        border: 2px solid #ffff00 !important;
+        box-shadow: none !important;
+
+        &:hover, &:focus-visible {
+            background-color: #ffff00 !important;
+            color: #000000 !important;
+        }
+    }
+
+    // Força o nosso próprio painel de botões a respeitar o Alto Contraste
+    .widget-acessibilidade-nativo button {
+        background-color: #000000 !important;
+        color: #ffff00 !important;
+        border: 2px solid #ffff00 !important;
+        box-shadow: none !important;
+        
+        &:hover {
+            background-color: #ffff00 !important;
+            color: #000000 !important;
+        }
+    }
+
+    // Filtro para garantir o contraste do Mapa Leaflet e imagens informativas
+    #map, iframe, img, .slide img {
+        filter: grayscale(100%) contrast(140%) !important;
     }
 }

@@ -3,36 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <title>Login - AccessMap</title>
 </head>
 <body class="autenticacao">
+    
+    <a href="#form-login" class="skip-link">Pular para o formulário de login</a>
+
     <div class="auth-container">
-        <div class="auth-header">
-            <a href="index.html">
-                <img src="assets/images/logo-roxa.png" alt="Logo AccessMap" class="logo-img-auth">
+        <header class="auth-header">
+            <a href="index.html" aria-label="Voltar para a página inicial Home">
+                <img src="assets/images/logo-roxa.png" alt="Logotipo AccessMap" class="logo-img-auth">
             </a>
             <a href="index.html" class="back-link">Voltar</a>
-        </div>
+        </header>
 
-        <div class="auth-card active">
+        <main class="auth-card active" id="form-login">
             <h2>Log in</h2>
+            
             <div class="input-group">
-                <input type="text" placeholder="Nome de usuário">
+                <label for="user-login" class="sr-only">Nome de usuário</label>
+                <input type="text" id="user-login" placeholder="Nome de usuário" required>
             </div>
+            
             <div class="input-group">
-                <input type="password" placeholder="Senha">
+                <label for="pass-login" class="sr-only">Senha</label>
+                <input type="password" id="pass-login" placeholder="Senha" required>
             </div>
+            
             <div class="options">
                 <label><input type="checkbox"> Lembre-me</label>
                 <a href="#">Esqueceu a senha?</a>
             </div>
-            <button class="btn-auth">Log in</button>
+            
+            <button type="submit" class="btn-auth">Log in</button>
             <p class="switch">ou <a href="cadastro.html">Cadastre-se</a></p>
-        </div>
+        </main>
     </div>
-
-    <!-- Widgets de Acessibilidade -->
 
     <div vw class="enabled">
         <div vw-access-button class="active"></div>
@@ -40,12 +48,19 @@
             <div class="vw-plugin-top-wrapper"></div>
         </div>
     </div>
+
+    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles manuais de acessibilidade">
+        <button type="button" id="btn-aumentar" onclick="mudarFonte(1)" aria-label="Aumentar tamanho do texto">A+</button>
+        <button type="button" id="btn-diminuir" onclick="mudarFonte(-1)" aria-label="Diminuir tamanho do texto">A-</button>
+        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alternar alto contraste">
+            <i class="fas fa-adjust" aria-hidden="true"></i>
+        </button>
+    </div>
+
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
-
-
     <script src="assets/js/script.js"></script>
 </body>
 </html>
