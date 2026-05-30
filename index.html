@@ -4,14 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
-    <title>Document</title>
+    <title>AccessMap - Acessibilidade no Campus</title>
 </head>
 
 <body>
-    <nav class="navbar">
+    
+    <nav class="navbar" aria-label="Navegação Principal">
         <div class="logo">
-            <img src="assets/images/logo-branca.png" alt="Logo AccessMap" class="logo-img">
+            <img src="assets/images/logo-branca.png" alt="Logotipo AccessMap com símbolo de localização" class="logo-img">
             <span class="logo-text">ACCESSMAP</span>
         </div>
 
@@ -24,157 +26,158 @@
         </ul>
 
         <div class="nav-right desktop-only">
-            <a href="login.html" class="btn-login-destaque">Log In</a> <!--Modifiquei rapinho!-->
+            <a href="login.html" class="btn-login-destaque">Log In</a>
         </div>
 
         <div id="menu" class="mobile-only">
-            <div id="menu-bar" onclick="menuOnClick()">
+            <div id="menu-bar" onclick="menuOnClick()" role="button" aria-expanded="false" aria-controls="nav" aria-label="Menu de Navegação" tabindex="0">
                 <div id="bar1" class="bar"></div>
                 <div id="bar2" class="bar"></div>
                 <div id="bar3" class="bar"></div>
             </div>
-            <nav class="nav-mobile" id="nav">
-            <ul>
-                <li><a href="#" onclick="menuOnClick()">Home</a></li>
-                <li><a href="#mapa" onclick="menuOnClick()">Map</a></li>
-                <li><a href="#estatisticas" onclick="menuOnClick()">Stats</a></li>
-                <li><a href="#contato" onclick="menuOnClick()">Contact</a></li>
-                <li><a href="#sobre" onclick="menuOnClick()">About Us</a></li>
-                <li><a href="login.html" onclick="menuOnClick()" style="color: #FF4D8D; font-weight: 800;">Log In</a></li>
-            </ul>
-</nav>
+            <nav class="nav-mobile" id="nav" aria-label="Navegação móvel">
+                <ul>
+                    <li><a href="#" onclick="menuOnClick()">Home</a></li>
+                    <li><a href="#mapa" onclick="menuOnClick()">Map</a></li>
+                    <li><a href="#estatisticas" onclick="menuOnClick()">Stats</a></li>
+                    <li><a href="#contato" onclick="menuOnClick()">Contact</a></li>
+                    <li><a href="#sobre" onclick="menuOnClick()">About Us</a></li>
+                    <li><a href="login.html" onclick="menuOnClick()" style="color: #FF4D8D; font-weight: 800;">Log In</a></li>
+                </ul>
+            </nav>
         </div>
         <div class="menu-bg mobile-only" id="menu-bg"></div>
     </nav>
 
-    <!-- Carrossel -->
-    <section class="secao-carrossel">
-    <div class="carousel-container">
-        <div class="slides-wrapper" id="slider">
-            <div class="slide"><img src="assets/images/motivacao.png" alt="Slide 1"></div>
-            <div class="slide"><img src="assets/images/simbolos.png" alt="Slide 2"></div>
-            <div class="slide"><img src="assets/images/slide-final.png" alt="Slide 3"></div>
-        </div>
+    <main id="conteudo-principal">
 
-        <button class="seta esquerda" onclick="btnMove(-1)" aria-label="Slide Anterior">❮</button>
-        <button class="seta direita" onclick="btnMove(1)" aria-label="Próximo Slide">❯</button>
-
-        <div class="indicadores">
-            <span class="dot active" onclick="jumpToSlide(0)"></span>
-            <span class="dot" onclick="jumpToSlide(1)"></span>
-            <span class="dot" onclick="jumpToSlide(2)"></span>
-            </div>
-    </div>
-</section>
-
-    <!-- Seção MAPA -->
-    <section id="mapa" class="map-section">
-        <div class="map-container">
-            <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3653.447543818324!2d-48.0191295!3d-23.6061803!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c5d336967733f3%3A0x67396a848c823f66!2sIFSP%20Campus%20Itapetininga!5e0!3m2!1spt-BR!2sbr!4v1700000000000"
-                width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
-            </iframe>
-
-            <div class="map-overlay">
-                <button type="button" class="btn-mapa" onclick="window.location.href='mapa.html'">
-                    IR PARA O MAPA
-                </button> <!--Modifiquei essa parte-->
-            </div>
-        </div>
-    </section>
-
-    <!-- Seção de estatísticas da Instituição -->
-<section id="estatisticas" class="stats-section">
-    <h2 class="stats-title">PANORAMA DE ACESSIBILIDADE NO CAMPUS</h2>
-
-    <div class="stats-container">
-        <div class="stats-cards">
-
-            <div class="stat-card">
-                <div class="card-content">
-                    <span class="card-number">82%</span>
-                    <span class="card-label">Acessibilidade Física</span>
+        <section class="secao-carrossel" aria-label="Destaques Informativos">
+            <div class="carousel-container">
+                <div class="slides-wrapper" id="slider">
+                    <div class="slide"><img src="assets/images/motivacao.png" alt="Texto motivacional sobre o direito à cidade e circulação livre de barreiras"></div>
+                    <div class="slide"><img src="assets/images/simbolos.png" alt="Infográfico exibindo os símbolos universais de acessibilidade física e auditiva"></div>
+                    <div class="slide"><img src="assets/images/slide-final.png" alt="Ilustração de estudantes interagindo e colaborando no desenvolvimento do projeto"></div>
                 </div>
-                <div class="card-icon">
-                    <img src="assets/images/simbolo-fisica-branca.png" alt="Ícone Acessibilidade Física">
+
+                <button class="seta esquerda" onclick="btnMove(-1)" aria-label="Slide Anterior">❮</button>
+                <button class="seta direita" onclick="btnMove(1)" aria-label="Próximo Slide">❯</button>
+
+                <div class="indicadores" role="tablist" aria-label="Indicadores dos slides">
+                    <button class="dot active" onclick="jumpToSlide(0)" role="tab" aria-selected="true" aria-label="Ir para o slide 1"></button>
+                    <button class="dot" onclick="jumpToSlide(1)" role="tab" aria-selected="false" aria-label="Ir para o slide 2"></button>
+                    <button class="dot" onclick="jumpToSlide(2)" role="tab" aria-selected="false" aria-label="Ir para o slide 3"></button>
                 </div>
             </div>
+        </section>
 
-            <div class="stat-card">
-                <div class="card-content">
-                    <span class="card-number">40%</span>
-                    <span class="card-label">Acessibilidade Auditiva</span>
-                </div>
-                <div class="card-icon">
-                    <img src="assets/images/simbolo-auditiva-branca.png" alt="Ícone Acessibilidade Auditiva">
-                </div>
-            </div>
+        <section id="mapa" class="map-section" aria-label="Mapa Interativo">
+            <div class="map-container">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3653.447543818324!2d-48.0191295!3d-23.6061803!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c5d336967733f3%3A0x67396a848c823f66!2sIFSP%20Campus%20Itapetininga!5e0!3m2!1spt-BR!2sbr!4v1700000000000"
+                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+                    title="Mapa de localização e acessibilidade do Campus Principal do Instituto Federal">
+                </iframe>
 
-        </div>
-
-        <div class="stats-chart">
-            <div class="chart-container">
-                <div class="chart-ring"></div>
-                <div class="chart-legend-inner">
-                    <span class="main-stat">61%</span>
-                    <span class="sub-text">Média de<br>Inclusão</span>
+                <div class="map-overlay">
+                    <button type="button" class="btn-mapa" onclick="window.location.href='mapa.html'">
+                        IR PARA O MAPA
+                    </button>
                 </div>
             </div>
-        </div>
-    </div>
-</section>
+        </section>
 
-    <!-- Section de feedbacks e contato -->
-<section id="contato" class="contact-section">
-    <div class="contact-container">
-        <div class="contact-card">
-            <form>
-                <div class="form-group">
-                    <label for="local-ocorrencia">Local da Ocorrência</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-map-pin" aria-hidden="true"></i> <input type="text" id="local-ocorrencia" placeholder="Ex: Bloco A, Biblioteca, Rampa central...">
+        <section id="estatisticas" class="stats-section">
+            <h2 class="stats-title">PANORAMA DE ACESSIBILIDADE NO CAMPUS</h2>
+
+            <div class="stats-container">
+                <div class="stats-cards">
+
+                    <div class="stat-card">
+                        <div class="card-content">
+                            <span class="card-number">82%</span>
+                            <span class="card-label">Acessibilidade Física</span>
+                        </div>
+                        <div class="card-icon">
+                            <img src="assets/images/simbolo-fisica-branca.png" alt="Ícone internacional de acessibilidade para cadeirantes">
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="card-content">
+                            <span class="card-number">40%</span>
+                            <span class="card-label">Acessibilidade Auditiva</span>
+                        </div>
+                        <div class="card-icon">
+                            <img src="assets/images/simbolo-auditiva-branca.png" alt="Ícone internacional de acessibilidade para perda auditiva ou surdez">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="stats-chart" aria-label="Gráfico circular mostrando a média de inclusão geral">
+                    <div class="chart-container">
+                        <div class="chart-ring"></div>
+                        <div class="chart-legend-inner">
+                            <span class="main-stat">61%</span>
+                            <span class="sub-text">Média de<br>Inclusão</span>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                <fieldset class="form-group fieldset-reset">
-                    <legend class="label-style">Categoria de Acessibilidade</legend>
-                    <div class="type-buttons" role="group" aria-label="Escolha o tipo de acessibilidade">
-                        <button type="button" class="btn-type btn-fisica" aria-pressed="false">FÍSICA</button>
-                        <button type="button" class="btn-type btn-auditiva" aria-pressed="false">AUDITIVA</button>
-                    </div>
-                </fieldset>
+        <section id="contato" class="contact-section">
+            <div class="contact-container">
+                <div class="contact-card">
+                    <form action="#" method="POST">
+                        <div class="form-group">
+                            <label for="local-ocorrencia">Local da Ocorrência</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-map-pin" aria-hidden="true"></i> 
+                                <input type="text" id="local-ocorrencia" placeholder="Ex: Bloco A, Biblioteca, Rampa central..." required>
+                            </div>
+                        </div>
 
-                <div class="form-group">
-                    <label for="relato-sugestao">Sua sugestão ou relato</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-comment-dots" aria-hidden="true"></i>
-                        <textarea id="relato-sugestao" placeholder="Descreva aqui o problema encontrado..."></textarea>
-                    </div>
+                        <fieldset class="form-group fieldset-reset">
+                            <legend class="label-style">Categoria de Acessibilidade</legend>
+                            <div class="type-buttons" role="group" aria-label="Escolha o tipo de acessibilidade afetada">
+                                <button type="button" class="btn-type btn-fisica" aria-pressed="false">FÍSICA</button>
+                                <button type="button" class="btn-type btn-auditiva" aria-pressed="false">AUDITIVA</button>
+                            </div>
+                        </fieldset>
+
+                        <div class="form-group">
+                            <label for="relato-sugestao">Sua sugestão ou relato</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-comment-dots" aria-hidden="true"></i>
+                                <textarea id="relato-sugestao" placeholder="Descreva aqui o problema de acessibilidade encontrado..." required></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit">ENVIAR COLABORAÇÃO</button>
+                    </form>
                 </div>
 
-                <button type="submit" class="btn-submit">ENVIAR COLABORAÇÃO</button>
-            </form>
-        </div>
+                <div class="contact-info">
+                    <h2>Sua voz constrói um campus melhor</h2>
+                    <p>O AccessMap é uma ferramenta colaborativa. Se encontrou uma barreira, utilize o formulário para nos ajudar a mapear e cobrar melhorias.</p>
 
-        <div class="contact-info">
-            <h2>Sua voz constrói um campus melhor</h2>
-            <p>O AccessMap é uma ferramenta colaborativa. Se encontrou uma barreira, utilize o formulário para nos ajudar a mapear e cobrar melhorias.</p>
+                    <ul class="info-list">
+                        <li>
+                            <i class="fas fa-envelope" aria-hidden="true"></i> 
+                            <span>Suporte: contato@accessmap.com.br</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i> 
+                            <span>Instituto Federal - Campus Principal</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
-            <ul class="info-list">
-    <li>
-        <i class="fas fa-envelope" aria-hidden="true"></i> 
-        <span>Suporte: contato@accessmap.com.br</span>
-    </li>
-    <li>
-        <i class="fas fa-map-marker-alt" aria-hidden="true"></i> 
-        <span>Instituto Federal - Campus Principal</span>
-    </li>
-</ul>
-        </div>
-    </div>
-</section>
+    </main>
 
-    <!-- Footer -->
     <footer id="sobre" class="main-footer">
         <div class="footer-content">
             <h2 class="footer-title">QUEM SOMOS NÓS</h2>
@@ -187,13 +190,13 @@
             <div class="team-container">
                 <div class="team-member">
                     <div class="member-photo">
-                        <img src="assets/images/mariana.png" alt="Mariana - Desenvolvedora">
+                        <img src="assets/images/mariana.png" alt="Fotografia de Mariana, co-desenvolvedora do projeto AccessMap">
                     </div>
                     <span class="member-name">MARIANA</span>
                 </div>
                 <div class="team-member">
                     <div class="member-photo">
-                        <img src="assets/images/yasmim.jpeg" alt="Yasmim - Desenvolvedora">
+                        <img src="assets/images/yasmim.jpeg" alt="Fotografia de Yasmim, co-desenvolvedora do projeto AccessMap">
                     </div>
                     <span class="member-name">YASMIM</span>
                 </div>
@@ -208,21 +211,19 @@
         </div>
     </footer>
 
-    <!-- Widgets de Acessibilidade -->
-
     <div vw class="enabled">
         <div vw-access-button class="active"></div>
         <div vw-plugin-wrapper>
             <div class="vw-plugin-top-wrapper"></div>
         </div>
     </div>
+    
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
-
     <script src="https://cdn.userway.org/widget.js" data-account="YOUR_ACCOUNT_ID"></script>
-
+    
     <script src="assets/js/script.js"></script>
 </body>
 
