@@ -21,19 +21,39 @@ const plantas = {
 };
 
 /**
- * DATABASE DE LUGARES ORIGINAL (Pontos naturais limpos do filtro de acessibilidade)
+ * DATABASE DE LUGARES (Blocos, Salas Internas, Acessibilidade e Alertas)
  */
 const lugares = [
-    { nome: "Ala de Informática (Laboratórios)", tipo: "geral", categoria: "informatica", y: 705, x: 1040 },
-    { nome: "Secretaria / Atendimento", tipo: "auditiva", categoria: "secretaria", y: 637, x: 1100 },
-    { nome: "Bloco de Salas (Edificações)", tipo: "geral", categoria: "edificacoes", y: 720, x: 640 },
-    { nome: "Bloco de Salas (Mecânica)", tipo: "geral", categoria: "mecanica", y: 720, x: 780 },
-    { nome: "Bloco de Salas de Aula (Geral)", tipo: "geral", categoria: "geral", y: 700, x: 950 },
-    { nome: "Biblioteca", tipo: "geral", categoria: "biblioteca", y: 500, x: 1000 },
-    { nome: "Entrada (Ala da biblioteca)", tipo: "geral", categoria: "entrada", y: 540, x: 1000 },
-    { nome: "Entrada Principal", tipo: "geral", categoria: "entrada", y: 350, x: 620 },
-    { nome: "Estacionamento de Ônibus", tipo: "geral", categoria: "estacionamento", y: 320, x: 890 },
-    { nome: "Estacionamento interno", tipo: "geral", categoria: "estacionamento", y: 520, x: 750 }
+    // === PONTOS PRINCIPAIS / BLOCOS ÂNCORAS ===
+    { nome: "Ala de Informática (Laboratórios)", tipo: "geral", categoria: "informatica", y: 705, x: 1040, subponto: false },
+    { nome: "Secretaria / Atendimento", tipo: "auditiva", categoria: "secretaria", y: 637, x: 1100, subponto: false },
+    { nome: "Bloco de Salas (Edificações)", tipo: "geral", categoria: "edificacoes", y: 720, x: 640, subponto: false },
+    { nome: "Bloco de Salas (Mecânica)", tipo: "geral", categoria: "mecanica", y: 720, x: 780, subponto: false },
+    { nome: "Bloco de Salas de Aula (Geral)", tipo: "geral", categoria: "geral", y: 700, x: 950, subponto: false },
+    { nome: "Biblioteca", tipo: "geral", categoria: "biblioteca", y: 500, x: 1000, subponto: false },
+    { nome: "Entrada (Ala da biblioteca)", tipo: "geral", categoria: "entrada", y: 540, x: 1000, subponto: false },
+    { nome: "Entrada Principal", tipo: "geral", categoria: "entrada", y: 350, x: 620, subponto: false },
+    { nome: "Estacionamento de Ônibus", tipo: "geral", categoria: "estacionamento", y: 320, x: 890, subponto: false },
+    { nome: "Estacionamento interno", tipo: "geral", categoria: "estacionamento", y: 520, x: 750, subponto: false },
+    { nome: "Quadra Poliesportiva", tipo: "geral", categoria: "quadra", y: 400, x: 500, subponto: false },
+    { nome: "Refeitório", tipo: "geral", categoria: "refeitorio", y: 450, x: 550, subponto: false },
+    { nome: "Salas Externas", tipo: "geral", categoria: "salas_externas", y: 480, x: 580, subponto: false },
+
+    // === SUBPONTOS / SALAS INTERNAS ===
+    { nome: "Laboratório de Redes (Sala 1)", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 710, x: 1045, subponto: true },
+    { nome: "Laboratório de Software (Sala 2)", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 700, x: 1035, subponto: true },
+    { nome: "Sala 101 - Desenho Técnico", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 725, x: 645, subponto: true },
+
+    // === PONTOS DE ACESSIBILIDADE DETALHADOS ===
+    { nome: "Sala de Intérpretes (LIBRAS)", tipo: "auditiva", categoria: "sala_interpretes", y: 645, x: 1110, subponto: false },
+    { nome: "Rampa de Acesso - Bloco Geral", tipo: "fisica", categoria: "rampa", y: 690, x: 950, subponto: false },
+    { nome: "Escadaria de Acesso Principal", tipo: "fisica", categoria: "escada", y: 360, x: 620, subponto: false },
+    { nome: "Elevador - Bloco Edificações", tipo: "fisica", categoria: "elevador", bloco_pai: "edificacoes", y: 722, x: 642, subponto: true },
+    { nome: "Vagas Exclusivas PCD - Estacionamento", tipo: "fisica", categoria: "vaga_pcd", y: 515, x: 740, subponto: false },
+
+    // === PONTOS DE ALERTA / CUIDADO NA ACESSIBILIDADE FÍSICA ===
+    { nome: "Alerta: Degrau sem Rampa no Bloco de Mecânica", tipo: "alerta", categoria: "alerta", bloco_pai: "mecanica", y: 715, x: 775, subponto: true },
+    { nome: "Alerta: Calçada Irregular / Acesso à Quadra", tipo: "alerta", categoria: "alerta", y: 410, x: 510, subponto: false }
 ];
 
 let mapa;
@@ -41,30 +61,71 @@ let marcadores = [];
 let camadaImagem = null; 
 let filtroAtual = null;
 let alaAtual = "todos"; 
-let primeiraInicializacao = true; // Variável de controle para iniciar o mapa sem marcadores
+let primeiraInicializacao = true; 
 
 /**
- * DEFINE A COR DO ÍCONE BASEADO NA CATEGORIA
+ * DEFINE A COR DO ÍCONE BASEADO NA CATEGORIA / TIPO DE ACESSIBILIDADE
  */
-function getIcon(categoria) {
+function getIcon(categoria, tipo) {
+    // Caso seja ponto de alerta, carrega a imagem local personalizada de aviso
+    if (tipo === "alerta") {
+        return L.icon({
+            iconUrl: 'assets/images/icone-alerta.png',
+            shadowUrl: "https://unpkg.com/leaflet/dist/images/marker-shadow.png",
+            iconSize: [25, 25],       
+            iconAnchor: [12, 25],     
+            popupAnchor: [0, -22]     
+        });
+    }
+
     let cor = "grey"; 
 
-    if (categoria === "secretaria") cor = "blue";
-    if (categoria === "mecanica") cor = "violet";    
-    if (categoria === "biblioteca") cor = "yellow";    
-    if (categoria === "edificacoes") cor = "red";    
-    if (categoria === "estacionamento") cor = "green"; 
-    if (categoria === "entrada") cor = "orange";
-    if (categoria === "informatica") cor = "black"; 
-    if (categoria === "geral") cor = "grey";    
+    if (tipo === "auditiva") {
+        cor = "red"; // Representação visual em vermelho para o ponto auditivo único
+    } else if (tipo === "fisica") {
+        if (categoria === "vaga_pcd") {
+            cor = "lightgreen"; // Verde claro para vagas de estacionamento PCD
+        } else {
+            cor = "green"; // Verde escuro para rampas, escadas e elevadores
+        }
+    } else {
+        // Cores padrão da infraestrutura estrutural do campus
+        if (categoria === "secretaria") cor = "red";
+        if (categoria === "mecanica") cor = "blue";    
+        if (categoria === "biblioteca") cor = "red";    
+        if (categoria === "edificacoes") cor = "green";    
+        if (categoria === "informatica") cor = "red"; 
+        if (categoria === "geral") cor = "red";   
+        
+        if (
+            categoria === "estacionamento" || 
+            categoria === "entrada" || 
+            categoria === "quadra" || 
+            categoria === "refeitorio" || 
+            categoria === "salas_externas"
+        ) {
+            cor = "orange";
+        }
+    }
 
     return L.icon({
         iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${cor}.png`,
         shadowUrl: "https://unpkg.com/leaflet/dist/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34]
+        iconSize: [18, 30],       
+        iconAnchor: [9, 30],       
+        popupAnchor: [1, -26]      
     });
+}
+
+/**
+ * DISPARA ALERTA NA TELA CASO O LOCAL REQUEIRA ATENÇÃO POR FALTA DE INFRAESTRUTURA
+ */
+function checarAlertaNecessidadeMelhoria(lugar) {
+    if (lugar.tipo === "alerta") {
+        setTimeout(() => {
+            alert(`⚠️ ATENÇÃO - Ponto de Alerta:\nO local "${lugar.nome}" apresenta barreiras físicas e necessita de melhorias urgentes de acessibilidade!`);
+        }, 300);
+    }
 }
 
 /**
@@ -77,7 +138,7 @@ function initMap() {
         maxZoom: 3
     });
 
-    primeiraInicializacao = true; // Garante que o estado inicial do mapa começa limpo
+    primeiraInicializacao = true; 
     atualizarPlantaDeFundo();
 
     mapa.on('click', function(e) {
@@ -111,12 +172,16 @@ function aplicarFiltrosCombinados() {
     const searchInput = document.getElementById('search-input');
     const termo = searchInput ? searchInput.value.toLowerCase() : "";
 
-    // 1. Filtragem por Ala (se for diferente de "todos", filtra pela ala selecionada)
-    if (alaAtual !== "todos") {
-        filtrados = filtrados.filter(l => l.categoria === alaAtual);
+    // 1. Controle de Visibilidade Macro/Micro por Ala
+    if (alaAtual === "todos") {
+        if (!termo && !filtroAtual) {
+            filtrados = filtrados.filter(l => l.subponto === false);
+        }
+    } else {
+        filtrados = filtrados.filter(l => l.categoria === alaAtual || l.bloco_pai === alaAtual);
     }
 
-    // 2. Filtragem por Tipo de Acessibilidade
+    // 2. Filtragem por Tipo de Acessibilidade / Alerta
     if (filtroAtual) {
         filtrados = filtrados.filter(l => l.tipo === filtroAtual);
     }
@@ -126,13 +191,12 @@ function aplicarFiltrosCombinados() {
         filtrados = filtrados.filter(l => l.nome.toLowerCase().includes(termo));
     }
 
-    // --- LOGICA AJUSTADA ---
-    // Se for a primeira inicialização do app (tela em 'todos') e sem busca por texto:
-    if (alaAtual === "todos" && primeiraInicializacao && !termo) {
-        limparMarcadores(); // Deixa o mapa limpo de pinos
-        atualizarListaLateral(lugares); // MAS atualiza a barra lateral com TODOS os locais do database
+    // 4. Decisão de renderização do mapa limpo no estado inicial
+    if (alaAtual === "todos" && primeiraInicializacao && !termo && !filtroAtual) {
+        limparMarcadores(); 
+        const blocosPrincipais = lugares.filter(l => l.subponto === false);
+        atualizarListaLateral(blocosPrincipais); 
     } else {
-        // Fluxo normal pós-clique ou pós-busca
         mostrarLugares(filtrados);
     }
 }
@@ -141,7 +205,7 @@ function aplicarFiltrosCombinados() {
  * FUNÇÃO DE FILTRAGEM DOS BOTÕES DE ALA
  */
 function filtrarAla(ala, elemento) {
-    primeiraInicializacao = false; // O usuário interagiu, desativa o modo de mapa limpo
+    primeiraInicializacao = false; 
 
     document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
         btn.classList.remove("active");
@@ -161,17 +225,25 @@ function mostrarLugares(lista) {
 
     lista.forEach(lugar => {
         const marcador = L.marker([lugar.y, lugar.x], {
-            icon: getIcon(lugar.categoria) 
+            icon: getIcon(lugar.categoria, lugar.tipo) 
         }).addTo(mapa);
 
-        const textoAcessibilidade = lugar.tipo === "geral" ? "Verificar local" : lugar.tipo.toUpperCase();
+        let textoPopup = lugar.tipo.toUpperCase();
+        if (lugar.tipo === "geral") textoPopup = "Ponto de Interesse";
+        if (lugar.tipo === "alerta") textoPopup = "⚠️ ATENÇÃO: Barreira Física Encontrada";
+        if (lugar.tipo === "fisica") textoPopup = "Acessibilidade Física";
+        if (lugar.tipo === "auditiva") textoPopup = "Acessibilidade Auditiva";
 
         marcador.bindPopup(`
             <div style="text-align:center;">
                 <strong style="font-size:14px; color:#5a2a83;">${lugar.nome}</strong><br>
-                <span style="color:#666; font-size:12px;">Filtro: ${textoAcessibilidade}</span>
+                <span style="color:#666; font-size:12px;">${textoPopup}</span>
             </div>
         `);
+
+        marcador.on('click', () => {
+            checarAlertaNecessidadeMelhoria(lugar);
+        });
         
         marcadores.push(marcador);
     });
@@ -185,10 +257,10 @@ function limparMarcadores() {
 }
 
 /**
- * FILTRAR POR ACESSIBILIDADE
+ * FILTRAR POR ACESSIBILIDADE OU ALERTA
  */
 function filtrar(tipo, elemento) {
-    primeiraInicializacao = false; // Desativa a trava inicial
+    primeiraInicializacao = false; 
 
     document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
 
@@ -205,7 +277,7 @@ function filtrar(tipo, elemento) {
  * BUSCA POR TEXTO
  */
 function pesquisarLugares() {
-    primeiraInicializacao = false; // Desativa a trava inicial
+    primeiraInicializacao = false; 
     aplicarFiltrosCombinados();
 }
 
@@ -227,7 +299,11 @@ function atualizarListaLateral(lista) {
         const item = document.createElement("div");
         item.className = "item-lugar"; 
         
-        const labelAcessibilidade = lugar.tipo === "geral" ? "Ponto de Interesse" : `Acessibilidade ${lugar.tipo}`;
+        let labelAcessibilidade = "Ponto de Interesse";
+        if (lugar.tipo === "alerta") labelAcessibilidade = "⚠️ Alerta de Acessibilidade";
+        else if (lugar.tipo === "fisica") labelAcessibilidade = "Acessibilidade Física";
+        else if (lugar.tipo === "auditiva") labelAcessibilidade = "Acessibilidade Auditiva";
+        else if (lugar.subponto) labelAcessibilidade = "Dependência Interna";
 
         item.innerHTML = `
             <p><strong>${lugar.nome}</strong></p>
@@ -235,11 +311,29 @@ function atualizarListaLateral(lista) {
         `;
         
         item.onclick = () => {
-            // Se o usuário clicar em um item da lista enquanto o mapa estiver no estado inicial limpo,
-            // nós desativamos a trava para criar o marcador do ponto onde ele clicou!
+            checarAlertaNecessidadeMelhoria(lugar);
+
             if (primeiraInicializacao) {
                 primeiraInicializacao = false;
+                
+                if (lugar.subponto && lugar.bloco_pai) {
+                    alaAtual = lugar.bloco_pai;
+                    atualizarPlantaDeFundo();
+                    return;
+                }
+                
                 aplicarFiltrosCombinados();
+            }
+
+            if (!lugar.subponto && plantas[lugar.categoria] && alaAtual === "todos") {
+                alaAtual = lugar.categoria;
+                const btnCorrespondente = document.querySelector(`#seletor-alas .btn-type[onclick*="'${lugar.categoria}'"]`);
+                if (btnCorrespondente) {
+                    document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => btn.classList.remove("active"));
+                    btnCorrespondente.classList.add("active");
+                }
+                atualizarPlantaDeFundo();
+                return;
             }
 
             mapa.setView([lugar.y, lugar.x], 1);
@@ -255,12 +349,12 @@ function atualizarListaLateral(lista) {
 }
 
 /**
- * MOSTRAR TODOS (Força a exibição de TODOS os pontos na tela e no mapa)
+ * MOSTRAR TODOS
  */
 function mostrarTodos() {
     filtroAtual = null;
     alaAtual = "todos";
-    primeiraInicializacao = false; // Desativa o mapa inicial limpo, exibindo tudo em ambos os cantos
+    primeiraInicializacao = false; 
 
     document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
     
