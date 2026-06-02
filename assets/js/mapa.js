@@ -6,17 +6,17 @@ const plantas = {
     todos: {
         largura: 1500,
         altura: 1056,
-        url: 'assets/images/planta-campus.jpg' 
+        url: 'assets/images/planta-campus.png' 
     },
     edificacoes: {
         largura: 1200, 
         altura: 800,
-        url: 'assets/images/planta-edificacoes.jpg' 
+        url: 'assets/images/planta-edificacoes.png' 
     },
     mecanica: {
         largura: 1200, 
         altura: 800,
-        url: 'assets/images/planta-mecanica.jpg' 
+        url: 'assets/images/planta-mecanica.png' 
     }
 };
 
@@ -41,7 +41,7 @@ let marcadores = [];
 let camadaImagem = null; 
 let filtroAtual = null;
 let alaAtual = "todos"; 
-let primeiraInicializacao = true; // Variável de controle para iniciar o mapa limpo
+let primeiraInicializacao = true; // Variável de controle para iniciar o mapa sem marcadores
 
 /**
  * DEFINE A COR DO ÍCONE BASEADO NA CATEGORIA
@@ -77,7 +77,7 @@ function initMap() {
         maxZoom: 3
     });
 
-    primeiraInicializacao = true; // Garante que o estado inicial é "limpo"
+    primeiraInicializacao = true; // Garante que o estado inicial do mapa começa limpo
     atualizarPlantaDeFundo();
 
     mapa.on('click', function(e) {
@@ -111,35 +111,37 @@ function aplicarFiltrosCombinados() {
     const searchInput = document.getElementById('search-input');
     const termo = searchInput ? searchInput.value.toLowerCase() : "";
 
-    // 1. TRAVA DE INICIALIZAÇÃO: Se a página acabou de abrir e não há busca, começa limpo
-    if (alaAtual === "todos" && primeiraInicializacao && !termo) {
-        mostrarLugares([]);
-        return; 
-    }
-
-    // 2. Filtragem por Ala (se for diferente de "todos", filtra pela ala selecionada)
+    // 1. Filtragem por Ala (se for diferente de "todos", filtra pela ala selecionada)
     if (alaAtual !== "todos") {
         filtrados = filtrados.filter(l => l.categoria === alaAtual);
     }
 
-    // 3. Filtragem por Tipo de Acessibilidade
+    // 2. Filtragem por Tipo de Acessibilidade
     if (filtroAtual) {
         filtrados = filtrados.filter(l => l.tipo === filtroAtual);
     }
 
-    // 4. Filtragem por Barra de Pesquisa Texto
+    // 3. Filtragem por Barra de Pesquisa Texto
     if (termo) {
         filtrados = filtrados.filter(l => l.nome.toLowerCase().includes(termo));
     }
 
-    mostrarLugares(filtrados);
+    // --- LOGICA AJUSTADA ---
+    // Se for a primeira inicialização do app (tela em 'todos') e sem busca por texto:
+    if (alaAtual === "todos" && primeiraInicializacao && !termo) {
+        limparMarcadores(); // Deixa o mapa limpo de pinos
+        atualizarListaLateral(lugares); // MAS atualiza a barra lateral com TODOS os locais do database
+    } else {
+        // Fluxo normal pós-clique ou pós-busca
+        mostrarLugares(filtrados);
+    }
 }
 
 /**
  * FUNÇÃO DE FILTRAGEM DOS BOTÕES DE ALA
  */
 function filtrarAla(ala, elemento) {
-    primeiraInicializacao = false; // O usuário interagiu, então desativa a trava inicial
+    primeiraInicializacao = false; // O usuário interagiu, desativa o modo de mapa limpo
 
     document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
         btn.classList.remove("active");
@@ -186,7 +188,7 @@ function limparMarcadores() {
  * FILTRAR POR ACESSIBILIDADE
  */
 function filtrar(tipo, elemento) {
-    primeiraInicializacao = false; // Desativa a trava se o usuário filtrar por acessibilidade
+    primeiraInicializacao = false; // Desativa a trava inicial
 
     document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
 
@@ -203,7 +205,7 @@ function filtrar(tipo, elemento) {
  * BUSCA POR TEXTO
  */
 function pesquisarLugares() {
-    primeiraInicializacao = false; // Desativa a trava caso o usuário use a busca por texto
+    primeiraInicializacao = false; // Desativa a trava inicial
     aplicarFiltrosCombinados();
 }
 
@@ -217,7 +219,7 @@ function atualizarListaLateral(lista) {
     container.innerHTML = "";
 
     if (lista.length === 0) {
-        container.innerHTML = "<p style='padding:15px; color:#888;'>Selecione uma ala, clique em 'Mostrar Tudo' ou faça uma busca para ver os locais.</p>";
+        container.innerHTML = "<p style='padding:15px; color:#888;'>Nenhum local encontrado para os filtros aplicados.</p>";
         return;
     }
 
@@ -233,6 +235,13 @@ function atualizarListaLateral(lista) {
         `;
         
         item.onclick = () => {
+            // Se o usuário clicar em um item da lista enquanto o mapa estiver no estado inicial limpo,
+            // nós desativamos a trava para criar o marcador do ponto onde ele clicou!
+            if (primeiraInicializacao) {
+                primeiraInicializacao = false;
+                aplicarFiltrosCombinados();
+            }
+
             mapa.setView([lugar.y, lugar.x], 1);
             marcadores.forEach(m => {
                 if (m.getLatLng().lat === lugar.y && m.getLatLng().lng === lugar.x) {
@@ -246,12 +255,12 @@ function atualizarListaLateral(lista) {
 }
 
 /**
- * MOSTRAR TODOS (Força a exibição de TODOS os pontos na tela)
+ * MOSTRAR TODOS (Força a exibição de TODOS os pontos na tela e no mapa)
  */
 function mostrarTodos() {
     filtroAtual = null;
     alaAtual = "todos";
-    primeiraInicializacao = false; // CRUCIAL: Desativa a trava para forçar a exibição total!
+    primeiraInicializacao = false; // Desativa o mapa inicial limpo, exibindo tudo em ambos os cantos
 
     document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
     
@@ -261,7 +270,7 @@ function mostrarTodos() {
     
     const botoesAla = document.querySelectorAll("#seletor-alas .btn-type");
     if (botoesAla.length > 0) {
-        botoesAla[0].classList.add("active"); // Deixa o botão "Todos" ou equivalente marcado
+        botoesAla[0].classList.add("active");
     }
 
     const searchInput = document.getElementById('search-input');
