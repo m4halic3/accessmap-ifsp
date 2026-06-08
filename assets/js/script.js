@@ -171,3 +171,36 @@ window.onclick = function(event) {
         fecharGuiaUsuario();
     }
 };
+
+/* ==========================================================================
+   FUNCIONALIDADE DE SWIPE PARA MOBILE
+   ========================================================================== */
+
+let touchStartX = 0;
+let touchEndX = 0;
+
+// Seleciona o container do carrossel
+const carouselContainer = document.querySelector('.carousel-container');
+
+if (carouselContainer) {
+    carouselContainer.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    carouselContainer.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, { passive: true });
+}
+
+function handleSwipe() {
+    const threshold = 50; // Distância mínima (em px) para disparar a troca
+    
+    if (touchEndX < touchStartX - threshold) {
+        // Arrastou para a esquerda: Próximo slide
+        btnMove(1); 
+    } else if (touchEndX > touchStartX + threshold) {
+        // Arrastou para a direita: Slide anterior
+        btnMove(-1);
+    }
+}

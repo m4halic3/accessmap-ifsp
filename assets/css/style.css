@@ -325,6 +325,7 @@ body {
     height: 350px;
     border-radius: 15px;
     box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.05);
+    touch-action: pan-y;
   }
   .carousel-container .seta {
     display: none !important;
