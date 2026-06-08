@@ -64,28 +64,34 @@ let alaAtual = "todos";
 let primeiraInicializacao = true; 
 
 /**
- * DEFINE A COR DO ÍCONE BASEADO NA CATEGORIA / TIPO DE ACESSIBILIDADE
+ * DEFINE O ÍCONE (IMAGEM OU COR) BASEADO NO TIPO COM ATRIBUTOS ALT DE ACESSIBILIDADE
  */
-function getIcon(categoria, tipo) {
+function getIcon(categoria, tipo, nomeLugar) {
+    // Caso seja ponto de alerta, carrega a imagem local e define o texto alternativo descritivo
     if (tipo === "alerta") {
         return L.icon({
             iconUrl: 'assets/images/icone-alerta.png',
             shadowUrl: "https://unpkg.com/leaflet/dist/images/marker-shadow.png",
             iconSize: [25, 25],       
             iconAnchor: [12, 25],     
-            popupAnchor: [0, -22]     
+            popupAnchor: [0, -22],
+            alt: `Ícone de alerta triangular amarelo indicando barreira arquitetônica em: ${nomeLugar}`
         });
     }
 
     let cor = "grey"; 
+    let descricaoAlt = `Marcador de ponto de interesse: ${nomeLugar}`;
 
     if (tipo === "auditiva") {
         cor = "red"; 
+        descricaoAlt = `Ícone vermelho indicando acessibilidade auditiva em: ${nomeLugar}`;
     } else if (tipo === "fisica") {
         if (categoria === "vaga_pcd") {
             cor = "lightgreen"; 
+            descricaoAlt = `Ícone verde claro indicando vaga exclusiva PCD em: ${nomeLugar}`;
         } else {
             cor = "green"; 
+            descricaoAlt = `Ícone verde indicando estrutura de acessibilidade física em: ${nomeLugar}`;
         }
     } else {
         if (categoria === "secretaria") cor = "red";
@@ -111,7 +117,8 @@ function getIcon(categoria, tipo) {
         shadowUrl: "https://unpkg.com/leaflet/dist/images/marker-shadow.png",
         iconSize: [18, 30],       
         iconAnchor: [9, 30],       
-        popupAnchor: [1, -26]      
+        popupAnchor: [1, -26],
+        alt: descricaoAlt
     });
 }
 
@@ -134,7 +141,7 @@ function initMap() {
 }
 
 /**
- * ATUALIZA A IMAGEM DE FUNDO DO LEAFLET DINAMICAMENTE
+ * ATUALIZA A IMAGEM DE FUNDO ADICIONANDO TEXTO ALTERNATIVO (ALT)
  */
 function atualizarPlantaDeFundo() {
     if (camadaImagem) {
@@ -144,9 +151,16 @@ function atualizarPlantaDeFundo() {
     const dadosPlanta = plantas[alaAtual];
     const limites = [[0, 0], [dadosPlanta.altura, dadosPlanta.largura]];
 
-    camadaImagem = L.imageOverlay(dadosPlanta.url, limites).addTo(mapa);
-    mapa.fitBounds(limites);
+    // Define descrição acessível baseada na ala visualizada
+    let textoAltPlanta = "Mapa do Campus Geral com distribuição dos blocos e caminhos.";
+    if (alaAtual === "edificacoes") textoAltPlanta = "Planta baixa detalhada do Bloco de Edificações.";
+    if (alaAtual === "mecanica") textoAltPlanta = "Planta baixa detalhada do Bloco de Mecânica.";
 
+    camadaImagem = L.imageOverlay(dadosPlanta.url, limites, {
+        alt: textoAltPlanta
+    }).addTo(mapa);
+    
+    mapa.fitBounds(limites);
     aplicarFiltrosCombinados();
 }
 
@@ -159,7 +173,6 @@ function aplicarFiltrosCombinados() {
     const searchInput = document.getElementById('search-input');
     const termo = searchInput ? searchInput.value.toLowerCase() : "";
 
-    // 1. Controle de Visibilidade Macro/Micro por Ala
     if (alaAtual === "todos") {
         if (!termo && !filtroAtual) {
             filtrados = filtrados.filter(l => l.subponto === false);
@@ -168,17 +181,14 @@ function aplicarFiltrosCombinados() {
         filtrados = filtrados.filter(l => l.categoria === alaAtual || l.bloco_pai === alaAtual);
     }
 
-    // 2. Filtragem por Tipo de Acessibilidade / Alerta
     if (filtroAtual) {
         filtrados = filtrados.filter(l => l.tipo === filtroAtual);
     }
 
-    // 3. Filtragem por Barra de Pesquisa Texto
     if (termo) {
         filtrados = filtrados.filter(l => l.nome.toLowerCase().includes(termo));
     }
 
-    // 4. Decisão de renderização do mapa limpo no estado inicial
     if (alaAtual === "todos" && primeiraInicializacao && !termo && !filtroAtual) {
         limparMarcadores(); 
         const blocosPrincipais = lugares.filter(l => l.subponto === false);
@@ -205,26 +215,30 @@ function filtrarAla(ala, elemento) {
 }
 
 /**
- * RENDERIZA OS MARCADORES NO MAPA
+ * RENDERIZA OS MARCADORES NO MAPA COM CORES CORRIGIDAS PARA ALTO CONTRASTE
  */
 function mostrarLugares(lista) {
     limparMarcadores();
 
     lista.forEach(lugar => {
         const marcador = L.marker([lugar.y, lugar.x], {
-            icon: getIcon(lugar.categoria, lugar.tipo) 
+            icon: getIcon(lugar.categoria, lugar.tipo, lugar.nome) 
         }).addTo(mapa);
 
         let textoPopup = lugar.tipo.toUpperCase();
         if (lugar.tipo === "geral") textoPopup = "Ponto de Interesse";
-        if (lugar.tipo === "alerta") textoPopup = "⚠️ ATENÇÃO: Barreira Física Encontrada";
+        
+        // CORRIGIDO: Vermelho escuro (#b71c1c) aplicado para conformidade de contraste (Acessibilidade)
+        if (lugar.tipo === "alerta") {
+           textoPopup = "<span style='color:#800000; font-weight:bold;'>⚠️ Barreira Física Encontrada (Necessita de Melhorias)</span>";
+        }
         if (lugar.tipo === "fisica") textoPopup = "Acessibilidade Física";
         if (lugar.tipo === "auditiva") textoPopup = "Acessibilidade Auditiva";
 
         marcador.bindPopup(`
             <div style="text-align:center;">
                 <strong style="font-size:14px; color:#5a2a83;">${lugar.nome}</strong><br>
-                <span style="color:#666; font-size:12px;">${textoPopup}</span>
+                <span style="color:#333333; font-size:12px;">${textoPopup}</span>
             </div>
         `);
         
@@ -274,7 +288,7 @@ function atualizarListaLateral(lista) {
     container.innerHTML = "";
 
     if (lista.length === 0) {
-        container.innerHTML = "<p style='padding:15px; color:#888;'>Nenhum local encontrado para os filtros aplicados.</p>";
+        container.innerHTML = "<p style='padding:15px; color:#555;'>Nenhum local encontrado para os filtros aplicados.</p>";
         return;
     }
 
@@ -283,7 +297,11 @@ function atualizarListaLateral(lista) {
         item.className = "item-lugar"; 
         
         let labelAcessibilidade = "Ponto de Interesse";
-        if (lugar.tipo === "alerta") labelAcessibilidade = "⚠️ Alerta de Acessibilidade";
+        
+        // CORRIGIDO: Cores da lista lateral atualizadas para vermelho escuro de alto contraste
+        if (lugar.tipo === "alerta") {
+            labelAcessibilidade = "<span style='color:#b71c1c; font-weight:bold;'>⚠️ Necessita de Melhorias</span>";
+        }
         else if (lugar.tipo === "fisica") labelAcessibilidade = "Acessibilidade Física";
         else if (lugar.tipo === "auditiva") labelAcessibilidade = "Acessibilidade Auditiva";
         else if (lugar.subponto) labelAcessibilidade = "Dependência Interna";
