@@ -1345,13 +1345,16 @@ body.alto-contraste #map, body.alto-contraste iframe, body.alto-contraste img, b
   .container-mapa {
     flex-direction: column !important;
     height: auto !important;
-    overflow-y: auto;
   }
   .sidebar {
     width: 100% !important;
     height: auto !important;
-    max-height: 60vh;
     padding: 20px !important;
+  }
+  .sidebar #lista-lugares {
+    max-height: 40vh;
+    overflow-y: auto;
+    margin-bottom: 20px;
   }
   #map {
     width: 100% !important;

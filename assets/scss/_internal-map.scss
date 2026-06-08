@@ -290,24 +290,30 @@
     }
 }
 
-// Responsividade
+// --- RESPONSIVIDADE CORRIGIDA ---
 @media (max-width: 992px) {
     .container-mapa {
         flex-direction: column !important;
         height: auto !important;
-        overflow-y: auto; 
     }
 
     .sidebar {
         width: 100% !important;
         height: auto !important;
-        max-height: 60vh; 
         padding: 20px !important;
+
+        // Aqui forçamos a lista a ter uma altura específica no mobile
+        // para que ela não ocupe a tela toda e force o scroll apenas nela.
+        #lista-lugares {
+            max-height: 40vh; // Define que a lista ocupará no máximo 40% da altura da tela
+            overflow-y: auto; // Garante a barra de rolagem dentro da lista
+            margin-bottom: 20px;
+        }
     }
 
     #map {
         width: 100% !important;
-        height: 400px !important;
+        height: 400px !important; // Mapa fica logo abaixo com tamanho fixo
         flex: none !important;
     }
 }
