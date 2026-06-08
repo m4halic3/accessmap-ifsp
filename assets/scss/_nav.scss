@@ -1,6 +1,9 @@
 @use "sass:color";
 @use 'variables' as *;
 
+// =========================================================================
+// NAVBAR COMPLETA
+// =========================================================================
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -15,6 +18,7 @@
     box-sizing: border-box;
     z-index: 100;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    
     .logo {
         flex: 1;
         display: flex;         
@@ -25,28 +29,16 @@
         color: $color-white;
         font-size: 1.2rem;
 
-        .logo-img {
-            height: 40px;      
-            width: auto;
-        }
-
+        .logo-img { height: 40px; width: auto; }
         .logo-text {
             display: flex;
             align-items: center;
-
-            &::after {
-                content: "|";
-                margin-left: 15px;
-                font-weight: 200;
-                opacity: 0.5;
-            }
+            &::after { content: "|"; margin-left: 15px; font-weight: 200; opacity: 0.5; }
         }
     }
 }
 
-body {
-    padding-top: 60px;
-}
+body { padding-top: 60px; }
 
 .nav-links-desktop {
     flex: 2;
@@ -65,12 +57,7 @@ body {
         border-radius: 4px;
 
         &:hover { color: $color-grey }
-
-        // Foco de acessibilidade no desktop
-        &:focus-visible {
-            outline: 2px solid $color-white;
-            outline-offset: 4px;
-        }
+        &:focus-visible { outline: 2px solid $color-white; outline-offset: 4px; }
     }
 }
 
@@ -91,140 +78,87 @@ body {
         transition: 0.3s;
         
         &:hover { color: $color-grey; }
-
-        // Foco de acessibilidade no botão de login
-        &:focus-visible {
-            outline: 2px solid $color-white;
-            outline-offset: 4px;
-        }
+        &:focus-visible { outline: 2px solid $color-white; outline-offset: 4px; }
     }
 }
 
 .mobile-only { display: none; }
 
+// =========================================================================
+// RESPONSIVIDADE MOBILE
+// =========================================================================
 @media (max-width: 768px) {
-    .desktop-only, .nav-links-desktop, .nav-right {
-        display: none !important;
-    }
-
+    .desktop-only, .nav-links-desktop, .nav-right { display: none !important; }
     .mobile-only { display: block !important; }
-
     .navbar { padding: 0 5%; }
 
     #menu-bar {
-        width: 30px;
-        height: 25px;
-        cursor: pointer;
-        z-index: 105;
+        width: 55px; height: 34px;
+        cursor: pointer; z-index: 105;
         position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: flex-end;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: flex-end;
         border-radius: 4px;
 
-        // Foco de acessibilidade no botão hambúrguer do mobile
-        &:focus-visible {
-            outline: 2px solid $color-white;
-            outline-offset: 6px;
-        }
-
         .bar {
-            height: 2px;
-            width: 100%;
+            height: 3px; width: 100%;
             background-color: $color-white;
-            display: block;
-            border-radius: 2px;
-            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            margin: 3px 0;
+            display: block; border-radius: 3px;
+            transition: 0.5s; margin: 4px 0;
         }
-        
-        #bar2 { width: 80%; }
+        #bar2 { width: 70%; }
     }
 
     .nav-mobile {
         display: none;
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 180px;
-        height: 180px;
+        position: fixed;
+        top: 0; right: 0;
+        width: 100%; height: 100vh;
         z-index: 104;
         flex-direction: column;
         align-items: center;
         justify-content: center;
 
-        &.change { 
-            display: flex; 
-            animation: fadeInMenu 0.7s ease-in-out forwards;
-        }
+        &.change { display: flex; }
 
         ul {
-            list-style: none;
-            padding: 0;
-            margin-top: 10px;
-            
+            list-style: none; padding: 0;
+            text-align: center;
             li {
-                padding: 4px 0;
+                padding: 20px 0;
                 a { 
-                    color: white; 
-                    font-size: 0.85rem;
-                    text-decoration: none; 
-                    font-family: $font-primary; 
-                    font-weight: 600;
-                    letter-spacing: 0.5px;
-                    transition: 0.3s;
-                    border-radius: 4px;
-                    display: inline-block;
-
-                    &:hover { 
-                        color: $color-grey;
-                        letter-spacing: 1.5px;
-                    }
-
-                    // Foco de acessibilidade nos links internos do menu mobile
-                    &:focus-visible {
-                        outline: 2px solid $color-white;
-                        outline-offset: 3px;
-                    }
+                    color: white; font-size: 1.5rem; // Letras grandes e legíveis
+                    text-decoration: none; font-family: $font-primary;
+                    font-weight: 600; transition: 0.3s;
+                    display: block;
+                    &:hover { color: $color-grey; }
                 }
             }
         }
     }
 
-    .menu-bg {
-        position: absolute;
-        top: 10px; 
-        right: 10px;
-        width: 0; 
-        height: 0;
-        // --- CORRIGIDO: Substituído darken() por color.adjust() moderno ---
-        background: rgba(color.adjust($color-purple, $lightness: -10%), 0.98); 
-        border-radius: 50% !important;
+.menu-bg {
+        position: fixed;
+        top: 15px; right: 15px;
+        width: 0; height: 0;
+        
+        // Altere o valor 0.98 para o nível de transparência desejado (ex: 0.8)
+        background: rgba(color.adjust($color-purple, $lightness: -10%), 0.9); 
+        
+        border-radius: 50%;
         transition: 0.7s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 90;
 
         &.change-bg {
-            width: 200px;  
-            height: 200px; 
-            transform: translate(12px, -12px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            width: 300vmax;  
+            height: 300vmax; 
+            transform: translate(50%, -50%);
         }
     }
-
     .change {
-        #bar1 { 
-            transform: translateY(8px) rotateZ(-45deg); 
-            width: 100%;
-        }
-        #bar2 { 
-            opacity: 0; 
-            transform: translateX(10px);
-        }
-        #bar3 { 
-            transform: translateY(-8px) rotateZ(45deg); 
-            width: 100%;
-        }
+        #bar1 { transform: translateY(11px) rotateZ(-45deg); width: 100%; }
+        #bar2 { opacity: 0; transform: translateX(10px); }
+        #bar3 { transform: translateY(-11px) rotateZ(45deg); width: 100%; }
     }
 }
 
