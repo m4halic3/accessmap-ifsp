@@ -1,3 +1,6 @@
+/* ==========================================================================
+   MENU MOBILE
+   ========================================================================== */
 function menuOnClick() {
     const menuBar = document.getElementById("menu-bar");
     const nav = document.getElementById("nav");
@@ -8,6 +11,9 @@ function menuOnClick() {
     if (menuBg) menuBg.classList.toggle("change-bg");
 }
 
+/* ==========================================================================
+   CARROSSEL E SWIPE MOBILE
+   ========================================================================== */
 let indexAtivo = 0;
 let isMoving = false; 
 const slider = document.getElementById("slider");
@@ -56,86 +62,69 @@ function jumpToSlide(n) {
     }, 1200);
 }
 
-let autoPlay = setInterval(() => {
-    btnMove(1);
-}, 5000);
+// Autoplay
+let autoPlay = setInterval(() => { btnMove(1); }, 5000);
 
 function reiniciarTimer() {
     clearInterval(autoPlay);
-    autoPlay = setInterval(() => {
-        btnMove(1);
-    }, 5000);
+    autoPlay = setInterval(() => { btnMove(1); }, 5000);
 }
 
-/*Parte Login*/
+// Lógica de Swipe Otimizada
+let touchStartX = 0;
+let touchEndX = 0;
+const carouselContainer = document.querySelector('.carousel-container');
 
+if (carouselContainer) {
+    carouselContainer.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].clientX;
+    }, { passive: true });
+
+    carouselContainer.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].clientX;
+        const diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 50) { // Distância mínima de 50px
+            btnMove(diff > 0 ? 1 : -1);
+        }
+    }, { passive: true });
+}
+
+/* ==========================================================================
+   LOGIN, PESQUISA E ACESSIBILIDADE
+   ========================================================================== */
 function toggleAuth() {
   const login = document.getElementById("loginCard");
   const signup = document.getElementById("signupCard");
-
-  login.classList.toggle("active");
-  signup.classList.toggle("active");
+  if (login && signup) {
+      login.classList.toggle("active");
+      signup.classList.toggle("active");
+  }
 }
 
 function pesquisarLugares() {
-    let input = document.getElementById('search-input').value.toLowerCase();
+    let input = document.getElementById('search-input')?.value.toLowerCase();
     let lista = document.getElementById('lista-lugares');
+    if (!lista) return;
     let itens = lista.getElementsByClassName('item-lugar');
 
     for (let i = 0; i < itens.length; i++) {
         let nomeLugar = itens[i].getElementsByTagName('p')[0].innerText.toLowerCase();
-        
-        if (nomeLugar.includes(input)) {
-            itens[i].style.display = ""; 
-        } else {
-            itens[i].style.display = "none"; 
-        }
+        itens[i].style.display = nomeLugar.includes(input) ? "" : "none";
     }
 }
 
-/* ==========================================================================
-   SISTEMA DE ACESSIBILIDADE NATIVA (Fontes e Alto Contraste)
-   ========================================================================== */
-
+// Acessibilidade
 let nivelFonte = 0; 
-const maxNivel = 3;  
-const minNivel = -2; 
-
 function mudarFonte(direcao) {
     const novoNivel = nivelFonte + direcao;
-    
-    if (novoNivel > maxNivel || novoNivel < minNivel) return;
-    
+    if (novoNivel > 3 || novoNivel < -2) return;
     nivelFonte = novoNivel;
-    const htmlElement = document.documentElement;
-    
-    switch (nivelFonte) {
-        case 0:
-            htmlElement.style.fontSize = "100%";
-            break;
-        case 1:
-            htmlElement.style.fontSize = "110%";
-            break;
-        case 2:
-            htmlElement.style.fontSize = "120%";
-            break;
-        case 3:
-            htmlElement.style.fontSize = "130%";
-            break;
-        case -1:
-            htmlElement.style.fontSize = "90%";
-            break;
-        case -2:
-            htmlElement.style.fontSize = "80%" ;
-            break;
-    }
+    document.documentElement.style.fontSize = (100 + (nivelFonte * 10)) + "%";
 }
 
 function toggleContraste() {
     document.body.classList.toggle("alto-contraste");
-    
-    const estadoAtivo = document.body.classList.contains("alto-contraste");
-    localStorage.setItem("altoContrasteState", estadoAtivo);
+    localStorage.setItem("altoContrasteState", document.body.classList.contains("alto-contraste"));
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -145,14 +134,13 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ==========================================================================
-   CONTROLE DO MODAL DE AJUDA / GUIA DO USUÁRIO
+   MODAL DE AJUDA
    ========================================================================== */
-
 function abrirGuiaUsuario() {
     const modal = document.getElementById("modal-guia");
     if (modal) {
         modal.style.display = "flex";
-        document.body.style.overflow = "hidden"; // Trava o scroll do fundo
+        document.body.style.overflow = "hidden";
     }
 }
 
@@ -160,47 +148,11 @@ function fecharGuiaUsuario() {
     const modal = document.getElementById("modal-guia");
     if (modal) {
         modal.style.display = "none";
-        document.body.style.overflow = "auto"; // Libera o scroll do fundo
+        document.body.style.overflow = "auto";
     }
 }
 
-// Fecha o modal caso o usuário clique fora da caixa de conteúdo técnico
 window.onclick = function(event) {
     const modal = document.getElementById("modal-guia");
-    if (event.target === modal) {
-        fecharGuiaUsuario();
-    }
+    if (event.target === modal) fecharGuiaUsuario();
 };
-
-/* ==========================================================================
-   FUNCIONALIDADE DE SWIPE PARA MOBILE
-   ========================================================================== */
-
-let touchStartX = 0;
-let touchEndX = 0;
-
-// Seleciona o container do carrossel
-const carouselContainer = document.querySelector('.carousel-container');
-
-if (carouselContainer) {
-    carouselContainer.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
-
-    carouselContainer.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    }, { passive: true });
-}
-
-function handleSwipe() {
-    const threshold = 50; // Distância mínima (em px) para disparar a troca
-    
-    if (touchEndX < touchStartX - threshold) {
-        // Arrastou para a esquerda: Próximo slide
-        btnMove(1); 
-    } else if (touchEndX > touchStartX + threshold) {
-        // Arrastou para a direita: Slide anterior
-        btnMove(-1);
-    }
-}
