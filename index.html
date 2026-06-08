@@ -53,24 +53,33 @@
     <main id="conteudo-principal">
 
         <section class="secao-carrossel" aria-label="Destaques Informativos">
-            <div class="carousel-container">
-                <div class="slides-wrapper" id="slider">
-                    <div class="slide"><img src="assets/images/motivacao.png" alt="Texto motivacional sobre o direito à cidade e circulação livre de barreiras"></div>
-                    <div class="slide"><img src="assets/images/simbolos.png" alt="Infográfico exibindo os símbolos universais de acessibilidade física e auditiva"></div>
-                    <div class="slide"><img src="assets/images/slide-final.png" alt="Ilustração de estudantes interagindo e colaborando no desenvolvimento do projeto"></div>
-                </div>
+    <div class="carousel-container">
+        <div class="slides-wrapper" id="slider">
+            <div class="slide">
+    <img src="assets/images/motivacao.png" 
+         alt="Logo AccessMap: Encontre blocos e laboratórios no campus de forma rápida.">
+</div>
 
-                <button class="seta esquerda" onclick="btnMove(-1)" aria-label="Slide Anterior">❮</button>
-                <button class="seta direita" onclick="btnMove(1)" aria-label="Próximo Slide">❯</button>
+<div class="slide">
+    <img src="assets/images/simbolos.png" 
+         alt="Infográfico: Símbolos universais de acessibilidade física e auditiva.">
+</div>
 
-                <div class="indicadores" role="tablist" aria-label="Indicadores dos slides">
-                    <button class="dot active" onclick="jumpToSlide(0)" role="tab" aria-selected="true" aria-label="Ir para o slide 1"></button>
-                    <button class="dot" onclick="jumpToSlide(1)" role="tab" aria-selected="false" aria-label="Ir para o slide 2"></button>
-                    <button class="dot" onclick="jumpToSlide(2)" role="tab" aria-selected="false" aria-label="Ir para o slide 3"></button>
-                </div>
-            </div>
-        </section>
+<div class="slide">
+    <img src="assets/images/slide-final.png" 
+         alt="Mapa do campus com pinos de localização: Mova-se com autonomia.">
+</div>
 
+        <button class="seta esquerda" onclick="btnMove(-1)" aria-label="Slide Anterior">❮</button>
+        <button class="seta direita" onclick="btnMove(1)" aria-label="Próximo Slide">❯</button>
+
+        <div class="indicadores" role="tablist" aria-label="Indicadores dos slides">
+            <button class="dot active" onclick="jumpToSlide(0)" role="tab" aria-selected="true" aria-label="Ir para o slide 1"></button>
+            <button class="dot" onclick="jumpToSlide(1)" role="tab" aria-selected="false" aria-label="Ir para o slide 2"></button>
+            <button class="dot" onclick="jumpToSlide(2)" role="tab" aria-selected="false" aria-label="Ir para o slide 3"></button>
+        </div>
+    </div>
+</section>
         <section id="mapa" class="map-section" aria-label="Mapa Interativo">
             <div class="map-container">
                 <iframe
