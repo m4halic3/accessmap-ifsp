@@ -97,20 +97,18 @@ function pesquisarLugares() {
    SISTEMA DE ACESSIBILIDADE NATIVA (Fontes e Alto Contraste)
    ========================================================================== */
 
-let nivelFonte = 0; // 0 representa o tamanho padrão (100%)
-const maxNivel = 3;  // Limite máximo de aumento
-const minNivel = -2; // Limite mínimo de redução
+let nivelFonte = 0; 
+const maxNivel = 3;  
+const minNivel = -2; 
 
 function mudarFonte(direcao) {
     const novoNivel = nivelFonte + direcao;
     
-    // Impede que ultrapasse as barreiras de legibilidade estabelecidas
     if (novoNivel > maxNivel || novoNivel < minNivel) return;
     
     nivelFonte = novoNivel;
     const htmlElement = document.documentElement;
     
-    // Altera a raiz de dimensionamento proporcional (rem) da aplicação
     switch (nivelFonte) {
         case 0:
             htmlElement.style.fontSize = "100%";
@@ -145,3 +143,31 @@ window.addEventListener("DOMContentLoaded", () => {
         document.body.classList.add("alto-contraste");
     }
 });
+
+/* ==========================================================================
+   CONTROLE DO MODAL DE AJUDA / GUIA DO USUÁRIO
+   ========================================================================== */
+
+function abrirGuiaUsuario() {
+    const modal = document.getElementById("modal-guia");
+    if (modal) {
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden"; // Trava o scroll do fundo
+    }
+}
+
+function fecharGuiaUsuario() {
+    const modal = document.getElementById("modal-guia");
+    if (modal) {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto"; // Libera o scroll do fundo
+    }
+}
+
+// Fecha o modal caso o usuário clique fora da caixa de conteúdo técnico
+window.onclick = function(event) {
+    const modal = document.getElementById("modal-guia");
+    if (event.target === modal) {
+        fecharGuiaUsuario();
+    }
+};

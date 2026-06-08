@@ -14,6 +14,9 @@
             <a href="./index.html"><img src="assets/images/logo-branca.png" alt="Logo AccessMap" class="logo-img"></a>
             <span class="logo-text">ACCESSMAP</span>
         </div>
+        <button type="button" class="btn-ajuda" id="btn-ajuda" onclick="abrirGuiaUsuario()" aria-label="Ajuda e Guia do Usuário: clique para entender o funcionamento dos pontos e a estrutura de acessibilidade do mapa.">
+            <i class="fas fa-question-circle" aria-hidden="true"></i>
+        </button>
     </nav>
 
     <main class="container-mapa" id="container-mapa-conteudo">
@@ -54,6 +57,31 @@
 
         <div id="map" aria-label="Mapa interativo do campus"></div>
     </main>
+
+    <div id="modal-guia" class="modal-guia" role="dialog" aria-modal="true" aria-labelledby="modal-guia-titulo" style="display: none;">
+        <div class="modal-conteudo">
+            <span class="fechar-modal" onclick="fecharGuiaUsuario()" role="button" tabindex="0" aria-label="Fechar guia do usuário">&times;</span>
+            <h2 id="modal-guia-titulo">📖 Guia de Uso do AccessMap</h2>
+            <hr style="border: 0; height: 1px; background: #eee; margin: 15px 0;">
+            
+            <h3>📍 Estrutura e Categorias do Mapa</h3>
+            <p>O mapa é dividido de forma limpa e categorizada para facilitar sua navegação pelo campus. Veja como os marcadores funcionam:</p>
+            
+            <ul>
+                <li><strong style="color: #2e7d32;">Verde Escuro:</strong> Pontos de <strong>Acessibilidade Física</strong> direta, indicando a localização de rampas de acesso, escadarias estruturais e elevadores.</li>
+                <li><strong style="color: #43a047;">Verde Claro:</strong> Vagas exclusivas e reservadas para PCD no <strong>Estacionamento</strong> interno do campus.</li>
+                <li><strong style="color: #e53935;">Vermelho:</strong> Pontos de <strong>Acessibilidade Auditiva</strong>, mapeando o local exato onde fica a Sala de Intérpretes de LIBRAS.</li>
+                <li><strong style="color: #fdd835; text-shadow: 1px 1px 1px rgba(0,0,0,0.1);">Amarelo (⚠️):</strong> <strong>Pontos de Alerta e Cuidado</strong>. Locais que possuem barreiras ou degraus e atualmente não contam com acessibilidade física adequada. Ao clicar neles, um aviso detalhado será exibido na tela.</li>
+            </ul>
+
+            <h3>🔄 Navegação por Abas e Aninhamento (Micro/Macro)</h3>
+            <p>Para evitar excesso de informações visuais, o sistema utiliza uma lógica inteligente de aninhamento:</p>
+            <ul>
+                <li><strong>Visão Geral (Ver Tudo):</strong> Exibe apenas os blocos âncoras principais, entradas e pontos de acessibilidade externos.</li>
+                <li><strong>Visão por Ala (Microambiente):</strong> Ao alternar para os botões <em>Ala Edificações</em> ou <em>Ala Mecânica</em>, o mapa altera a imagem de fundo para a planta baixa interna e **revela dinamicamente as salas e dependências internas (subpontos)** que pertencem exclusivamente àquele bloco, bem como os elevadores ou degraus internos daquela ala.</li>
+            </ul>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="assets/js/mapa.js"></script>

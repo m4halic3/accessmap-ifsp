@@ -67,7 +67,6 @@ let primeiraInicializacao = true;
  * DEFINE A COR DO ÍCONE BASEADO NA CATEGORIA / TIPO DE ACESSIBILIDADE
  */
 function getIcon(categoria, tipo) {
-    // Caso seja ponto de alerta, carrega a imagem local personalizada de aviso
     if (tipo === "alerta") {
         return L.icon({
             iconUrl: 'assets/images/icone-alerta.png',
@@ -81,15 +80,14 @@ function getIcon(categoria, tipo) {
     let cor = "grey"; 
 
     if (tipo === "auditiva") {
-        cor = "red"; // Representação visual em vermelho para o ponto auditivo único
+        cor = "red"; 
     } else if (tipo === "fisica") {
         if (categoria === "vaga_pcd") {
-            cor = "lightgreen"; // Verde claro para vagas de estacionamento PCD
+            cor = "lightgreen"; 
         } else {
-            cor = "green"; // Verde escuro para rampas, escadas e elevadores
+            cor = "green"; 
         }
     } else {
-        // Cores padrão da infraestrutura estrutural do campus
         if (categoria === "secretaria") cor = "red";
         if (categoria === "mecanica") cor = "blue";    
         if (categoria === "biblioteca") cor = "red";    
@@ -115,17 +113,6 @@ function getIcon(categoria, tipo) {
         iconAnchor: [9, 30],       
         popupAnchor: [1, -26]      
     });
-}
-
-/**
- * DISPARA ALERTA NA TELA CASO O LOCAL REQUEIRA ATENÇÃO POR FALTA DE INFRAESTRUTURA
- */
-function checarAlertaNecessidadeMelhoria(lugar) {
-    if (lugar.tipo === "alerta") {
-        setTimeout(() => {
-            alert(`⚠️ ATENÇÃO - Ponto de Alerta:\nO local "${lugar.nome}" apresenta barreiras físicas e necessita de melhorias urgentes de acessibilidade!`);
-        }, 300);
-    }
 }
 
 /**
@@ -240,10 +227,6 @@ function mostrarLugares(lista) {
                 <span style="color:#666; font-size:12px;">${textoPopup}</span>
             </div>
         `);
-
-        marcador.on('click', () => {
-            checarAlertaNecessidadeMelhoria(lugar);
-        });
         
         marcadores.push(marcador);
     });
@@ -311,8 +294,6 @@ function atualizarListaLateral(lista) {
         `;
         
         item.onclick = () => {
-            checarAlertaNecessidadeMelhoria(lugar);
-
             if (primeiraInicializacao) {
                 primeiraInicializacao = false;
                 
