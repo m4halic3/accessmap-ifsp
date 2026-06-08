@@ -25,10 +25,12 @@ const plantas = {
  */
 const lugares = [
     // === PONTOS PRINCIPAIS / BLOCOS ÂNCORAS ===
-    { nome: "Ala de Informática (Laboratórios)", tipo: "geral", categoria: "informatica", y: 705, x: 1040, subponto: false },
+    { nome: "Bloco Vermelho - Bloco A", tipo: "geral", categoria: "informatica", y: 705, x: 1040, subponto: false },
+    { nome: "Bloco Azul - Bloco B", tipo: "geral", categoria: "mecanica", y: 720, x: 780, subponto: false },
+    { nome: "Bloco Verde - Bloco C", tipo: "geral", categoria: "edificacoes", y: 720, x: 640, subponto: false },
+    
+    // Demais pontos principais
     { nome: "Secretaria / Atendimento", tipo: "auditiva", categoria: "secretaria", y: 637, x: 1100, subponto: false },
-    { nome: "Bloco de Salas (Edificações)", tipo: "geral", categoria: "edificacoes", y: 720, x: 640, subponto: false },
-    { nome: "Bloco de Salas (Mecânica)", tipo: "geral", categoria: "mecanica", y: 720, x: 780, subponto: false },
     { nome: "Bloco de Salas de Aula (Geral)", tipo: "geral", categoria: "geral", y: 700, x: 950, subponto: false },
     { nome: "Biblioteca", tipo: "geral", categoria: "biblioteca", y: 500, x: 1000, subponto: false },
     { nome: "Entrada (Ala da biblioteca)", tipo: "geral", categoria: "entrada", y: 540, x: 1000, subponto: false },
@@ -39,56 +41,59 @@ const lugares = [
     { nome: "Refeitório", tipo: "geral", categoria: "refeitorio", y: 450, x: 550, subponto: false },
     { nome: "Salas Externas", tipo: "geral", categoria: "salas_externas", y: 480, x: 580, subponto: false },
 
-    // === INÚMERAS SALAS ADICIONADAS POR BLOCO ===
+    // === INÚMERAS SALAS ADICIONADAS POR BLOCO (AGRUPADAS NOS BLOCOS RAIZ) ===
     
-    // ALA DE INFORMÁTICA / BLOCO VERMELHO
-    { nome: "Laboratório de Redes (Sala 1)", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 710, x: 1045, subponto: true },
-    { nome: "Laboratório de Software (Sala 2)", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 700, x: 1035, subponto: true },
-    { nome: "Sala de Aula Inclusiva 01", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 705, x: 1050, subponto: true },
-    { nome: "Sala de Aula Inclusiva 02", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 695, x: 1040, subponto: true },
-    { nome: "Sala de Aula Inclusiva 03", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 715, x: 1030, subponto: true },
-    { nome: "Sala de Aula Inclusiva 04", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 690, x: 1055, subponto: true },
-    { nome: "Sala de Aula Inclusiva 05", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 720, x: 1045, subponto: true },
-    { nome: "Sala de Aula Inclusiva 06", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 685, x: 1035, subponto: true },
-    { nome: "Sala de Aula Inclusiva 07", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 725, x: 1050, subponto: true },
-    { nome: "Sala de Aula Inclusiva 08", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 680, x: 1040, subponto: true },
+    // BLOCO VERMELHO / BLOCO A (Novas salas adicionadas)
+    { nome: "Bloco A - Laboratório de Redes (Sala 1)", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 710, x: 1045, subponto: true },
+    { nome: "Bloco A - Laboratório de Software (Sala 2)", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 700, x: 1035, subponto: true },
+    { nome: "Bloco A - Sala de Aula Inclusiva 01", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 705, x: 1050, subponto: true },
+    { nome: "Bloco A - Sala de Aula Inclusiva 02", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 695, x: 1040, subponto: true },
+    { nome: "Bloco A - Sala de Aula Inclusiva 03", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 715, x: 1030, subponto: true },
+    { nome: "Bloco A - Sala de Aula Inclusiva 04", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 690, x: 1055, subponto: true },
+    { nome: "Bloco A - Sala de Aula Inclusiva 05", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 720, x: 1045, subponto: true },
+    { nome: "Bloco A - Sala de Aula Inclusiva 06", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 685, x: 1035, subponto: true },
+    { nome: "Bloco A - Sala de Aula Inclusiva 07", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 725, x: 1050, subponto: true },
+    { nome: "Bloco A - Sala de Aula Inclusiva 08", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 680, x: 1040, subponto: true },
+    { nome: "Bloco A - Auditório Principal", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 712, x: 1058, subponto: true },
+    { nome: "Bloco A - Mini Auditório", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 692, x: 1028, subponto: true },
+    { nome: "Bloco A - Maker Space / Robótica", tipo: "geral", categoria: "informatica", bloco_pai: "informatica", y: 718, x: 1038, subponto: true },
 
-    // BLOCO DE EDIFICAÇÕES / BLOCO VERDE
-    { nome: "Sala 101 - Desenho Técnico", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 725, x: 645, subponto: true },
-    { nome: "Sala de Aula Adaptada 11", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 715, x: 635, subponto: true },
-    { nome: "Sala de Aula Adaptada 12", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 730, x: 650, subponto: true },
-    { nome: "Sala de Aula Adaptada 13", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 710, x: 630, subponto: true },
-    { nome: "Sala de Aula Adaptada 14", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 735, x: 655, subponto: true },
-    { nome: "Sala de Aula Adaptada 15", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 705, x: 640, subponto: true },
-    { nome: "Sala de Aula Adaptada 16", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 740, x: 645, subponto: true },
-    { nome: "Sala de Aula Adaptada 17", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 700, x: 635, subponto: true },
-    { nome: "Sala de Aula Adaptada 18", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 745, x: 650, subponto: true },
+    // BLOCO VERDE / BLOCO C (Movidos para orbitar o Bloco C Geral: X:640, Y:720)
+    { nome: "Bloco C - Sala 101 - Desenho Técnico", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 725, x: 645, subponto: true },
+    { nome: "Bloco C - Sala de Aula Adaptada 11", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 715, x: 635, subponto: true },
+    { nome: "Bloco C - Sala de Aula Adaptada 12", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 730, x: 650, subponto: true },
+    { nome: "Bloco C - Sala de Aula Adaptada 13", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 710, x: 630, subponto: true },
+    { nome: "Bloco C - Sala de Aula Adaptada 14", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 735, x: 655, subponto: true },
+    { nome: "Bloco C - Sala de Aula Adaptada 15", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 705, x: 640, subponto: true },
+    { nome: "Bloco C - Sala de Aula Adaptada 16", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 740, x: 645, subponto: true },
+    { nome: "Bloco C - Sala de Aula Adaptada 17", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 700, x: 635, subponto: true },
+    { nome: "Bloco C - Sala de Aula Adaptada 18", tipo: "geral", categoria: "edificacoes", bloco_pai: "edificacoes", y: 745, x: 650, subponto: true },
 
-    // BLOCO DE MECÂNICA / BLOCO AZUL
-    { nome: "Sala de Aula Funcional 21", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 725, x: 785, subponto: true },
-    { nome: "Sala de Aula Funcional 22", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 715, x: 775, subponto: true },
-    { nome: "Sala de Aula Funcional 23", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 730, x: 790, subponto: true },
-    { nome: "Sala de Aula Funcional 24", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 710, x: 770, subponto: true },
-    { nome: "Sala de Aula Funcional 25", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 735, x: 795, subponto: true },
-    { nome: "Sala de Aula Funcional 26", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 705, x: 780, subponto: true },
-    { nome: "Sala de Aula Funcional 27", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 740, x: 785, subponto: true },
-    { nome: "Sala de Aula Funcional 28", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 700, x: 775, subponto: true },
+    // BLOCO AZUL / BLOCO B (Movidos para orbitar o Bloco B Geral: X:780, Y:720)
+    { nome: "Bloco B - Sala de Aula Funcional 21", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 725, x: 785, subponto: true },
+    { nome: "Bloco B - Sala de Aula Funcional 22", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 715, x: 775, subponto: true },
+    { nome: "Bloco B - Sala de Aula Funcional 23", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 730, x: 790, subponto: true },
+    { nome: "Bloco B - Sala de Aula Funcional 24", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 710, x: 770, subponto: true },
+    { nome: "Bloco B - Sala de Aula Funcional 25", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 735, x: 795, subponto: true },
+    { nome: "Bloco B - Sala de Aula Funcional 26", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 705, x: 780, subponto: true },
+    { nome: "Bloco B - Sala de Aula Funcional 27", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 740, x: 785, subponto: true },
+    { nome: "Bloco B - Sala de Aula Funcional 28", tipo: "geral", categoria: "mecanica", bloco_pai: "mecanica", y: 700, x: 775, subponto: true },
 
     // === PONTOS DE ACESSIBILIDADE DETALHADOS ===
     { nome: "Sala de Intérpretes (LIBRAS)", tipo: "auditiva", categoria: "sala_interpretes", y: 645, x: 1110, subponto: false },
     { nome: "Rampa de Acesso - Bloco Geral", tipo: "fisica", categoria: "rampa", y: 690, x: 950, subponto: false },
     { nome: "Escadaria de Acesso Principal", tipo: "fisica", categoria: "escada", y: 360, x: 620, subponto: false },
-    { nome: "Elevador - Bloco Edificações", tipo: "fisica", categoria: "elevador", bloco_pai: "edificacoes", y: 722, x: 642, subponto: true },
+    { nome: "Elevador - Bloco C (Verde)", tipo: "fisica", categoria: "elevador", bloco_pai: "edificacoes", y: 722, x: 642, subponto: true },
     { nome: "Vagas Exclusivas PCD - Estacionamento", tipo: "fisica", categoria: "vaga_pcd", y: 515, x: 740, subponto: false },
 
     // === MAIS PONTOS DE ALERTA DISTRIBUÍDOS PELO CAMPUS ===
-    { nome: "Alerta: Degrau sem Rampa no Bloco de Mecânica", tipo: "alerta", categoria: "alerta", bloco_pai: "mecanica", y: 715, x: 775, subponto: true },
+    { nome: "Alerta: Degrau sem Rampa no Bloco B (Azul)", tipo: "alerta", categoria: "alerta", bloco_pai: "mecanica", y: 715, x: 775, subponto: true },
     { nome: "Alerta: Calçada Irregular / Acesso à Quadra", tipo: "alerta", categoria: "alerta", y: 410, x: 510, subponto: false },
     { nome: "Alerta: Piso Tátil Interrompido no Corredor Central", tipo: "alerta", categoria: "alerta", y: 600, x: 900, subponto: false },
     { nome: "Alerta: Inclinação Excessiva na Rampa Sul", tipo: "alerta", categoria: "alerta", y: 480, x: 700, subponto: false },
     { nome: "Alerta: Entrada Secundária com Porta Estreita", tipo: "alerta", categoria: "alerta", y: 530, x: 1010, subponto: false },
-    { nome: "Alerta: Bebedouro Inadequado na Ala de Informática", tipo: "alerta", categoria: "alerta", bloco_pai: "informatica", y: 712, x: 1038, subponto: true },
-    { nome: "Alerta: Sanitário PCD Obstruído no Bloco de Edificações", tipo: "alerta", categoria: "alerta", bloco_pai: "edificacoes", y: 718, x: 644, subponto: true }
+    { nome: "Alerta: Bebedouro Inadequado no Bloco A (Vermelho)", tipo: "alerta", categoria: "alerta", bloco_pai: "informatica", y: 712, x: 1038, subponto: true },
+    { nome: "Alerta: Sanitário PCD Obstruído no Bloco C (Verde)", tipo: "alerta", categoria: "alerta", bloco_pai: "edificacoes", y: 718, x: 644, subponto: true }
 ];
 
 let mapa;
@@ -186,8 +191,8 @@ function atualizarPlantaDeFundo() {
     const limites = [[0, 0], [dadosPlanta.altura, dadosPlanta.largura]];
 
     let textAltPlanta = "Mapa do Campus Geral com distribuição dos blocos e caminhos.";
-    if (alaAtual === "edificacoes") textAltPlanta = "Planta baixa detalhada do Bloco de Edificações.";
-    if (alaAtual === "mecanica") textAltPlanta = "Planta baixa detalhada do Bloco de Mecânica.";
+    if (alaAtual === "edificacoes") textAltPlanta = "Planta baixa detalhada do Bloco C (Verde).";
+    if (alaAtual === "mecanica") textAltPlanta = "Planta baixa detalhada do Bloco B (Azul).";
 
     camadaImagem = L.imageOverlay(dadosPlanta.url, limites, {
         alt: textAltPlanta
@@ -300,7 +305,7 @@ function filtrar(tipo, elemento) {
         filtroAtual = null;
     } else {
         filtroAtual = tipo;
-        element.classList.add("ativo");
+        elemento.classList.add("ativo");
     }
     aplicarFiltrosCombinados();
 }
@@ -314,7 +319,7 @@ function pesquisarLugares() {
 }
 
 /**
- * ATUALIZA A LISTA LATERAL TEXTUAL COM ISOLAMENTO DE MARCADOR ÚNICO
+ * ATUALIZA A LISTA LATERAL TEXTUAL COM ISOLAMENTO DE MARCADOR ÚNICO OU EXPANSÃO DE BLOCOS
  */
 function atualizarListaLateral(lista) {
     const container = document.getElementById("lista-lugares");
@@ -331,18 +336,42 @@ function atualizarListaLateral(lista) {
         const item = document.createElement("div");
         item.className = "item-lugar"; 
         
-        let labelAcessibilidade = "Ponto de Interesse";
+        // --- LÓGICA DE COR DA BORDA BASEADA NO BLOCO ---
+        let corBorda = "#ccc"; 
+        const categoriaAlvo = lugar.bloco_pai || lugar.categoria;
         
-        if (lugar.tipo === "alerta") {
-            labelAcessibilidade = "<span style='color:#800000; font-weight:bold;'>⚠️ Necessita de Melhorias</span>";
+        if (categoriaAlvo === "informatica" || lugar.nome.includes(" - Bloco A")) {
+            corBorda = "#790000"; // Vermelho para Bloco A
+        } else if (categoriaAlvo === "mecanica" || lugar.nome.includes(" - Bloco B")) {
+            corBorda = "#002f5e"; // Azul para Bloco B
+        } else if (categoriaAlvo === "edificacoes" || lugar.nome.includes(" - Bloco C")) {
+            corBorda = "#005b26"; // Verde para Bloco C
+        } else if (lugar.tipo === "alerta") {
+            corBorda = "#e67e22"; // Laranja para alertas
         }
+
+        // Aplica o estilo de borda esquerda grossa para um visual moderno e limpo
+        item.style.borderLeft = `5px solid ${corBorda}`;
+        item.style.padding = "10px 15px";
+        item.style.marginBottom = "8px";
+        item.style.backgroundColor = "#f9f9f9";
+        item.style.borderRadius = "4px";
+        item.style.cursor = "pointer";
+        item.style.transition = "background-color 0.2s ease";
+
+        // Efeito de hover simples via JS
+        item.onmouseenter = () => item.style.backgroundColor = "#f1f1f1";
+        item.onmouseleave = () => item.style.backgroundColor = "#f9f9f9";
+        
+        let labelAcessibilidade = "Ponto de Interesse";
+        if (lugar.tipo === "alerta") labelAcessibilidade = "<span style='color:#800000; font-weight:bold;'>⚠️ Necessita de Melhorias</span>";
         else if (lugar.tipo === "fisica") labelAcessibilidade = "Acessibilidade Física";
         else if (lugar.tipo === "auditiva") labelAcessibilidade = "Acessibilidade Auditiva";
         else if (lugar.subponto) labelAcessibilidade = "Dependência Interna";
 
         item.innerHTML = `
-            <p><strong>${lugar.nome}</strong></p>
-            <span>${labelAcessibilidade}</span>
+            <p style="margin: 0 0 5px 0;"><strong>${lugar.nome}</strong></p>
+            <span style="font-size: 12px; color: #666;">${labelAcessibilidade}</span>
         `;
         
         item.onclick = () => {
@@ -350,37 +379,37 @@ function atualizarListaLateral(lista) {
                 primeiraInicializacao = false;
             }
 
-            // MODIFICAÇÃO SOLICITADA: Limpa o mapa e exibe APENAS este local selecionado
+            // Limpa o mapa para a nova seleção
             limparMarcadores();
+
+            // CASO ESPECIAL: Se clicar em um Bloco Principal (A, B ou C)
+            if (!lugar.subponto && (lugar.categoria === "informatica" || lugar.categoria === "mecanica" || lugar.categoria === "edificacoes")) {
+                // 1. Mostra o marcador do próprio Bloco
+                const blocoRaiz = adicionarMarcador(lugar);
+                
+                // 2. Filtra e mostra TODAS as salas internas que pertencem a este bloco
+                const subSalas = lugares.filter(l => l.bloco_pai === lugar.categoria);
+                subSalas.forEach(sala => adicionarMarcador(sala));
+
+                // 3. Move o foco do mapa para o Bloco e abre o popup principal (Mantém na mesma planta)
+                mapa.setView([lugar.y, lugar.x], 1);
+                blocoRaiz.openPopup();
+                return; // Encerra a execução do clique aqui
+            }
+
+            // CASO NORMAL: Se for uma sala individual (subponto) ou outro ponto qualquer do campus
             const marcadorUnico = adicionarMarcador(lugar);
 
-            // Se for um subponto e não estivermos na planta correta dele, ajusta o fundo primeiro
+            // Só altera o fundo de forma forçada caso seja um subponto estrito que exija outra imagem carregada
             if (lugar.subponto && lugar.bloco_pai && alaAtual !== lugar.bloco_pai) {
                 alaAtual = lugar.bloco_pai;
                 atualizarPlantaDeFundo();
-                // Re-adiciona o marcador pois a atualização limpa o mapa
                 limparMarcadores();
                 adicionarMarcador(lugar).openPopup();
                 mapa.setView([lugar.y, lugar.x], 1);
                 return;
             }
-
-            // Se for um bloco raiz com planta própria e estivermos no mapa "todos", entra na planta
-            if (!lugar.subponto && plantas[lugar.categoria] && alaAtual === "todos") {
-                alaAtual = lugar.categoria;
-                const btnCorrespondente = document.querySelector(`#seletor-alas .btn-type[onclick*="'${lugar.categoria}'"]`);
-                if (btnCorrespondente) {
-                    document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => btn.classList.remove("active"));
-                    btnCorrespondente.classList.add("active");
-                }
-                atualizarPlantaDeFundo();
-                limparMarcadores();
-                adicionarMarcador(lugar).openPopup();
-                mapa.setView([lugar.y, lugar.x], 1);
-                return;
-            }
-
-            // Movimenta o mapa para o ponto isolado e abre o popup automaticamente
+            
             mapa.setView([lugar.y, lugar.x], 1);
             marcadorUnico.openPopup();
         };
@@ -388,7 +417,6 @@ function atualizarListaLateral(lista) {
         container.appendChild(item);
     });
 }
-
 /**
  * MOSTRAR TODOS
  */
