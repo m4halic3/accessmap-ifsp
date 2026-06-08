@@ -422,31 +422,59 @@ function atualizarListaLateral(lista) {
         container.appendChild(item);
     });
 }
+
 /**
- * MOSTRAR TODOS
+ * MOSTRAR TODOS OS LOCAIS (Exclui os marcadores puros de acessibilidade e alertas)
  */
 function mostrarTodos() {
     filtroAtual = null;
-    alaAtual = "todos";
-    primeiraInicializacao = false; 
+    primeiraInicializacao = false; // Desativa o modo inicial travado para renderizar na tela
 
+    // Desmarca visualmente os filtros ativos de acessibilidade na lateral
     document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
-    
-    document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
-        btn.classList.remove("active");
-    });
-    
-    const botoesAla = document.querySelectorAll("#seletor-alas .btn-type");
-    if (botoesAla.length > 0) {
-        botoesAla[0].classList.add("active");
+
+    // Filtra o banco de dados para pegar apenas os locais, ignorando pins de acessibilidade e alertas
+    let apenasLocais = lugares.filter(l => l.tipo !== "fisica" && l.tipo !== "auditiva" && l.tipo !== "alerta");
+
+    // Se estivermos na visão geral (todos), mostramos os blocos/locais principais para não poluir
+    if (alaAtual === "todos") {
+        apenasLocais = apenasLocais.filter(l => l.subponto === false);
+    } else {
+        // Se estiver em uma ala específica, mostra as salas daquela ala
+        apenasLocais = apenasLocais.filter(l => l.categoria === alaAtual || l.bloco_pai === alaAtual);
     }
 
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.value = '';
-    }
-
-    atualizarPlantaDeFundo();
+    // Renderiza os locais filtrados no mapa e reconstrói a lista lateral correspondente
+    mostrarLugares(apenasLocais);
+    atualizarListaLateral(apenasLocais);
 }
 
+/**
+ * RESET COMPLETO DO MAPA (Limpa todos os marcadores e exibe apenas os blocos âncoras na lista)
+ */
+function resetarMapaCompleto() {
+    filtroAtual = null;
+    alaAtual = "todos";
+    primeiraInicializacao = true; // Ativa a trava inicial
+
+    // Limpa filtros visuais e campos de busca
+    document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
+    document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => btn.classList.remove("active"));
+    
+    const botoesAla = document.querySelectorAll("#seletor-alas .btn-type");
+    if (botoesAla.length > 0) botoesAla[0].classList.add("active");
+
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) searchInput.value = '';
+
+    // Limpa o mapa completamente
+    limparMarcadores();
+
+    // Recarrega o fundo e monta a lista lateral limpa apenas com os blocos âncoras
+    atualizarPlantaDeFundo();
+
+    // ADICIONADO: Força a atualização da lista lateral para o estado inicial "Ver Tudo"
+    const blocosPrincipais = lugares.filter(l => l.subponto === false);
+    atualizarListaLateral(blocosPrincipais);
+}
 window.onload = initMap;

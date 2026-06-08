@@ -7,6 +7,40 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <title>Mapa - AccessMap</title>
+
+    <style>
+        .sidebar .fieldset-reset .btn-limpar-mapa {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 15px;
+            background-color: #007750; /* Grafite neutro */
+            color: #ffffff;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .fieldset-reset .btn-limpar-mapa:hover {
+            background-color: #007556; /* Escurece no hover */
+            box-shadow: 0 4px 12px rgba(74, 85, 104, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .sidebar .fieldset-reset .btn-limpar-mapa:active {
+            transform: scale(0.98);
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar" aria-label="Navegação Principal">
@@ -14,9 +48,6 @@
             <a href="./index.html"><img src="assets/images/logo-branca.png" alt="Logo AccessMap" class="logo-img"></a>
             <span class="logo-text">ACCESSMAP</span>
         </div>
-        <button type="button" class="btn-ajuda" id="btn-ajuda" onclick="abrirGuiaUsuario()" aria-label="Ajuda e Guia do Usuário: clique para entender o funcionamento dos pontos e a estrutura de acessibilidade do mapa.">
-            <i class="fas fa-question-circle" aria-hidden="true"></i>
-        </button>
     </nav>
 
     <main class="container-mapa" id="container-mapa-conteudo">
@@ -31,11 +62,15 @@
 
             <div class="fieldset-reset" style="margin-bottom: 20px;">
                 <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px; color: #000;">Filtrar por Ala</span>
-                <div class="type-buttons" id="seletor-alas" style="display: flex; gap: 8px;">
+                <div class="type-buttons" id="seletor-alas" style="display: flex; gap: 8px; margin-bottom: 10px;">
                     <button type="button" class="btn-type active" onclick="filtrarAla('todos', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Ver Tudo</button>
-                    <button type="button" class="btn-type" onclick="filtrarAla('edificacoes', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Ala Edif.</button>
-                    <button type="button" class="btn-type" onclick="filtrarAla('mecanica', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Ala Mec.</button>
+                    <button type="button" class="btn-type" onclick="filtrarAla('edificacoes', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Subsolo Edif.</button>
+                    <button type="button" class="btn-type" onclick="filtrarAla('mecanica', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Subsolo Mec.</button>
                 </div>
+
+                <button type="button" class="btn-limpar-mapa" onclick="resetarMapaCompleto()">
+                    <i class="fas fa-eraser"></i> Limpar Mapa e Filtros
+                </button>
             </div>
 
             <div class="header-filtros">
@@ -78,7 +113,7 @@
             <p>Para evitar excesso de informações visuais, o sistema utiliza uma lógica inteligente de aninhamento:</p>
             <ul>
                 <li><strong>Visão Geral (Ver Tudo):</strong> Exibe apenas os blocos âncoras principais, entradas e pontos de acessibilidade externos.</li>
-                <li><strong>Visão por Ala (Microambiente):</strong> Ao alternar para os botões <em>Ala Edificações</em> ou <em>Ala Mecânica</em>, o mapa altera a imagem de fundo para a planta baixa interna e **revela dinamicamente as salas e dependências internas (subpontos)** que pertencem exclusivamente àquele bloco, bem como os elevadores ou degraus internos daquela ala.</li>
+                <li><strong>Visão por Ala (Microambiente):</strong> Ao alternar para os botões <em>Subsolo Edificações</em> ou <em>Subsolo Mecânica</em>, o mapa altera a imagem de fundo para a planta baixa interna e **revela dinamicamente as salas e dependências internas (subpontos)** que pertencem exclusivamente àquele bloco, bem como os elevadores ou degraus internos daquela ala.</li>
             </ul>
         </div>
     </div>
