@@ -222,15 +222,7 @@ body {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.05);
-  transition: all 0.5s ease;
-}
-.carousel-container:hover {
-  transform: translate(-3px, -3px);
-  box-shadow: 18px 18px 0px rgba(0, 0, 0, 0.08);
-}
-.carousel-container:hover .seta {
-  opacity: 1 !important;
-  transform: translateY(-50%) scale(1);
+  touch-action: pan-y;
 }
 .carousel-container .slides-wrapper {
   display: flex;
@@ -249,17 +241,9 @@ body {
   backface-visibility: hidden;
 }
 .carousel-container .seta {
-  appearance: none;
-  -webkit-appearance: none;
-  background: #b40096;
-  color: #ffffff;
-  padding: 0;
-  margin: 0;
   position: absolute;
   top: 50%;
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: translateY(-50%) scale(1) !important;
+  transform: translateY(-50%);
   width: 46px;
   height: 46px;
   display: flex;
@@ -269,28 +253,22 @@ body {
   cursor: pointer;
   border-radius: 50%;
   transition: all 0.3s ease;
-  z-index: 10;
-  border: 3px solid #ffffff !important;
-  box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
+  z-index: 20;
+  background: #b40096;
+  color: #ffffff;
+  border: 3px solid #ffffff;
+  box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.45);
 }
 .carousel-container .seta:hover {
-  background: #44025c !important;
-  color: #ffffff !important;
-  transform: translateY(-50%) scale(1.12) !important;
-  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
-}
-.carousel-container .seta {
-  outline: none;
-}
-.carousel-container .seta:focus-visible {
-  transform: translateY(-50%) scale(1.12) !important;
-  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.45), 0 0 0 3px #ffffff, 0 0 0 7px #000000;
+  background: #44025c;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.55);
 }
 .carousel-container .seta.esquerda {
-  left: 25px !important;
+  left: 25px;
 }
 .carousel-container .seta.direita {
-  right: 25px !important;
+  right: 25px;
 }
 
 .indicadores {
@@ -300,7 +278,7 @@ body {
   transform: translateX(-50%);
   display: flex;
   gap: 12px;
-  z-index: 10;
+  z-index: 20;
 }
 .indicadores .dot {
   width: 10px;
@@ -325,7 +303,6 @@ body {
     height: 350px;
     border-radius: 15px;
     box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.05);
-    touch-action: pan-y;
   }
   .carousel-container .seta {
     display: none !important;

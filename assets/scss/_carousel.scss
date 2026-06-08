@@ -17,18 +17,9 @@
     background: white;
     border: 1px solid rgba(0, 0, 0, 0.1);
     box-shadow: 15px 15px 0px rgba(0, 0, 0, 0.05);
-    transition: all 0.5s ease;
+    touch-action: pan-y; // Permite rolar a página verticalmente no mobile
 
-    &:hover {
-        transform: translate(-3px, -3px);
-        box-shadow: 18px 18px 0px rgba(0, 0, 0, 0.08);
-        
-        .seta {
-            opacity: 1 !important;
-            transform: translateY(-50%) scale(1);
-        }
-    }
-
+    // Wrapper que faz a transição de slides
     .slides-wrapper {
         display: flex;
         width: 100%;
@@ -48,21 +39,11 @@
         }
     }
 
-    // --- BOTÕES DE SETA (Versão com Borda Branca de Alto Contraste) ---
+    // BOTÕES DE SETA - Estrutura estável
     .seta {
-        appearance: none;
-        -webkit-appearance: none;
-        background: $color-pink;
-        color: #ffffff;
-        padding: 0;
-        margin: 0;
-        
         position: absolute;
         top: 50%;
-        opacity: 1 !important;                 
-        visibility: visible !important;        
-        transform: translateY(-50%) scale(1) !important; 
-        
+        transform: translateY(-50%);
         width: 46px;         
         height: 46px;        
         display: flex;
@@ -72,43 +53,25 @@
         cursor: pointer;
         border-radius: 50%;
         transition: all 0.3s ease;           
-        z-index: 10;
+        z-index: 20; // Garante que fiquem acima dos slides
         
-        // --- ALTERADO: Borda externa principal agora é sólida e branca ---
-        border: 3px solid #ffffff !important; 
-        
-        // Mantemos uma sombra externa um pouco mais marcante (0.45 de opacidade) 
-        // para que a borda branca se separe perfeitamente dos slides claros/brancos.
-        box-shadow: 
-            0px 4px 14px rgba(0, 0, 0, 0.45),
-            inset 0 0 0 1px rgba(0, 0, 0, 0.05) !important; 
+        background: $color-pink;
+        color: #ffffff;
+        border: 3px solid #ffffff;
+        box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.45);
 
         &:hover {
-            background: $color-purple !important;
-            color: #ffffff !important;
-            transform: translateY(-50%) scale(1.12) !important; 
-            
-            box-shadow: 
-                0px 6px 18px rgba(0, 0, 0, 0.55),
-                inset 0 0 0 1px rgba(0, 0, 0, 0.05) !important; 
+            background: $color-purple;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.55);
         }
 
-        outline: none;
-
-        &:focus-visible {
-            transform: translateY(-50%) scale(1.12) !important;
-            // Foco do teclado adaptado para a nova borda clara
-            box-shadow: 
-                0px 6px 18px rgba(0, 0, 0, 0.45), 
-                0 0 0 3px #ffffff, 
-                0 0 0 7px #000000;
-        }
-
-        &.esquerda { left: 25px !important; } 
-        &.direita { right: 25px !important; } 
+        &.esquerda { left: 25px; } 
+        &.direita { right: 25px; } 
     }
 }
 
+// INDICADORES
 .indicadores {
     position: absolute;
     bottom: 25px;
@@ -116,7 +79,7 @@
     transform: translateX(-50%);
     display: flex;
     gap: 12px;
-    z-index: 10;
+    z-index: 20;
 
     .dot {
         width: 10px;
@@ -137,18 +100,17 @@
     }
 }
 
-// --- RESPONSIVIDADE (Ajustes Mobile) ---
+// RESPONSIVIDADE
 @media (max-width: 768px) {
     .carousel-container {
         width: 90%;          
         height: 350px;       
         border-radius: 15px;
         box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.05);
-        touch-action: pan-y;
-        // --- ADICIONE ESTA LINHA ---
+
+        // Oculta as setas completamente no mobile
         .seta {
             display: none !important; 
         }
     }
 }
-

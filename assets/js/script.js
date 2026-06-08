@@ -1,6 +1,3 @@
-/* ==========================================================================
-   MENU MOBILE
-   ========================================================================== */
 function menuOnClick() {
     const menuBar = document.getElementById("menu-bar");
     const nav = document.getElementById("nav");
@@ -11,9 +8,6 @@ function menuOnClick() {
     if (menuBg) menuBg.classList.toggle("change-bg");
 }
 
-/* ==========================================================================
-   CARROSSEL E SWIPE MOBILE
-   ========================================================================== */
 let indexAtivo = 0;
 let isMoving = false; 
 const slider = document.getElementById("slider");
@@ -62,69 +56,86 @@ function jumpToSlide(n) {
     }, 1200);
 }
 
-// Autoplay
-let autoPlay = setInterval(() => { btnMove(1); }, 5000);
+let autoPlay = setInterval(() => {
+    btnMove(1);
+}, 5000);
 
 function reiniciarTimer() {
     clearInterval(autoPlay);
-    autoPlay = setInterval(() => { btnMove(1); }, 5000);
+    autoPlay = setInterval(() => {
+        btnMove(1);
+    }, 5000);
 }
 
-// Lógica de Swipe Otimizada
-let touchStartX = 0;
-let touchEndX = 0;
-const carouselContainer = document.querySelector('.carousel-container');
+/*Parte Login*/
 
-if (carouselContainer) {
-    carouselContainer.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].clientX;
-    }, { passive: true });
-
-    carouselContainer.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].clientX;
-        const diff = touchStartX - touchEndX;
-        if (Math.abs(diff) > 50) { // Distância mínima de 50px
-            btnMove(diff > 0 ? 1 : -1);
-        }
-    }, { passive: true });
-}
-
-/* ==========================================================================
-   LOGIN, PESQUISA E ACESSIBILIDADE
-   ========================================================================== */
 function toggleAuth() {
   const login = document.getElementById("loginCard");
   const signup = document.getElementById("signupCard");
-  if (login && signup) {
-      login.classList.toggle("active");
-      signup.classList.toggle("active");
-  }
+
+  login.classList.toggle("active");
+  signup.classList.toggle("active");
 }
 
 function pesquisarLugares() {
-    let input = document.getElementById('search-input')?.value.toLowerCase();
+    let input = document.getElementById('search-input').value.toLowerCase();
     let lista = document.getElementById('lista-lugares');
-    if (!lista) return;
     let itens = lista.getElementsByClassName('item-lugar');
 
     for (let i = 0; i < itens.length; i++) {
         let nomeLugar = itens[i].getElementsByTagName('p')[0].innerText.toLowerCase();
-        itens[i].style.display = nomeLugar.includes(input) ? "" : "none";
+        
+        if (nomeLugar.includes(input)) {
+            itens[i].style.display = ""; 
+        } else {
+            itens[i].style.display = "none"; 
+        }
     }
 }
 
-// Acessibilidade
+/* ==========================================================================
+   SISTEMA DE ACESSIBILIDADE NATIVA (Fontes e Alto Contraste)
+   ========================================================================== */
+
 let nivelFonte = 0; 
+const maxNivel = 3;  
+const minNivel = -2; 
+
 function mudarFonte(direcao) {
     const novoNivel = nivelFonte + direcao;
-    if (novoNivel > 3 || novoNivel < -2) return;
+    
+    if (novoNivel > maxNivel || novoNivel < minNivel) return;
+    
     nivelFonte = novoNivel;
-    document.documentElement.style.fontSize = (100 + (nivelFonte * 10)) + "%";
+    const htmlElement = document.documentElement;
+    
+    switch (nivelFonte) {
+        case 0:
+            htmlElement.style.fontSize = "100%";
+            break;
+        case 1:
+            htmlElement.style.fontSize = "110%";
+            break;
+        case 2:
+            htmlElement.style.fontSize = "120%";
+            break;
+        case 3:
+            htmlElement.style.fontSize = "130%";
+            break;
+        case -1:
+            htmlElement.style.fontSize = "90%";
+            break;
+        case -2:
+            htmlElement.style.fontSize = "80%" ;
+            break;
+    }
 }
 
 function toggleContraste() {
     document.body.classList.toggle("alto-contraste");
-    localStorage.setItem("altoContrasteState", document.body.classList.contains("alto-contraste"));
+    
+    const estadoAtivo = document.body.classList.contains("alto-contraste");
+    localStorage.setItem("altoContrasteState", estadoAtivo);
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -134,13 +145,14 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ==========================================================================
-   MODAL DE AJUDA
+   CONTROLE DO MODAL DE AJUDA / GUIA DO USUÁRIO
    ========================================================================== */
+
 function abrirGuiaUsuario() {
     const modal = document.getElementById("modal-guia");
     if (modal) {
         modal.style.display = "flex";
-        document.body.style.overflow = "hidden";
+        document.body.style.overflow = "hidden"; // Trava o scroll do fundo
     }
 }
 
@@ -148,11 +160,14 @@ function fecharGuiaUsuario() {
     const modal = document.getElementById("modal-guia");
     if (modal) {
         modal.style.display = "none";
-        document.body.style.overflow = "auto";
+        document.body.style.overflow = "auto"; // Libera o scroll do fundo
     }
 }
 
+// Fecha o modal caso o usuário clique fora da caixa de conteúdo técnico
 window.onclick = function(event) {
     const modal = document.getElementById("modal-guia");
-    if (event.target === modal) fecharGuiaUsuario();
+    if (event.target === modal) {
+        fecharGuiaUsuario();
+    }
 };
