@@ -16,7 +16,7 @@
             gap: 8px;
             width: 100%;
             margin-top: 15px;
-            background-color: #007750; /* Grafite neutro */
+            background-color: #007750; 
             color: #ffffff;
             padding: 10px 16px;
             border: none;
@@ -32,7 +32,7 @@
         }
 
         .sidebar .fieldset-reset .btn-limpar-mapa:hover {
-            background-color: #007556; /* Escurece no hover */
+            background-color: #007556; 
             box-shadow: 0 4px 12px rgba(74, 85, 104, 0.25);
             transform: translateY(-1px);
         }
@@ -45,7 +45,7 @@
 <body>
     <nav class="navbar" aria-label="Navegação Principal">
         <div class="logo">
-            <a href="./index.html"><img src="assets/images/logo-branca.png" alt="Logo AccessMap" class="logo-img"></a>
+            <a href="./index.html"><img src="assets/images/logo-branca.png" alt="Logotipo do AccessMap mostrando linhas de rotas estilizadas" class="logo-img"></a>
             <span class="logo-text">ACCESSMAP</span>
         </div>
     </nav>
@@ -60,16 +60,16 @@
                 <input type="text" id="search-input" placeholder="Pesquisar local..." onkeyup="pesquisarLugares()">
             </div>
 
-            <div class="fieldset-reset" style="margin-bottom: 20px;">
-                <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px; color: #000;">Filtrar por Ala</span>
-            <div class="type-buttons" id="seletor-alas" style="display: flex; gap: 8px; margin-bottom: 10px;">
-                <button type="button" class="btn-type active" onclick="filtrarAla('todos', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Mapa Geral</button>
-                <button type="button" class="btn-type" onclick="filtrarAla('edificacoes', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Subsolo Edif.</button>
-                <button type="button" class="btn-type" onclick="filtrarAla('mecanica', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Subsolo Mec.</button>
-            </div>
+            <div class="fieldset-reset" style="margin-bottom: 20px;" role="region" aria-label="Controles de filtragem por pavimentos">
+                <span id="titulo-filtro-ala" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px; color: #000;">Filtrar por Ala</span>
+                <div class="type-buttons" id="seletor-alas" style="display: flex; gap: 8px; margin-bottom: 10px;" role="group" aria-labelledby="titulo-filtro-ala">
+                    <button type="button" class="btn-type active" aria-current="true" onclick="filtrarAla('todos', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Mapa Geral</button>
+                    <button type="button" class="btn-type" aria-current="false" onclick="filtrarAla('edificacoes', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Subsolo Edif.</button>
+                    <button type="button" class="btn-type" aria-current="false" onclick="filtrarAla('mecanica', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Subsolo Mec.</button>
+                </div>
 
                 <button type="button" class="btn-limpar-mapa" onclick="resetarMapaCompleto()">
-                    <i class="fas fa-eraser"></i> Limpar Mapa e Filtros
+                    <i class="fas fa-eraser" aria-hidden="true"></i> Limpar Mapa e Filtros
                 </button>
             </div>
 
@@ -78,16 +78,16 @@
                 <button class="btn-reset" onclick="mostrarTodos()">Ver Todos</button>
             </div>
 
-            <div class="filtros" role="group" aria-label="Filtros de acessibilidade">
-                <div class="filtro" id="filtro-fisica" onclick="filtrar('fisica', this)" role="button" tabindex="0" aria-label="Filtrar por Acessibilidade Física">
-                    <img src="assets/images/simbolo-fisica.png" alt="" aria-hidden="true">
+            <div class="filtros" role="group" aria-label="Filtros de categorias de acessibilidade">
+                <div class="filtro" id="filtro-fisica" onclick="filtrar('fisica', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); filtrar('fisica', this);}" role="button" tabindex="0" aria-label="Filtrar por Acessibilidade Física" aria-pressed="false">
+                    <img src="assets/images/simbolo-fisica.png" alt="Símbolo Internacional de Acessibilidade retratando uma pessoa em cadeira de rodas em verde">
                 </div>
-                <div class="filtro" id="filtro-auditiva" onclick="filtrar('auditiva', this)" role="button" tabindex="0" aria-label="Filtrar por Acessibilidade Auditiva">
-                    <img src="assets/images/simbolo-auditiva.png" alt="" aria-hidden="true">
+                <div class="filtro" id="filtro-auditiva" onclick="filtrar('auditiva', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); filtrar('auditiva', this);}" role="button" tabindex="0" aria-label="Filtrar por Acessibilidade Auditiva" aria-pressed="false">
+                    <img src="assets/images/simbolo-auditiva.png" alt="Símbolo Internacional de Deficiência Auditiva retratando um ouvido atravessado por uma linha em roxo">
                 </div>
             </div>
 
-            <div id="lista-lugares"></div>
+            <div id="lista-lugares" role="region" aria-live="polite" aria-label="Lista dinâmica de locais encontrados"></div>
         </div>
 
         <div id="map" aria-label="Mapa interativo do campus"></div>
@@ -95,7 +95,7 @@
 
     <div id="modal-guia" class="modal-guia" role="dialog" aria-modal="true" aria-labelledby="modal-guia-titulo" style="display: none;">
         <div class="modal-conteudo">
-            <span class="fechar-modal" onclick="fecharGuiaUsuario()" role="button" tabindex="0" aria-label="Fechar guia do usuário">&times;</span>
+            <span class="fechar-modal" onclick="fecharGuiaUsuario()" onkeydown="if(event.key==='Enter'||event.key===' '){fecharGuiaUsuario();}" role="button" tabindex="0" aria-label="Fechar guia do usuário">&times;</span>
             <h2 id="modal-guia-titulo">📖 Guia de Uso do AccessMap</h2>
             <hr style="border: 0; height: 1px; background: #eee; margin: 15px 0;">
             
@@ -112,8 +112,8 @@
             <h3>🔄 Navegação por Abas e Aninhamento (Micro/Macro)</h3>
             <p>Para evitar excesso de informações visuais, o sistema utiliza uma lógica inteligente de aninhamento:</p>
             <ul>
-                <li><strong>Visão Geral (Ver Tudo):</strong> Exibe apenas os blocos âncoras principais, entradas e pontos de acessibilidade externos.</li>
-                <li><strong>Visão por Ala (Microambiente):</strong> Ao alternar para os botões <em>Subsolo Edificações</em> ou <em>Subsolo Mecânica</em>, o mapa altera a imagem de fundo para a planta baixa interna e **revela dinamicamente as salas e dependências internas (subpontos)** que pertencem exclusivamente àquele bloco, bem como os elevadores ou degraus internos daquela ala.</li>
+                <li><strong>Visão Geral (Mapa Geral):</strong> Exibe apenas os blocos âncoras principais, entradas e pontos de acessibilidade externos do campus.</li>
+                <li><strong>Visão por Subsolo (Microambiente):</strong> Ao alternar para os botões <em>Subsolo Edif.</em> ou <em>Subsolo Mec.</em>, o mapa altera a imagem de fundo para a planta baixa correspondente e **revela dinamicamente as salas e dependências internas (subpontos)** que pertencem exclusivamente àquele bloco, bem como os elevadores ou degraus internos estruturais.</li>
             </ul>
         </div>
     </div>
@@ -128,10 +128,10 @@
         </div>
     </div>
     
-    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles manuais de acessibilidade">
+    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles manuais de acessibilidade visual">
         <button type="button" id="btn-aumentar" onclick="mudarFonte(1)" aria-label="Aumentar tamanho do texto">A+</button>
         <button type="button" id="btn-diminuir" onclick="mudarFonte(-1)" aria-label="Diminuir tamanho do texto">A-</button>
-        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alternar alto contraste">
+        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alternar alto contraste da página">
             <i class="fas fa-adjust" aria-hidden="true"></i>
         </button>
     </div>

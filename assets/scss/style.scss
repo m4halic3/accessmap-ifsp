@@ -43,3 +43,10 @@ body {
         transform: translateY(0);
     }
 }
+/* No seu arquivo CSS/SCSS principal */
+button:focus,
+input:focus,
+[role="button"]:focus {
+    outline: 3px solid #007750; /* Mesma cor verde de identidade do seu projeto */
+    outline-offset: 2px;
+}
