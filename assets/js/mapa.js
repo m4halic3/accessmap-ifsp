@@ -80,12 +80,18 @@ const lugares = [
     { nome: "Bloco C - Sala de Aula Adaptada 18", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 745, x: 650, subponto: true },
 
     // --- NOVAS DEPENDÊNCIAS: SUBSOLO DO BLOCO C (EDIFICAÇÕES) ---
-{ nome: "Subsolo C - Lab. de Concreto", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 250, x: 400, subponto: true },
-{ nome: "Subsolo C - Almoxarifado", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 230, x: 550, subponto: true },
-{ nome: "Subsolo C - Depósito", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 300, x: 550, subponto: true },
-{ nome: "Subsolo C - Canteiro de Obras", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 600, x: 600, subponto: true },
-{ nome: "Subsolo C - Sala W", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 700, x: 400, subponto: true },
-{ nome: "Subsolo C - Laboratório de Mecânica dos Solos (C512)", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 250, x: 750, subponto: true },
+// --- NOVAS DEPENDÊNCIAS: SUBSOLO DO BLOCO C (EDIFICAÇÕES) ---
+    { nome: "Subsolo C - Lab. de Concreto", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 250, x: 400, subponto: true },
+    { nome: "Subsolo C - Almoxarifado", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 230, x: 550, subponto: true },
+    { nome: "Subsolo C - Depósito", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 300, x: 550, subponto: true },
+    { nome: "Subsolo C - Canteiro de Obras", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 600, x: 600, subponto: true },
+    { nome: "Subsolo C - Sala W", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 700, x: 400, subponto: true },
+    { nome: "Subsolo C - Laboratório de Mecânica dos Solos (C512)", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 250, x: 750, subponto: true },
+    
+    // --- ACESSIBILIDADE NO SUBSOLO C ---
+    { nome: "Elevador - Subsolo C", tipo: "fisica", categoria: "elevador", andar: "subsolo", bloco_pai: "edificacoes", y: 150, x: 550, subponto: true },
+    { nome: "Escada - Subsolo C", tipo: "fisica", categoria: "escada", andar: "subsolo", bloco_pai: "edificacoes", y: 70, x: 600, subponto: true },
+
 
     // --- BLOCO D (ADMINISTRATIVO) ---
     { nome: "Bloco D - Sala de Aula 31", tipo: "geral", categoria: "administrativo", andar: "terreo", bloco_pai: "administrativo", y: 605, x: 855, subponto: true },
@@ -438,25 +444,26 @@ function atualizarListaLateral(lista) {
  */
 function mostrarTodos() {
     filtroAtual = null;
-    primeiraInicializacao = false; // Desativa o modo inicial travado para renderizar na tela
+    primeiraInicializacao = false;
 
-    // Desmarca visualmente os filtros ativos de acessibilidade na lateral
     document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
 
-    // Filtra o banco de dados para pegar apenas os locais, ignorando pins de acessibilidade e alertas
-    let apenasLocais = lugares.filter(l => l.tipo !== "fisica" && l.tipo !== "auditiva" && l.tipo !== "alerta");
+    // REMOVIDO: O filtro que excluía "fisica" e "auditiva"
+    let listaFiltrada = lugares; 
 
-    // Se estivermos na visão geral (todos), mostramos os blocos/locais principais para não poluir
     if (alaAtual === "todos") {
-        apenasLocais = apenasLocais.filter(l => l.subponto === false);
+        listaFiltrada = listaFiltrada.filter(l => l.subponto === false);
     } else {
-        // Se estiver em uma ala específica, mostra as salas daquela ala
-        apenasLocais = apenasLocais.filter(l => l.categoria === alaAtual || l.bloco_pai === alaAtual);
+        // Agora, se estiver em uma ala, ele mantém todos os pontos (físicos ou não)
+        // MAS respeita o andar atual (Térreo/Subsolo)
+        listaFiltrada = listaFiltrada.filter(l => 
+            (l.categoria === alaAtual || l.bloco_pai === alaAtual) && 
+            l.andar === andarAtual
+        );
     }
 
-    // Renderiza os locais filtrados no mapa e reconstrói a lista lateral correspondente
-    mostrarLugares(apenasLocais);
-    atualizarListaLateral(apenasLocais);
+    mostrarLugares(listaFiltrada);
+    atualizarListaLateral(listaFiltrada);
 }
 
 /**
