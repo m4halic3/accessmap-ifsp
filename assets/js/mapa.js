@@ -18,21 +18,17 @@ const plantas = {
 
 const lugares = [
     // =========================================================================
-// 1. PONTOS PRINCIPAIS / BLOCOS ÂNCORAS (ORDEM DO TOPO DA SIDEBAR)
-// =========================================================================
-{ nome: "Bloco A", tipo: "geral", categoria: "geral", andar: "terreo", y: 650, x: 1150, subponto: false },
-{ nome: "Bloco B", tipo: "geral", categoria: "mecanica", andar: "terreo", y: 710, x: 780, subponto: false },
-{ nome: "Bloco C", tipo: "geral", categoria: "edificacoes", andar: "terreo", y: 720, x: 640, subponto: false },
-{ nome: "Bloco D", tipo: "geral", categoria: "administrativo", andar: "terreo", y: 600, x: 850, subponto: false },
-{ nome: "Estacionamento interno A", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 520, x: 750, subponto: false },
-{ nome: "Estacionamento interno B", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 500, x: 700, subponto: false },
-{ nome: "Estacionamento externo", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 300, x: 600, subponto: false },
-    // Outros pontos principais antigos (ajustados/mantidos)
-    { nome: "Bloco de Salas de Aula (Geral)", tipo: "geral", categoria: "geral", andar: "terreo", y: 700, x: 950, subponto: false },
-    { nome: "Biblioteca", tipo: "geral", categoria: "biblioteca", andar: "terreo", y: 500, x: 1000, subponto: false },
-    { nome: "Quadra Poliesportiva", tipo: "geral", categoria: "quadra", andar: "terreo", y: 400, x: 500, subponto: false },
-    { nome: "Refeitório", tipo: "geral", categoria: "refeitorio", andar: "terreo", y: 450, x: 550, subponto: false },
-    { nome: "Salas Externas", tipo: "geral", categoria: "salas_externas", andar: "terreo", y: 480, x: 580, subponto: false },
+    // 1. PONTOS PRINCIPAIS / BLOCOS ÂNCORAS (ORDEM DO TOPO DA SIDEBAR)
+    // =========================================================================
+    { nome: "Bloco A", tipo: "geral", categoria: "geral", andar: "terreo", y: 650, x: 1150, subponto: false },
+    { nome: "Bloco B", tipo: "geral", categoria: "mecanica", andar: "terreo", y: 710, x: 780, subponto: false },
+    { nome: "Bloco C", tipo: "geral", categoria: "edificacoes", andar: "terreo", y: 720, x: 640, subponto: false },
+    { nome: "Bloco D", tipo: "geral", categoria: "administrativo", andar: "terreo", y: 630, x: 400, subponto: false },
+    { nome: "Estacionamento interno A", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 520, x: 750, subponto: false },
+    { nome: "Estacionamento interno B", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 500, x: 700, subponto: false },
+    { nome: "Estacionamento externo", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 300, x: 600, subponto: false },
+    { nome: "Quadra", tipo: "geral", categoria: "quadra", andar: "terreo", y: 650, x: 150, subponto: false },
+    { nome: "Refeitório", tipo: "geral", categoria: "refeitorio", andar: "terreo", y: 800, x: 300, subponto: false },
 
     // =========================================================================
     // 3. DEPENDÊNCIAS INTERNAS / SUBPONTOS (NÃO APARECEM NA SIDEBAR - subponto: true)
@@ -88,19 +84,35 @@ const lugares = [
     { nome: "Bloco A - Alerta: Área em Construção", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "informatica", y: 550, x: 1000, subponto: true },
     { nome: "Bloco A - Entrada Principal", tipo: "geral", categoria: "entrada", andar: "terreo", bloco_pai: "informatica", y: 350, x: 500, subponto: true },
 
-
     // --- NOVOS BANHEIROS DO SAGUÃO (CONVENCIONAIS E ACESSÍVEIS) ---
-    { nome: "Bloco A - Banheiro Masculino (Saguão)", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 635, x: 1020, subponto: true },
-    { nome: "Bloco A - Banheiro Feminino (Saguão)", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 635, x: 1025, subponto: true },
-    { nome: "Bloco A - Banheiro Acessível Masculino (Saguão)", tipo: "fisica", categoria: "elevador", andar: "terreo", bloco_pai: "informatica", y: 635, x: 1030, subponto: true },
-    { nome: "Bloco A - Banheiro Acessível Feminino (Saguão)", tipo: "fisica", categoria: "elevador", andar: "terreo", bloco_pai: "informatica", y: 635, x: 1035, subponto: true },
+    { nome: "Bloco A - Banheiro Masculino (Saguão)", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 400, x: 1100, subponto: true },
+    { nome: "Bloco A - Banheiro Feminino (Saguão)", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 350, x: 1100, subponto: true },
+    { nome: "Bloco A - Banheiro Acessível Masculino (Saguão)", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "informatica", y: 380, x: 1085, subponto: true },
+    { nome: "Bloco A - Banheiro Acessível Feminino (Saguão)", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "informatica", y: 365, x: 1085, subponto: true },
 
     // --- ACESSIBILIDADE NO BLOCO A GERAL ---
-    { nome: "Bloco A - Banheiro Acessível Feminino", tipo: "fisica", categoria: "elevador", andar: "terreo", bloco_pai: "informatica", y: 680, x: 1015, subponto: true },
-    { nome: "Bloco A - Banheiro Acessível Masculino", tipo: "fisica", categoria: "elevador", andar: "terreo", bloco_pai: "informatica", y: 680, x: 1075, subponto: true },
+    { nome: "Bloco A - Banheiro Acessível Feminino", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "informatica", y: 680, x: 1015, subponto: true },
+    { nome: "Bloco A - Banheiro Acessível Masculino", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "informatica", y: 680, x: 1075, subponto: true },
     { nome: "Bloco A - Rampa de Acesso Principal", tipo: "fisica", categoria: "rampa", andar: "terreo", bloco_pai: "informatica", y: 550, x: 1045, subponto: true },
-    { nome: "Bloco A - Alerta: Piso Tátil Estragado", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "informatica", y:610, x: 1045, subponto: true },
+    { nome: "Bloco A - Alerta: Piso Tátil Estragado", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "informatica", y: 610, x: 1045, subponto: true },
 
+
+    // --- DEPENDÊNCIAS INTERNAS: ALA DOS SERVIDORES (BLOCO A) ---
+    { nome: "Bloco A - Movimento Estudantil (A102)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1070, subponto: true },
+    { nome: "Bloco A - Setor Sociopedagógico (A103)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1102, subponto: true },
+    { nome: "Bloco A - Cozinha dos Servidores (A106)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1125, subponto: true },
+    { nome: "Bloco A - Cozinha dos Terceirizados (A107)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1138, subponto: true },
+    { nome: "Bloco A - Banheiro Feminino (Servidores)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1148, subponto: true },
+    { nome: "Bloco A - Banheiro Masculino (Servidores)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1170, subponto: true },
+    { nome: "Bloco A - Depósito I (A111)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1190, subponto: true },
+    { nome: "Bloco A - Depósito II (A1013)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1210, subponto: true },
+    { nome: "Bloco A - Manutenção (A112)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 420, x: 1218, subponto: true },
+    { nome: "Bloco A - Limpeza (A110)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 420, x: 1210, subponto: true },
+    { nome: "Bloco A - Sala de Vigilância (A109)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 420, x: 1195, subponto: true },
+    { nome: "Bloco A - Almoxarifado (A108)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 420, x: 1170, subponto: true },
+    { nome: "Bloco A - Almoxarifado (A105)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 420, x: 1150, subponto: true },
+    { nome: "Bloco A - Almoxarifado (A104)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 420, x: 1090, subponto: true },
+    { nome: "Bloco A - Garagem", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 380, x: 1200, subponto: true },
 
     // --- BLOCO B (AZUL) ---
     { nome: "Bloco B - Sala de Aula Funcional 21", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 725, x: 785, subponto: true },
@@ -112,7 +124,7 @@ const lugares = [
     { nome: "Bloco B - Sala de Aula Funcional 27", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 740, x: 785, subponto: true },
     { nome: "Bloco B - Sala de Aula Funcional 28", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 700, x: 775, subponto: true },
     { nome: "Subsolo B - Laboratório de CNC (B419)", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 190, x: 480, subponto: true },
-    { nome: "Subsolo B - Laboratório  Indústrial", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 600, x: 600, subponto: true },
+    { nome: "Subsolo B - Laboratório Industrial", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 600, x: 600, subponto: true },
     { nome: "Subsolo B - Sala B417", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 280, x: 840, subponto: true },
     { nome: "Subsolo B - Sala de Aula B418", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 340, x: 880, subponto: true },
     { nome: "Subsolo B - Sala NumPSA (B421)", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 740, x: 790, subponto: true },
@@ -141,43 +153,25 @@ const lugares = [
     { nome: "Escada - Subsolo C", tipo: "fisica", categoria: "escada", andar: "subsolo", bloco_pai: "edificacoes", y: 70, x: 600, subponto: true },
 
     // --- BLOCO D (ADMINISTRATIVO) ---
-    { nome: "Bloco D - Sala de Aula 31", tipo: "geral", categoria: "administrativo", andar: "terreo", bloco_pai: "administrativo", y: 605, x: 855, subponto: true },
-    { nome: "Bloco D - Sala de Aula 32", tipo: "geral", categoria: "administrativo", andar: "terreo", bloco_pai: "administrativo", y: 595, x: 845, subponto: true },
-    { nome: "Bloco D - Sala de Aula 33", tipo: "geral", categoria: "administrativo", andar: "terreo", bloco_pai: "administrativo", y: 610, x: 840, subponto: true },
-    { nome: "Bloco D - Sala de Aula 34", tipo: "geral", categoria: "administrativo", andar: "terreo", bloco_pai: "administrativo", y: 590, x: 860, subponto: true },
+    { nome: "Bloco D - Sala de Aula 31", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 450, x: 855, subponto: true },
+    { nome: "Bloco D - Sala de Aula 32", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 595, x: 845, subponto: true },
+    { nome: "Bloco D - Sala de Aula 33", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 610, x: 840, subponto: true },
+    { nome: "Bloco D - Sala de Aula 34", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 590, x: 860, subponto: true },
 
     // =========================================================================
-    // 4. PONTOS DE ACESSIBILIDADE DETALHADOS E ALERTAS
+    // 4. PONTOS DE ACESSIBILIDADE E ALERTAS ATUALIZADOS
     // =========================================================================
-    // Vinculado ao Bloco A (Vermelho) - Coordenadas originais restauradas
-    { nome: "Bloco A - Sala de Intérpretes (LIBRAS)", tipo: "auditiva", categoria: "sala_interpretes", andar: "terreo", bloco_pai: "informatica", y: 645, x: 1110, subponto: true },
-    
-    // Ponto externo mantido conforme original
-    { nome: "Rampa de Acesso - Bloco Geral", tipo: "fisica", categoria: "rampa", andar: "terreo", y: 690, x: 950, subponto: false },
-    
-    // Vinculado ao Bloco A - Coordenadas originais restauradas
     { nome: "Bloco A - Escadaria de Acesso Principal", tipo: "fisica", categoria: "escada", andar: "terreo", bloco_pai: "informatica", y: 360, x: 620, subponto: true },
-    
-    // Vinculado ao Bloco C - Coordenadas originais restauradas
     { nome: "Bloco C - Elevador (Verde)", tipo: "fisica", categoria: "elevador", andar: "terreo", bloco_pai: "edificacoes", y: 722, x: 642, subponto: true },
-    
-    // Ponto externo do estacionamento mantido conforme original
-    { nome: "Vagas Exclusivas PCD - Estacionamento", tipo: "fisica", categoria: "vaga_pcd", andar: "terreo", y: 515, x: 740, subponto: false },
-    
-    // Vinculado ao Bloco B - Coordenadas originais restauradas
+    { nome: "Vagas Exclusivas PCD - Estacionamento", tipo: "fisica", categoria: "vaga_pcd", andar: "terreo", y: 470, x: 700, subponto: false },
     { nome: "Bloco B - Alerta: Degrau sem Rampa", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "mecanica", y: 715, x: 775, subponto: true },
-    
-    // Pontos de alertas externos mantidos conforme originais
-    { nome: "Alerta: Calçada Irregular / Acesso à Quadra", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 410, x: 510, subponto: false },
-    { nome: "Alerta: Piso Tátil Interrompido no Corredor Central", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 600, x: 900, subponto: false },
-    { nome: "Alerta: Inclinação Excessiva na Rampa Sul", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 480, x: 700, subponto: false },
-    
-    // Vinculados ao Bloco A - Coordenadas originais restauradas
-    { nome: "Bloco A - Alerta: Entrada Secundária com Porta Estreita", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "informatica", y: 530, x: 1010, subponto: true },
-    { nome: "Bloco A - Alerta: Bebedouro Inadequado", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "informatica", y: 712, x: 1038, subponto: true },
-    
-    // Vinculado ao Bloco C - Coordenadas originais restauradas
-    { nome: "Bloco C - Alerta: Sanitário PCD Obstruído", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "edificacoes", y: 718, x: 644, subponto: true }
+    { nome: "Alerta: Porta com Largura Reduzida na Entrada do Refeitório", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 400, x: 820, subponto: false },
+
+    { nome: "Alerta: Inclinação Excessiva na Rampa de Acesso à Quadra", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 550, x: 510, subponto: false },
+    { nome: "Alerta: Inclinação Excessiva na Rampa no Final do Bloco C", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 480, x: 700, subponto: false },
+    { nome: "Alerta: Piso Tátil Interrompido no Corredor Central", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 665, x: 950, subponto: false }, 
+    { nome: "Alerta: Porta com Largura Reduzida na Entrada do Refeitório", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 650, x: 820, subponto: false },
+    { nome: "Bloco A - Alerta: Ausência de Sinalização Sonora nos Laboratórios de Informática", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "informatica", y: 635, x: 1180, subponto: true },
 ];
 
 let mapa;
@@ -207,9 +201,13 @@ function getIcon(categoria, tipo, nomeLugar) {
         cor = "red"; 
         descricaoAlt = `Ícone vermelho indicando acessibilidade auditiva em: ${nomeLugar}`;
     } else if (tipo === "fisica") {
+        // AJUSTADO: "vaga_pcd" e "banheiro_acessivel" agora usam "green" para o filtro de acessibilidade física
         if (categoria === "vaga_pcd") {
-            cor = "lightgreen"; 
-            descricaoAlt = `Ícone verde claro indicando vaga exclusiva PCD em: ${nomeLugar}`;
+            cor = "green"; 
+            descricaoAlt = `Ícone verde indicando vaga exclusiva PCD em: ${nomeLugar}`;
+        } else if (categoria === "banheiro_acessivel") {
+            cor = "green";
+            descricaoAlt = `Ícone verde indicando banheiro acessível em: ${nomeLugar}`;
         } else {
             cor = "green"; 
             descricaoAlt = `Ícone verde indicando estrutura de acessibilidade física em: ${nomeLugar}`;
