@@ -230,8 +230,8 @@ function getIcon(categoria, tipo, nomeLugar) {
         // Lógica original para blocos e áreas externas
         if (categoria === "administrativo") cor = "violet";
         else if (["estacionamento", "entrada", "quadra", "refeitorio", "rampa", "escada"].includes(categoria)) cor = "orange";
-        else if (categoria === "mecanica") cor = "blue";
-        else if (categoria === "edificacoes") cor = "green";
+        else if (categoria === "mecanica") cor = "red";
+        else if (categoria === "edificacoes") cor = "blue";
         else if (categoria === "informatica") cor = "black";
         else if (categoria === "secretaria") cor = "violet";
         else if (categoria === "servidores") cor = "blue";
