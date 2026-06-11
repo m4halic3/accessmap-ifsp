@@ -138,17 +138,24 @@ const lugares = [
     { nome: "Elevador - Subsolo B", tipo: "fisica", categoria: "elevador", andar: "subsolo", bloco_pai: "mecanica", y: 120, x: 840, subponto: true },
     { nome: "Escada - Subsolo B", tipo: "fisica", categoria: "escada", andar: "subsolo", bloco_pai: "mecanica", y: 70, x: 800, subponto: true },
 
-    // --- BLOCO C - TÉRREO (visível no Mapa Geral) ---
+   // --- BLOCO C - TÉRREO (Atualizado com nomes reais) ---
     { nome: "Bloco C - Sala 101 - Desenho Técnico", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 725, x: 645, subponto: true },
-    { nome: "Bloco C - Sala de Aula Adaptada 11", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 715, x: 635, subponto: true },
-    { nome: "Bloco C - Sala de Aula Adaptada 12", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 730, x: 650, subponto: true },
-    { nome: "Bloco C - Sala de Aula Adaptada 13", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 710, x: 630, subponto: true },
-    { nome: "Bloco C - Sala de Aula Adaptada 14", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 735, x: 655, subponto: true },
-    { nome: "Bloco C - Sala de Aula Adaptada 15", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 705, x: 640, subponto: true },
-    { nome: "Bloco C - Sala de Aula Adaptada 16", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 740, x: 645, subponto: true },
-    { nome: "Bloco C - Sala de Aula Adaptada 17", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 700, x: 635, subponto: true },
-    { nome: "Bloco C - Sala de Aula Adaptada 18", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 745, x: 650, subponto: true },
+    { nome: "Bloco C - Lab de Experimentos Físicos (C505)", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 715, x: 635, subponto: true },
+    { nome: "Bloco C - Pranchetaria (C509)", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 730, x: 650, subponto: true },
+    { nome: "Bloco C - Sala de Aula (C507)", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 710, x: 630, subponto: true },
+    { nome: "Bloco C - Gabinete de Topografia (C503)", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 735, x: 655, subponto: true },
+    { nome: "Bloco C - Lab de Informática (C502)", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 705, x: 640, subponto: true },
+    { nome: "Bloco C - Coordenação do Curso de Edificações", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 740, x: 645, subponto: true },
+    { nome: "Bloco C - Lab de Oficina de Física e Química (C508)", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 700, x: 635, subponto: true },
+    { nome: "Bloco C - Sala dos Professores (C510)", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 745, x: 650, subponto: true },
     { nome: "Bloco C - Elevador (Verde)", tipo: "fisica", categoria: "elevador", andar: "terreo", bloco_pai: "edificacoes", y: 722, x: 642, subponto: true },
+    
+    // --- BLOCO C - INSTALAÇÕES (Adicionado conforme solicitado) ---
+    { nome: "Bloco C - Sala sem identificação", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "edificacoes", y: 710, x: 620, subponto: true },
+    { nome: "Bloco C - Banheiro Feminino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "edificacoes", y: 720, x: 620, subponto: true },
+    { nome: "Bloco C - Banheiro Masculino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "edificacoes", y: 730, x: 620, subponto: true },
+    { nome: "Bloco C - Banheiro PCD", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "edificacoes", y: 740, x: 620, subponto: true },
+    { nome: "Bloco C - Sala de Limpeza", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "edificacoes", y: 750, x: 620, subponto: true },
 
     // --- BLOCO C - SUBSOLO (visível em "Subsolo Edif.") ---
     { nome: "Subsolo C - Lab. de Concreto", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 250, x: 400, subponto: true },
