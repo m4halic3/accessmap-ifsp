@@ -161,10 +161,10 @@ const lugares = [
     { nome: "Escada - Subsolo C", tipo: "fisica", categoria: "escada", andar: "subsolo", bloco_pai: "edificacoes", y: 70, x: 600, subponto: true },
 
     // --- BLOCO D ---
-    { nome: "Bloco D - Sala de Aula 31", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 450, x: 855, subponto: true },
-    { nome: "Bloco D - Sala de Aula 32", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 595, x: 845, subponto: true },
-    { nome: "Bloco D - Sala de Aula 33", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 610, x: 840, subponto: true },
-    { nome: "Bloco D - Sala de Aula 34", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 590, x: 860, subponto: true },
+    { nome: "Bloco D - Sala de Aula (D604)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 600, x: 370, subponto: true },
+    { nome: "Bloco D - Sala de Aula (D603)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 700, x: 370, subponto: true },
+    { nome: "Bloco D - Sala de Aula (D602)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 600, x: 410, subponto: true },
+    { nome: "Bloco D - Sala multirecursos (D601)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 700, x: 410, subponto: true },
 
     // --- ACESSIBILIDADE E ALERTAS GERAIS (Mapa Geral) ---
     { nome: "Vagas Exclusivas PCD - Estacionamento", tipo: "fisica", categoria: "vaga_pcd", andar: "terreo", y: 470, x: 700, subponto: false },
