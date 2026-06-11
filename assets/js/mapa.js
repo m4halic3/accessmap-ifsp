@@ -54,8 +54,8 @@ const lugares = [
     { nome: "Bloco A - CDI - Coordenadoria de Apoio à Direção (A122)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 530, x: 1180, subponto: true },
     { nome: "Bloco A - Direção Geral (A123)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 530, x: 1205, subponto: true },
     { nome: "Bloco A - Sala de Reuniões (A124)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 555, x: 1200, subponto: true },
-    { nome: "Bloco A - NAPNE (C501)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 530, x: 1090, subponto: true },
-    { nome: "Bloco A - NAPNE Atendimento", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 530, x: 1070, subponto: true },
+    { nome: "Bloco A - NAPNE (C501)", tipo: "auditiva", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 530, x: 1090, subponto: true },
+    { nome: "Bloco A - NAPNE Atendimento", tipo: "auditiva", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 530, x: 1070, subponto: true },
 
     // --- BLOCO A - ALA SALAS DE AULA / LABORATÓRIOS ---
     { nome: "Bloco A - Lab de Química (A302)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 700, x: 990, subponto: true },
@@ -130,7 +130,7 @@ const lugares = [
     { nome: "Bloco B - Auditório", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 700, x: 710, subponto: true },
     { nome: "Bloco B - Laboratório de ensaios", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 720, x: 780, subponto: true },
 
-       // --- BLOCO B - SUBSOLO (visível em "Subsolo Mec.") ---
+    // --- BLOCO B - SUBSOLO (visível em "Subsolo Mec.") ---
     { nome: "Subsolo B - Laboratório de CNC (B419)", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 190, x: 480, subponto: true },
     { nome: "Subsolo B - Laboratório Industrial", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 600, x: 600, subponto: true },
     { nome: "Subsolo B - Sala B417", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 280, x: 840, subponto: true },
@@ -141,7 +141,7 @@ const lugares = [
     { nome: "Elevador - Subsolo B", tipo: "fisica", categoria: "elevador", andar: "subsolo", bloco_pai: "mecanica", y: 120, x: 840, subponto: true },
     { nome: "Escada - Subsolo B", tipo: "fisica", categoria: "escada", andar: "subsolo", bloco_pai: "mecanica", y: 70, x: 800, subponto: true },
 
-   // --- BLOCO C - TÉRREO (Atualizado com nomes reais) ---
+    // --- BLOCO C - TÉRREO (Atualizado com nomes reais) ---
     { nome: "Bloco C - Sala 101 - Desenho Técnico", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 725, x: 630, subponto: true },
     { nome: "Bloco C - Lab de Experimentos Físicos (C505)", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 720, x: 570, subponto: true },
     { nome: "Bloco C - Pranchetaria (C509)", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 790, x: 630, subponto: true },
@@ -154,7 +154,7 @@ const lugares = [
     { nome: "Bloco C - Elevador (térreo)", tipo: "fisica", categoria: "elevador", andar: "terreo", bloco_pai: "edificacoes", y: 780, x: 560, subponto: true },
     { nome: "Bloco C - Escada (térreo)", tipo: "fisica", categoria: "escada", andar: "terreo", bloco_pai: "edificacoes", y: 795, x: 560, subponto: true },
     
-    // --- BLOCO C - INSTALAÇÕES (Adicionado conforme solicitado) ---
+    // --- BLOCO C - INSTALAÇÕES ---
     { nome: "Bloco C - Sala sem identificação", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "edificacoes", y: 680, x: 565, subponto: true },
     { nome: "Bloco C - Banheiro Feminino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "edificacoes", y: 680, x: 550, subponto: true },
     { nome: "Bloco C - Banheiro Masculino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "edificacoes", y: 680, x: 530, subponto: true },
@@ -188,8 +188,6 @@ let filtroAtual = null;
 let alaAtual = "todos";
 let primeiraInicializacao = true;
 
-// Retorna o andar correspondente à ala atual.
-// "todos" = térreo (mapa geral), "edificacoes"/"mecanica" = subsolo (plantas separadas)
 function getAndarDaAla() {
     return (alaAtual === "todos") ? "terreo" : "subsolo";
 }
@@ -296,22 +294,26 @@ function filtrarAla(ala, elemento) {
 function aplicarFiltrosCombinados() {
     const searchInput = document.getElementById('search-input');
     const termo = searchInput ? searchInput.value.toLowerCase().trim() : "";
-    const andarDaAla = getAndarDaAla();
 
     let filtrados = lugares;
 
     if (termo) {
-        // Com busca: pesquisa em todos os lugares, sem restrição de ala ou andar
+        // Com busca: pesquisa em todos os lugares sem restrição de ala ou andar
         filtrados = lugares.filter(l => {
             const nomeNormalizado = l.nome.toLowerCase();
             const nomeSemHifens = nomeNormalizado.replace(/-/g, "");
             return nomeNormalizado.includes(termo) || nomeSemHifens.includes(termo.replace(/-/g, ""));
         });
     } else {
-        // Sem busca: regras rígidas por ala
         if (alaAtual === "todos") {
-            // Mapa geral: apenas pontos do térreo, sem subpontos
-            filtrados = filtrados.filter(l => l.subponto === false && l.andar === "terreo");
+            if (filtroAtual) {
+                // Com filtro ativo no mapa geral: inclui TODOS os andares e subpontos
+                // para que elevadores/escadas do subsolo e recursos internos sejam encontrados
+                filtrados = lugares; // sem restrição de andar ou subponto
+            } else {
+                // Sem filtro: comportamento padrão — só pontos principais do térreo
+                filtrados = filtrados.filter(l => l.subponto === false && l.andar === "terreo");
+            }
         } else {
             // Subsolo Edif. ou Subsolo Mec.: apenas subpontos do subsolo da ala correta
             filtrados = filtrados.filter(l =>
@@ -321,8 +323,17 @@ function aplicarFiltrosCombinados() {
         }
     }
 
+    // Aplicação do filtro por tipo
     if (filtroAtual) {
-        filtrados = filtrados.filter(l => l.tipo === filtroAtual);
+        if (filtroAtual === "fisica") {
+            // Física: recursos de acessibilidade física + alertas de barreira
+            filtrados = filtrados.filter(l => l.tipo === "fisica" || l.tipo === "alerta");
+        } else if (filtroAtual === "auditiva") {
+            // Auditiva: apenas pontos com tipo "auditiva" (NAPNE)
+            filtrados = filtrados.filter(l => l.tipo === "auditiva");
+        } else {
+            filtrados = filtrados.filter(l => l.tipo === filtroAtual);
+        }
     }
 
     limparMarcadores();
@@ -396,14 +407,14 @@ function atualizarListaLateral(lista, termoDeBusca = "") {
 
     container.innerHTML = "";
 
-    // Na sidebar, sem busca ativa: mostra apenas pontos principais (subponto: false)
-    // Com busca: mostra tudo que bateu, incluindo subpontos
-    let listaParaExibir = termoDeBusca.length > 0
+    // Com busca OU filtro ativo: mostra tudo (incluindo subpontos)
+    // Sem busca e sem filtro: mostra apenas pontos principais
+    let listaParaExibir = (termoDeBusca.length > 0 || filtroAtual)
         ? [...lista]
         : lista.filter(l => l.subponto === false);
 
-    // Quando estamos numa ala de subsolo sem busca: mostra todos os subpontos daquele subsolo
-    if (alaAtual !== "todos" && termoDeBusca.length === 0) {
+    // Ala de subsolo sem busca e sem filtro: mostra todos os subpontos daquele subsolo
+    if (alaAtual !== "todos" && termoDeBusca.length === 0 && !filtroAtual) {
         listaParaExibir = [...lista];
     }
 
@@ -448,6 +459,8 @@ function atualizarListaLateral(lista, termoDeBusca = "") {
         let labelAcessibilidade = "Ponto de Interesse";
         if (lugar.tipo === "alerta") {
             labelAcessibilidade = "<span style='color:#800000; font-weight:bold;'>⚠️ Necessita de Melhorias</span>";
+        } else if (lugar.tipo === "auditiva") {
+            labelAcessibilidade = "Acessibilidade Auditiva";
         } else if (lugar.subponto) {
             const andarLabel = lugar.andar === "subsolo" ? "Subsolo" : "Térreo";
             labelAcessibilidade = `Dependência Interna (${andarLabel})`;
@@ -479,11 +492,9 @@ function atualizarListaLateral(lista, termoDeBusca = "") {
                 const subSalas = lugares.filter(l => {
                     if (!l.subponto) return false;
                     if (l.bloco_pai !== blocoPaiAlvo) return false;
-                    // Bloco A e D: só térreo (não têm planta de subsolo separada)
                     if (lugar.nome === "Bloco A" || lugar.nome === "Bloco D") {
                         return l.andar === "terreo";
                     }
-                    // Bloco B e C: respeita o andar determinado pela ala atual
                     return l.andar === andarDaAla;
                 });
 
