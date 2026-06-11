@@ -28,10 +28,10 @@ const lugares = [
     { nome: "Refeitório", tipo: "geral", categoria: "refeitorio", andar: "terreo", y: 800, x: 300, subponto: false },
 
     // =========================================================================
-    // DEPENDÊNCIAS INTERNAS / SUBPONTOS (NÃO APARECEM NA SIDEBAR - subponto: true)
+    // DEPENDÊNCIAS INTERNAS / SUBPONTOS (subponto: true)
     // =========================================================================
-    
-    // --- BLOCO A (VERMELHO) INFORMÁTICA ---
+
+    // --- BLOCO A - ALA INFORMÁTICA ---
     { nome: "Bloco A - Auditório A202", tipo: "geral", categoria: "informatica", andar: "terreo", bloco_pai: "informatica", y: 630, x: 1110, subponto: true },
     { nome: "Bloco A - Sala dos Professores A209", tipo: "geral", categoria: "informatica", andar: "terreo", bloco_pai: "informatica", y: 630, x: 1245, subponto: true },
     { nome: "Bloco A - Lab A (A206)", tipo: "geral", categoria: "informatica", andar: "terreo", bloco_pai: "informatica", y: 630, x: 1180, subponto: true },
@@ -42,7 +42,7 @@ const lugares = [
     { nome: "Bloco A - Lab E (A204)", tipo: "geral", categoria: "informatica", andar: "terreo", bloco_pai: "informatica", y: 700, x: 1160, subponto: true },
     { nome: "Bloco A - Lab de Hardware (A203)", tipo: "geral", categoria: "informatica", andar: "terreo", bloco_pai: "informatica", y: 700, x: 1110, subponto: true },
 
-    // --- ALA DA SECRETARIA (BLOCO A) ---
+    // --- BLOCO A - ALA SECRETARIA ---
     { nome: "Bloco A - Banheiro Feminino (Secretaria)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 555, x: 1075, subponto: true },
     { nome: "Bloco A - Coordenação de Licenciaturas (A115)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 555, x: 1090, subponto: true },
     { nome: "Bloco A - CEX / CPI - Extensão, Pesquisa e Inovação (A114/A115)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 555, x: 1110, subponto: true },
@@ -53,10 +53,10 @@ const lugares = [
     { nome: "Bloco A - CDI - Coordenadoria de Apoio à Direção (A122)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 530, x: 1180, subponto: true },
     { nome: "Bloco A - Direção Geral (A123)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 530, x: 1205, subponto: true },
     { nome: "Bloco A - Sala de Reuniões (A124)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 555, x: 1200, subponto: true },
-    { nome: "Bloco A - NAPNE (C501)", tipo: "geral", categoria: "secretaria", andar: "subsolo", bloco_pai: "informatica", y: 530, x: 1090, subponto: true },
-    { nome: "Bloco A - NAPNE Atendimento", tipo: "geral", categoria: "secretaria", andar: "subsolo", bloco_pai: "informatica", y: 530, x: 1070, subponto: true },
+    { nome: "Bloco A - NAPNE (C501)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 530, x: 1090, subponto: true },
+    { nome: "Bloco A - NAPNE Atendimento", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 530, x: 1070, subponto: true },
 
-    // --- ALA DE SALAS DE AULA / LABORATÓRIOS (BLOCO A) ---
+    // --- BLOCO A - ALA SALAS DE AULA / LABORATÓRIOS ---
     { nome: "Bloco A - Lab de Química (A302)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 700, x: 990, subponto: true },
     { nome: "Bloco A - Sala Polímeros (A304)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 700, x: 960, subponto: true },
     { nome: "Bloco A - Sala A306", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 700, x: 930, subponto: true },
@@ -68,7 +68,7 @@ const lugares = [
     { nome: "Bloco A - Lab de Ensino de Matemática (A309)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 630, x: 900, subponto: true },
     { nome: "Bloco A - Fisbrink (A311)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 630, x: 870, subponto: true },
 
-    // --- ÁREA GERAL / CONVIVÊNCIA (BLOCO A) ---
+    // --- BLOCO A - ÁREA GERAL / CONVIVÊNCIA ---
     { nome: "Bloco A - Banheiro Masculino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 710, x: 1020, subponto: true },
     { nome: "Bloco A - Banheiro Feminino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 710, x: 1070, subponto: true },
     { nome: "Bloco A - Cantina", tipo: "geral", categoria: "refeitorio", andar: "terreo", bloco_pai: "informatica", y: 685, x: 1045, subponto: true },
@@ -77,21 +77,21 @@ const lugares = [
     { nome: "Bloco A - Biblioteca", tipo: "geral", categoria: "biblioteca", andar: "terreo", bloco_pai: "informatica", y: 300, x: 1000, subponto: true },
     { nome: "Bloco A - Sala dos Professores (Geral)", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 440, x: 1000, subponto: true },
     { nome: "Bloco A - Alerta: Área em Construção", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "informatica", y: 550, x: 1000, subponto: true },
-    { nome: "Bloco A - Entrada Principal", tipo: "geral", categoria: "entrada", andar: "terreo", bloco_pai: "informatica", y: 350, x: 500, subponto: true },
+    { nome: "Bloco A - Entrada Principal", tipo: "geral", categoria: "entrada", andar: "terreo", bloco_pai: "informatica", y: 370, x: 1000, subponto: true },
 
-    // --- BANHEIROS DO SAGUÃO ---
+    // --- BLOCO A - BANHEIROS DO SAGUÃO ---
     { nome: "Bloco A - Banheiro Masculino (Saguão)", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 400, x: 1100, subponto: true },
     { nome: "Bloco A - Banheiro Feminino (Saguão)", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 350, x: 1100, subponto: true },
     { nome: "Bloco A - Banheiro Acessível Masculino (Saguão)", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "informatica", y: 380, x: 1085, subponto: true },
     { nome: "Bloco A - Banheiro Acessível Feminino (Saguão)", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "informatica", y: 365, x: 1085, subponto: true },
 
-    // --- ACESSIBILIDADE BLOCO A ---
+    // --- BLOCO A - ACESSIBILIDADE ---
     { nome: "Bloco A - Banheiro Acessível Feminino", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "informatica", y: 680, x: 1015, subponto: true },
     { nome: "Bloco A - Banheiro Acessível Masculino", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "informatica", y: 680, x: 1075, subponto: true },
     { nome: "Bloco A - Rampa de Acesso Principal", tipo: "fisica", categoria: "rampa", andar: "terreo", bloco_pai: "informatica", y: 550, x: 1045, subponto: true },
     { nome: "Bloco A - Alerta: Piso Tátil Estragado", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "informatica", y: 610, x: 1045, subponto: true },
 
-    // --- ALA DOS SERVIDORES (BLOCO A) ---
+    // --- BLOCO A - ALA SERVIDORES ---
     { nome: "Bloco A - Movimento Estudantil (A102)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1070, subponto: true },
     { nome: "Bloco A - Setor Sociopedagógico (A103)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1102, subponto: true },
     { nome: "Bloco A - Cozinha dos Servidores (A106)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1125, subponto: true },
@@ -108,13 +108,11 @@ const lugares = [
     { nome: "Bloco A - Almoxarifado (A104)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 420, x: 1090, subponto: true },
     { nome: "Bloco A - Garagem", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 380, x: 1200, subponto: true },
 
-    // --- BLOCO B (AZUL) ---
-    { nome: "Bloco B - Estúdio de Gravação (B402)", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 680, x: 770, subponto: true },
-    { nome: "Bloco B - Auditório", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 680, x: 700, subponto: true },
+    // --- BLOCO B - TÉRREO (visível no Mapa Geral) ---
     { nome: "Bloco B - Banheiro Masculino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "mecanica", y: 680, x: 790, subponto: true },
     { nome: "Bloco B - Banheiro Feminino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "mecanica", y: 650, x: 790, subponto: true },
-    { nome: "Bloco B - Banheiro PCD", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "mecanica", y: 650, x: 790, subponto: true },
-    { nome: "Bloco B - Sala de Limpeza", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "mecanica", y: 680, x: 790, subponto: true },
+    { nome: "Bloco B - Banheiro PCD", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "mecanica", y: 640, x: 800, subponto: true },
+    { nome: "Bloco B - Sala de Limpeza", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "mecanica", y: 695, x: 800, subponto: true },
     { nome: "Bloco B - Elevador (Térreo)", tipo: "fisica", categoria: "elevador", andar: "terreo", bloco_pai: "mecanica", y: 720, x: 750, subponto: true },
     { nome: "Bloco B - Escada (Térreo)", tipo: "fisica", categoria: "escada", andar: "terreo", bloco_pai: "mecanica", y: 720, x: 770, subponto: true },
     { nome: "Bloco B - Lab de Metalografia (B409)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 250, x: 700, subponto: true },
@@ -125,6 +123,11 @@ const lugares = [
     { nome: "Bloco B - Sala dos Professores (B406)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 890, x: 795, subponto: true },
     { nome: "Bloco B - Sala de Coordenação (B407)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 700, x: 805, subponto: true },
     { nome: "Bloco B - Núcleo NIAS (B416)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 910, x: 755, subponto: true },
+    { nome: "Bloco B - Alerta: Degrau sem Rampa", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "mecanica", y: 715, x: 775, subponto: true },
+
+    // --- BLOCO B - SUBSOLO (visível em "Subsolo Mec.") ---
+    { nome: "Bloco B - Estúdio de Gravação (B402)", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 680, x: 770, subponto: true },
+    { nome: "Bloco B - Auditório", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 680, x: 700, subponto: true },
     { nome: "Subsolo B - Laboratório de CNC (B419)", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 190, x: 480, subponto: true },
     { nome: "Subsolo B - Laboratório Industrial", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 600, x: 600, subponto: true },
     { nome: "Subsolo B - Sala B417", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 280, x: 840, subponto: true },
@@ -135,7 +138,7 @@ const lugares = [
     { nome: "Elevador - Subsolo B", tipo: "fisica", categoria: "elevador", andar: "subsolo", bloco_pai: "mecanica", y: 120, x: 840, subponto: true },
     { nome: "Escada - Subsolo B", tipo: "fisica", categoria: "escada", andar: "subsolo", bloco_pai: "mecanica", y: 70, x: 800, subponto: true },
 
-    // --- BLOCO C (VERDE) ---
+    // --- BLOCO C - TÉRREO (visível no Mapa Geral) ---
     { nome: "Bloco C - Sala 101 - Desenho Técnico", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 725, x: 645, subponto: true },
     { nome: "Bloco C - Sala de Aula Adaptada 11", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 715, x: 635, subponto: true },
     { nome: "Bloco C - Sala de Aula Adaptada 12", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 730, x: 650, subponto: true },
@@ -145,6 +148,9 @@ const lugares = [
     { nome: "Bloco C - Sala de Aula Adaptada 16", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 740, x: 645, subponto: true },
     { nome: "Bloco C - Sala de Aula Adaptada 17", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 700, x: 635, subponto: true },
     { nome: "Bloco C - Sala de Aula Adaptada 18", tipo: "geral", categoria: "edificacoes", andar: "terreo", bloco_pai: "edificacoes", y: 745, x: 650, subponto: true },
+    { nome: "Bloco C - Elevador (Verde)", tipo: "fisica", categoria: "elevador", andar: "terreo", bloco_pai: "edificacoes", y: 722, x: 642, subponto: true },
+
+    // --- BLOCO C - SUBSOLO (visível em "Subsolo Edif.") ---
     { nome: "Subsolo C - Lab. de Concreto", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 250, x: 400, subponto: true },
     { nome: "Subsolo C - Almoxarifado", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 230, x: 550, subponto: true },
     { nome: "Subsolo C - Depósito", tipo: "geral", categoria: "edificacoes", andar: "subsolo", bloco_pai: "edificacoes", y: 300, x: 550, subponto: true },
@@ -154,83 +160,70 @@ const lugares = [
     { nome: "Elevador - Subsolo C", tipo: "fisica", categoria: "elevador", andar: "subsolo", bloco_pai: "edificacoes", y: 150, x: 550, subponto: true },
     { nome: "Escada - Subsolo C", tipo: "fisica", categoria: "escada", andar: "subsolo", bloco_pai: "edificacoes", y: 70, x: 600, subponto: true },
 
-    // --- BLOCO D (ADMINISTRATIVO) ---
+    // --- BLOCO D ---
     { nome: "Bloco D - Sala de Aula 31", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 450, x: 855, subponto: true },
     { nome: "Bloco D - Sala de Aula 32", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 595, x: 845, subponto: true },
     { nome: "Bloco D - Sala de Aula 33", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 610, x: 840, subponto: true },
     { nome: "Bloco D - Sala de Aula 34", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 590, x: 860, subponto: true },
 
-    { nome: "Bloco A - Escadaria de Acesso Principal", tipo: "fisica", categoria: "escada", andar: "terreo", bloco_pai: "informatica", y: 360, x: 620, subponto: true },
-    { nome: "Bloco C - Elevador (Verde)", tipo: "fisica", categoria: "elevador", andar: "terreo", bloco_pai: "edificacoes", y: 722, x: 642, subponto: true },
+    // --- ACESSIBILIDADE E ALERTAS GERAIS (Mapa Geral) ---
     { nome: "Vagas Exclusivas PCD - Estacionamento", tipo: "fisica", categoria: "vaga_pcd", andar: "terreo", y: 470, x: 700, subponto: false },
-    { nome: "Bloco B - Alerta: Degrau sem Rampa", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "mecanica", y: 715, x: 775, subponto: true },
     { nome: "Alerta: Porta com Largura Reduzida na Entrada do Refeitório", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 400, x: 820, subponto: false },
     { nome: "Alerta: Inclinação Excessiva na Rampa de Acesso à Quadra", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 550, x: 510, subponto: false },
     { nome: "Alerta: Inclinação Excessiva na Rampa no Final do Bloco C", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 480, x: 700, subponto: false },
-    { nome: "Alerta: Piso Tátil Interrompido no Corredor Central", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 665, x: 950, subponto: false }, 
+    { nome: "Alerta: Piso Tátil Interrompido no Corredor Central", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 665, x: 950, subponto: false },
     { nome: "Alerta: Porta com Largura Reduzida na Entrada do Refeitório", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 650, x: 820, subponto: false },
     { nome: "Bloco A - Alerta: Ausência de Sinalização Sonora nos Laboratórios de Informática", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "informatica", y: 635, x: 1180, subponto: true },
 ];
 
 let mapa;
 let marcadores = [];
-let camadaImagem = null; 
+let camadaImagem = null;
 let filtroAtual = null;
-let alaAtual = "todos"; 
-// ✅ CORREÇÃO 1: andarAtual declarado corretamente como variável global com let
-let andarAtual = "terreo";
-let primeiraInicializacao = true; 
+let alaAtual = "todos";
+let primeiraInicializacao = true;
 
+// Retorna o andar correspondente à ala atual.
+// "todos" = térreo (mapa geral), "edificacoes"/"mecanica" = subsolo (plantas separadas)
+function getAndarDaAla() {
+    return (alaAtual === "todos") ? "terreo" : "subsolo";
+}
 
 function getIcon(categoria, tipo, nomeLugar) {
     if (tipo === "alerta") {
         return L.icon({
             iconUrl: 'assets/images/icone-alerta.png',
             shadowUrl: "https://unpkg.com/leaflet/dist/images/marker-shadow.png",
-            iconSize: [25, 25],       
-            iconAnchor: [12, 25],     
+            iconSize: [25, 25],
+            iconAnchor: [12, 25],
             popupAnchor: [0, -22],
             alt: `Ícone de alerta triangular amarelo indicando barreira arquitetônica em: ${nomeLugar}`
         });
     }
 
-    let cor = "grey"; 
+    let cor = "grey";
     let descricaoAlt = `Marcador de ponto de interesse: ${nomeLugar}`;
 
     if (tipo === "auditiva") {
-        cor = "red"; 
+        cor = "red";
         descricaoAlt = `Ícone vermelho indicando acessibilidade auditiva em: ${nomeLugar}`;
     } else if (tipo === "fisica") {
-        if (categoria === "vaga_pcd") {
-            cor = "green"; 
-            descricaoAlt = `Ícone verde indicando vaga exclusiva PCD em: ${nomeLugar}`;
-        } else if (categoria === "banheiro_acessivel") {
-            cor = "green";
-            descricaoAlt = `Ícone verde indicando banheiro acessível em: ${nomeLugar}`;
-        } else {
-            cor = "green"; 
-            descricaoAlt = `Ícone verde indicando estrutura de acessibilidade física em: ${nomeLugar}`;
-        }
+        cor = "green";
+        if (categoria === "vaga_pcd") descricaoAlt = `Ícone verde indicando vaga exclusiva PCD em: ${nomeLugar}`;
+        else if (categoria === "banheiro_acessivel") descricaoAlt = `Ícone verde indicando banheiro acessível em: ${nomeLugar}`;
+        else descricaoAlt = `Ícone verde indicando estrutura de acessibilidade física em: ${nomeLugar}`;
     } else {
         if (categoria === "secretaria") cor = "red";
-        if (categoria === "mecanica") cor = "blue";    
-        if (categoria === "biblioteca") cor = "red";    
-        if (categoria === "edificacoes") cor = "green";    
-        if (categoria === "informatica") cor = "red"; 
-        if (categoria === "geral") cor = "red";   
-        
+        if (categoria === "mecanica") cor = "blue";
+        if (categoria === "biblioteca") cor = "red";
+        if (categoria === "edificacoes") cor = "green";
+        if (categoria === "informatica") cor = "red";
+        if (categoria === "geral") cor = "red";
         if (categoria === "administrativo") {
             cor = "violet";
             descricaoAlt = `Ícone roxo indicando o Bloco D ou suas dependências em: ${nomeLugar}`;
         }
-        
-        if (
-            categoria === "estacionamento" || 
-            categoria === "entrada" || 
-            categoria === "quadra" || 
-            categoria === "refeitorio" || 
-            categoria === "salas_externas"
-        ) {
+        if (["estacionamento","entrada","quadra","refeitorio","salas_externas"].includes(categoria)) {
             cor = "orange";
         }
     }
@@ -238,8 +231,8 @@ function getIcon(categoria, tipo, nomeLugar) {
     return L.icon({
         iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${cor}.png`,
         shadowUrl: "https://unpkg.com/leaflet/dist/images/marker-shadow.png",
-        iconSize: [18, 30],       
-        iconAnchor: [9, 30],       
+        iconSize: [18, 30],
+        iconAnchor: [9, 30],
         popupAnchor: [1, -26],
         alt: descricaoAlt
     });
@@ -252,7 +245,7 @@ function initMap() {
         maxZoom: 3
     });
 
-    primeiraInicializacao = true; 
+    primeiraInicializacao = true;
     atualizarPlantaDeFundo();
 
     mapa.on('click', function(e) {
@@ -269,36 +262,56 @@ function atualizarPlantaDeFundo() {
     const limites = [[0, 0], [dadosPlanta.altura, dadosPlanta.largura]];
 
     let textAltPlanta = "Mapa do Campus Geral com distribuição dos blocos e caminhos.";
-    if (alaAtual === "edificacoes") textAltPlanta = "Planta baixa detalhada do Bloco C (Verde).";
-    if (alaAtual === "mecanica") textAltPlanta = "Planta baixa detalhada do Bloco B (Azul).";
+    if (alaAtual === "edificacoes") textAltPlanta = "Planta baixa detalhada do Subsolo do Bloco C (Edificações).";
+    if (alaAtual === "mecanica") textAltPlanta = "Planta baixa detalhada do Subsolo do Bloco B (Mecânica).";
 
     camadaImagem = L.imageOverlay(dadosPlanta.url, limites, {
         alt: textAltPlanta
     }).addTo(mapa);
-    
+
     mapa.fitBounds(limites);
     aplicarFiltrosCombinados();
 }
 
-// ✅ CORREÇÃO 2: As duas linhas soltas que estavam aqui foram REMOVIDAS:
-// andarAtual = "subsolo"; ← REMOVIDO
-// aplicarFiltrosCombinados(); ← REMOVIDO
+function filtrarAla(ala, elemento) {
+    primeiraInicializacao = false;
+
+    document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
+        btn.classList.remove("active");
+        btn.setAttribute("aria-current", "false");
+    });
+
+    alaAtual = ala;
+    elemento.classList.add("active");
+    elemento.setAttribute("aria-current", "true");
+
+    atualizarPlantaDeFundo();
+}
 
 function aplicarFiltrosCombinados() {
-    let filtrados = lugares;
-
     const searchInput = document.getElementById('search-input');
     const termo = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    const andarDaAla = getAndarDaAla();
+
+    let filtrados = lugares;
 
     if (termo) {
-        filtrados = lugares; 
+        // Com busca: pesquisa em todos os lugares, sem restrição de ala ou andar
+        filtrados = lugares.filter(l => {
+            const nomeNormalizado = l.nome.toLowerCase();
+            const nomeSemHifens = nomeNormalizado.replace(/-/g, "");
+            return nomeNormalizado.includes(termo) || nomeSemHifens.includes(termo.replace(/-/g, ""));
+        });
     } else {
+        // Sem busca: regras rígidas por ala
         if (alaAtual === "todos") {
-            filtrados = filtrados.filter(l => l.subponto === false && l.andar !== "subsolo");
+            // Mapa geral: apenas pontos do térreo, sem subpontos
+            filtrados = filtrados.filter(l => l.subponto === false && l.andar === "terreo");
         } else {
-            filtrados = filtrados.filter(l => 
-                (l.categoria === alaAtual || l.bloco_pai === alaAtual) && 
-                (l.andar === andarAtual)
+            // Subsolo Edif. ou Subsolo Mec.: apenas subpontos do subsolo da ala correta
+            filtrados = filtrados.filter(l =>
+                l.bloco_pai === alaAtual &&
+                l.andar === "subsolo"
             );
         }
     }
@@ -307,36 +320,15 @@ function aplicarFiltrosCombinados() {
         filtrados = filtrados.filter(l => l.tipo === filtroAtual);
     }
 
-    if (termo) {
-        filtrados = filtrados.filter(l => {
-            const nomeNormalizado = l.nome.toLowerCase();
-            const nomeSemHifens = nomeNormalizado.replace(/-/g, "");
-            return nomeNormalizado.includes(termo) || nomeSemHifens.includes(termo.replace(/-/g, ""));
-        });
-    }
-
-    limparMarcadores(); 
+    limparMarcadores();
 
     if (alaAtual === "todos" && primeiraInicializacao && !termo && !filtroAtual) {
-        const blocosPrincipais = lugares.filter(l => l.subponto === false && l.andar !== "subsolo");
-        atualizarListaLateral(blocosPrincipais); 
+        const blocosPrincipais = lugares.filter(l => l.subponto === false && l.andar === "terreo");
+        atualizarListaLateral(blocosPrincipais);
     } else {
         mostrarLugares(filtrados);
-        atualizarListaLateral(filtrados, termo); 
+        atualizarListaLateral(filtrados, termo);
     }
-}
-
-function filtrarAla(ala, elemento) {
-    primeiraInicializacao = false; 
-
-    document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
-        btn.classList.remove("active");
-    });
-    
-    alaAtual = ala;
-    elemento.classList.add("active"); 
-
-    atualizarPlantaDeFundo();
 }
 
 function mostrarLugares(lista) {
@@ -346,15 +338,11 @@ function mostrarLugares(lista) {
 
 function adicionarMarcador(lugar) {
     const marcador = L.marker([lugar.y, lugar.x], {
-        icon: getIcon(lugar.categoria, lugar.tipo, lugar.nome) 
+        icon: getIcon(lugar.categoria, lugar.tipo, lugar.nome)
     }).addTo(mapa);
 
-    let textoPopup = lugar.tipo.toUpperCase();
-    if (lugar.tipo === "geral") textoPopup = "Ponto de Interesse";
-    
-    if (lugar.tipo === "alerta") {
-        textoPopup = "<span style='color:#800000; font-weight:bold;'>⚠️ Barreira Física Encontrada (Necessita de Melhorias)</span>";
-    }
+    let textoPopup = "Ponto de Interesse";
+    if (lugar.tipo === "alerta") textoPopup = "<span style='color:#800000; font-weight:bold;'>⚠️ Barreira Física Encontrada (Necessita de Melhorias)</span>";
     if (lugar.tipo === "fisica") textoPopup = "Acessibilidade Física";
     if (lugar.tipo === "auditiva") textoPopup = "Acessibilidade Auditiva";
 
@@ -364,7 +352,7 @@ function adicionarMarcador(lugar) {
             <span style="color:#333333; font-size:12px;">${textoPopup}</span>
         </div>
     `);
-    
+
     marcadores.push(marcador);
     return marcador;
 }
@@ -375,125 +363,126 @@ function limparMarcadores() {
 }
 
 function filtrar(tipo, elemento) {
-    primeiraInicializacao = false; 
+    primeiraInicializacao = false;
 
-    document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
+    document.querySelectorAll(".filtro").forEach(el => {
+        el.classList.remove("ativo");
+        el.setAttribute("aria-pressed", "false");
+    });
 
     if (filtroAtual === tipo) {
         filtroAtual = null;
     } else {
         filtroAtual = tipo;
         elemento.classList.add("ativo");
+        elemento.setAttribute("aria-pressed", "true");
     }
     aplicarFiltrosCombinados();
 }
 
 function pesquisarLugares() {
-    primeiraInicializacao = false; 
+    primeiraInicializacao = false;
     aplicarFiltrosCombinados();
 }
 
 function atualizarListaLateral(lista, termoDeBusca = "") {
     const container = document.getElementById("lista-lugares");
     if (!container) return;
-    
+
     container.innerHTML = "";
 
-    let listaParaExibir = [];
+    // Na sidebar, sem busca ativa: mostra apenas pontos principais (subponto: false)
+    // Com busca: mostra tudo que bateu, incluindo subpontos
+    let listaParaExibir = termoDeBusca.length > 0
+        ? [...lista]
+        : lista.filter(l => l.subponto === false);
 
-    if (termoDeBusca.length > 0) {
+    // Quando estamos numa ala de subsolo sem busca: mostra todos os subpontos daquele subsolo
+    if (alaAtual !== "todos" && termoDeBusca.length === 0) {
         listaParaExibir = [...lista];
-    } else {
-        listaParaExibir = lista.filter(lugar => lugar.subponto === false);
     }
 
-    const ordemDesejada = [
-        "Bloco A", 
-        "Bloco B", 
-        "Bloco C", 
-        "Bloco D", 
-        "Estacionamento interno A", 
-        "Estacionamento interno B", 
-        "Estacionamento externo"
-    ];
+    const ordemDesejada = ["Bloco A", "Bloco B", "Bloco C", "Bloco D",
+        "Estacionamento interno A", "Estacionamento interno B", "Estacionamento externo"];
 
     listaParaExibir.sort((a, b) => {
-        const indexA = ordemDesejada.indexOf(a.nome);
-        const indexB = ordemDesejada.indexOf(b.nome);
-
-        if (indexA !== -1 && indexB !== -1) return indexA - indexB; 
-        if (indexA !== -1) return -1; 
-        if (indexB !== -1) return 1;  
-        return 0; 
+        const iA = ordemDesejada.indexOf(a.nome);
+        const iB = ordemDesejada.indexOf(b.nome);
+        if (iA !== -1 && iB !== -1) return iA - iB;
+        if (iA !== -1) return -1;
+        if (iB !== -1) return 1;
+        return 0;
     });
 
     listaParaExibir.forEach(lugar => {
         const item = document.createElement("div");
-        item.className = "item-lugar"; 
-        
-        let corBorda = "#ccc"; 
-        const categoriaAlvo = lugar.bloco_pai || lugar.categoria;
-        
-        if (categoriaAlvo === "informatica" || lugar.nome.includes("Bloco A")) {
-            corBorda = "#790000"; 
-        } else if (categoriaAlvo === "mecanica" || lugar.nome.includes("Bloco B") || lugar.nome.includes("Subsolo B")) {
-            corBorda = "#002f5e"; 
-        } else if (categoriaAlvo === "edificacoes" || lugar.nome.includes("Bloco C") || lugar.nome.includes("Subsolo C")) {
-            corBorda = "#005b26"; 
-        } else if (categoriaAlvo === "administrativo" || lugar.nome.includes("Bloco D")) {
-            corBorda = "#4e0071"; 
-        } else if (lugar.tipo === "alerta") {
-            corBorda = "#e67e22"; 
-        } else if (categoriaAlvo === "estacionamento") {
-            corBorda = "#f39c12"; 
-        }
+        item.className = "item-lugar";
 
-        item.style.borderLeft = `5px solid ${corBorda}`;
-        item.style.padding = "10px 15px";
-        item.style.marginBottom = "8px";
-        item.style.backgroundColor = "#f9f9f9";
-        item.style.borderRadius = "4px";
-        item.style.cursor = "pointer";
-        item.style.transition = "background-color 0.2s ease";
+        let corBorda = "#ccc";
+        const categoriaAlvo = lugar.bloco_pai || lugar.categoria;
+        if (categoriaAlvo === "informatica" || lugar.nome.includes("Bloco A")) corBorda = "#790000";
+        else if (categoriaAlvo === "mecanica" || lugar.nome.includes("Bloco B") || lugar.nome.includes("Subsolo B")) corBorda = "#002f5e";
+        else if (categoriaAlvo === "edificacoes" || lugar.nome.includes("Bloco C") || lugar.nome.includes("Subsolo C")) corBorda = "#005b26";
+        else if (categoriaAlvo === "administrativo" || lugar.nome.includes("Bloco D")) corBorda = "#4e0071";
+        else if (lugar.tipo === "alerta") corBorda = "#e67e22";
+        else if (categoriaAlvo === "estacionamento") corBorda = "#f39c12";
+
+        item.style.cssText = `
+            border-left: 5px solid ${corBorda};
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        `;
 
         item.onmouseenter = () => item.style.backgroundColor = "#f1f1f1";
         item.onmouseleave = () => item.style.backgroundColor = "#f9f9f9";
 
         let labelAcessibilidade = "Ponto de Interesse";
-        if (lugar.tipo === "alerta") labelAcessibilidade = "<span style='color:#800000; font-weight:bold;'>⚠️ Necessita de Melhorias</span>";
-        else if (lugar.subponto) labelAcessibilidade = `Dependência Interna (${lugar.andar === 'subsolo' ? 'Subsolo' : 'Térreo'})`;
+        if (lugar.tipo === "alerta") {
+            labelAcessibilidade = "<span style='color:#800000; font-weight:bold;'>⚠️ Necessita de Melhorias</span>";
+        } else if (lugar.subponto) {
+            const andarLabel = lugar.andar === "subsolo" ? "Subsolo" : "Térreo";
+            labelAcessibilidade = `Dependência Interna (${andarLabel})`;
+        }
 
         item.innerHTML = `
             <p style="margin: 0 0 5px 0;"><strong>${lugar.nome}</strong></p>
             <span style="font-size: 12px; color: #666;">${labelAcessibilidade}</span>
         `;
-        
-        item.onclick = () => {
-            if (primeiraInicializacao) {
-                primeiraInicializacao = false;
-            }
 
+        item.onclick = () => {
+            primeiraInicializacao = false;
             limparMarcadores();
 
-            const blocosComSubpontos = ["Bloco A", "Bloco B", "Bloco C", "Bloco D"];
-            
-            if (blocosComSubpontos.includes(lugar.nome)) {
+            const blocosRaiz = ["Bloco A", "Bloco B", "Bloco C", "Bloco D"];
+
+            if (blocosRaiz.includes(lugar.nome)) {
                 const blocoRaiz = adicionarMarcador(lugar);
-                
+
+                const mapaBlocoPai = {
+                    "Bloco A": "informatica",
+                    "Bloco B": "mecanica",
+                    "Bloco C": "edificacoes",
+                    "Bloco D": "administrativo"
+                };
+                const blocoPaiAlvo = mapaBlocoPai[lugar.nome];
+                const andarDaAla = getAndarDaAla();
+
                 const subSalas = lugares.filter(l => {
-                    const pertenceAoBloco = l.nome.startsWith(`${lugar.nome} - `);
-                    
-                    // ✅ CORREÇÃO 3: Bloco A e D trazem tudo (sem filtro de andar)
-                    // Bloco B e C respeitam o andarAtual atual selecionado pelo usuário
+                    if (!l.subponto) return false;
+                    if (l.bloco_pai !== blocoPaiAlvo) return false;
+                    // Bloco A e D: só térreo (não têm planta de subsolo separada)
                     if (lugar.nome === "Bloco A" || lugar.nome === "Bloco D") {
-                        return pertenceAoBloco;
+                        return l.andar === "terreo";
                     }
-                    // Bloco B e Bloco C: filtra pelo andar atualmente selecionado
-                    return pertenceAoBloco && l.andar === andarAtual;
+                    // Bloco B e C: respeita o andar determinado pela ala atual
+                    return l.andar === andarDaAla;
                 });
 
                 subSalas.forEach(sala => adicionarMarcador(sala));
-
                 mapa.setView([lugar.y, lugar.x], 1);
                 blocoRaiz.openPopup();
                 return;
@@ -503,7 +492,7 @@ function atualizarListaLateral(lista, termoDeBusca = "") {
             mapa.setView([lugar.y, lugar.x], 1);
             marcadorUnico.openPopup();
         };
-        
+
         container.appendChild(item);
     });
 }
@@ -512,44 +501,41 @@ function mostrarTodos() {
     filtroAtual = null;
     primeiraInicializacao = false;
 
-    document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
+    document.querySelectorAll(".filtro").forEach(el => {
+        el.classList.remove("ativo");
+        el.setAttribute("aria-pressed", "false");
+    });
 
-    let listaFiltrada = lugares; 
-
-    if (alaAtual === "todos") {
-        listaFiltrada = listaFiltrada.filter(l => l.subponto === false);
-    } else {
-        listaFiltrada = listaFiltrada.filter(l => 
-            (l.categoria === alaAtual || l.bloco_pai === alaAtual) && 
-            l.andar === andarAtual
-        );
-    }
-
-    mostrarLugares(listaFiltrada);
-    atualizarListaLateral(listaFiltrada);
+    aplicarFiltrosCombinados();
 }
 
 function resetarMapaCompleto() {
     filtroAtual = null;
     alaAtual = "todos";
-    // ✅ CORREÇÃO 4: reseta andarAtual para "terreo" ao resetar o mapa
-    andarAtual = "terreo";
     primeiraInicializacao = true;
 
-    document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
-    document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => btn.classList.remove("active"));
-    
+    document.querySelectorAll(".filtro").forEach(el => {
+        el.classList.remove("ativo");
+        el.setAttribute("aria-pressed", "false");
+    });
+    document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
+        btn.classList.remove("active");
+        btn.setAttribute("aria-current", "false");
+    });
+
     const botoesAla = document.querySelectorAll("#seletor-alas .btn-type");
-    if (botoesAla.length > 0) botoesAla[0].classList.add("active");
+    if (botoesAla.length > 0) {
+        botoesAla[0].classList.add("active");
+        botoesAla[0].setAttribute("aria-current", "true");
+    }
 
     const searchInput = document.getElementById('search-input');
     if (searchInput) searchInput.value = '';
 
     limparMarcadores();
-
     atualizarPlantaDeFundo();
 
-    const blocosPrincipais = lugares.filter(l => l.subponto === false);
+    const blocosPrincipais = lugares.filter(l => l.subponto === false && l.andar === "terreo");
     atualizarListaLateral(blocosPrincipais);
 }
 
