@@ -295,41 +295,35 @@ function aplicarFiltrosCombinados() {
     const searchInput = document.getElementById('search-input');
     const termo = searchInput ? searchInput.value.toLowerCase().trim() : "";
 
-    let filtrados = lugares;
+    let filtrados;
 
     if (termo) {
-        // Com busca: pesquisa em todos os lugares sem restrição de ala ou andar
         filtrados = lugares.filter(l => {
             const nomeNormalizado = l.nome.toLowerCase();
             const nomeSemHifens = nomeNormalizado.replace(/-/g, "");
             return nomeNormalizado.includes(termo) || nomeSemHifens.includes(termo.replace(/-/g, ""));
         });
     } else {
+        // Sem busca: comportamento original baseado na ala selecionada
         if (alaAtual === "todos") {
             if (filtroAtual) {
-                // Com filtro ativo no mapa geral: inclui TODOS os andares e subpontos
-                // para que elevadores/escadas do subsolo e recursos internos sejam encontrados
-                filtrados = lugares; // sem restrição de andar ou subponto
+                filtrados = [...lugares];
             } else {
-                // Sem filtro: comportamento padrão — só pontos principais do térreo
-                filtrados = filtrados.filter(l => l.subponto === false && l.andar === "terreo");
+                filtrados = lugares.filter(l => l.subponto === false && l.andar === "terreo");
             }
         } else {
-            // Subsolo Edif. ou Subsolo Mec.: apenas subpontos do subsolo da ala correta
-            filtrados = filtrados.filter(l =>
+            filtrados = lugares.filter(l =>
                 l.bloco_pai === alaAtual &&
                 l.andar === "subsolo"
             );
         }
     }
 
-    // Aplicação do filtro por tipo
+    // Aplicação do filtro por tipo de acessibilidade
     if (filtroAtual) {
         if (filtroAtual === "fisica") {
-            // Física: recursos de acessibilidade física + alertas de barreira
             filtrados = filtrados.filter(l => l.tipo === "fisica" || l.tipo === "alerta");
         } else if (filtroAtual === "auditiva") {
-            // Auditiva: apenas pontos com tipo "auditiva" (NAPNE)
             filtrados = filtrados.filter(l => l.tipo === "auditiva");
         } else {
             filtrados = filtrados.filter(l => l.tipo === filtroAtual);
@@ -340,9 +334,13 @@ function aplicarFiltrosCombinados() {
 
     if (alaAtual === "todos" && primeiraInicializacao && !termo && !filtroAtual) {
         const blocosPrincipais = lugares.filter(l => l.subponto === false && l.andar === "terreo");
-        atualizarListaLateral(blocosPrincipais);
+        atualizarListaLateral(blocosPrincipais, "");
     } else {
         mostrarLugares(filtrados);
+        // -----------------------------------------------------------------
+        // CORREÇÃO: passa `termo` para atualizarListaLateral em todos os casos,
+        // garantindo que a lista lateral não filtre subpontos quando há busca
+        // -----------------------------------------------------------------
         atualizarListaLateral(filtrados, termo);
     }
 }
@@ -407,15 +405,25 @@ function atualizarListaLateral(lista, termoDeBusca = "") {
 
     container.innerHTML = "";
 
-    // Com busca OU filtro ativo: mostra tudo (incluindo subpontos)
-    // Sem busca e sem filtro: mostra apenas pontos principais
-    let listaParaExibir = (termoDeBusca.length > 0 || filtroAtual)
-        ? [...lista]
-        : lista.filter(l => l.subponto === false);
+    // -----------------------------------------------------------------
+    // CORREÇÃO: com busca ativa, exibe TODOS os resultados recebidos
+    // (incluindo subpontos) sem nenhum filtro adicional aqui.
+    // Sem busca e sem filtro: exibe apenas pontos principais (subponto false).
+    // -----------------------------------------------------------------
+    let listaParaExibir;
 
-    // Ala de subsolo sem busca e sem filtro: mostra todos os subpontos daquele subsolo
-    if (alaAtual !== "todos" && termoDeBusca.length === 0 && !filtroAtual) {
+    if (termoDeBusca.length > 0) {
+        // Busca ativa: mostra tudo que foi encontrado, inclusive subpontos
         listaParaExibir = [...lista];
+    } else if (filtroAtual) {
+        // Filtro de acessibilidade ativo sem busca: mostra tudo
+        listaParaExibir = [...lista];
+    } else if (alaAtual !== "todos") {
+        // Ala de subsolo sem busca e sem filtro: mostra todos os subpontos daquela ala
+        listaParaExibir = [...lista];
+    } else {
+        // Estado padrão (mapa geral, sem busca, sem filtro): só pontos principais
+        listaParaExibir = lista.filter(l => l.subponto === false);
     }
 
     const ordemDesejada = ["Bloco A", "Bloco B", "Bloco C", "Bloco D",
@@ -552,7 +560,7 @@ function resetarMapaCompleto() {
     atualizarPlantaDeFundo();
 
     const blocosPrincipais = lugares.filter(l => l.subponto === false && l.andar === "terreo");
-    atualizarListaLateral(blocosPrincipais);
+    atualizarListaLateral(blocosPrincipais, "");
 }
 
 window.onload = initMap;
