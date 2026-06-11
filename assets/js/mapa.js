@@ -110,10 +110,10 @@ const lugares = [
     { nome: "Bloco A - Garagem", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 380, x: 1200, subponto: true },
 
     // --- BLOCO B - TÉRREO (visível no Mapa Geral) ---
-    { nome: "Bloco B - Banheiro Masculino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "mecanica", y: 680, x: 790, subponto: true },
-    { nome: "Bloco B - Banheiro Feminino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "mecanica", y: 650, x: 790, subponto: true },
-    { nome: "Bloco B - Banheiro PCD", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "mecanica", y: 640, x: 800, subponto: true },
-    { nome: "Bloco B - Sala de Limpeza", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "mecanica", y: 695, x: 800, subponto: true },
+    { nome: "Bloco B - Banheiro Masculino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "mecanica", y: 680, x: 815, subponto: true },
+    { nome: "Bloco B - Banheiro Feminino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "mecanica", y: 680, x: 790 , subponto: true },
+    { nome: "Bloco B - Banheiro PCD", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "mecanica", y: 700, x: 820 , subponto: true },
+    { nome: "Bloco B - Sala de Limpeza", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "mecanica", y: 695, x: 810, subponto: true },
     { nome: "Bloco B - Elevador (Térreo)", tipo: "fisica", categoria: "elevador", andar: "terreo", bloco_pai: "mecanica", y: 720, x: 750, subponto: true },
     { nome: "Bloco B - Escada (Térreo)", tipo: "fisica", categoria: "escada", andar: "terreo", bloco_pai: "mecanica", y: 720, x: 770, subponto: true },
     { nome: "Bloco B - Lab de Metalografia (B409)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 250, x: 700, subponto: true },
