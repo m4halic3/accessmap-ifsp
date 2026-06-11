@@ -17,9 +17,9 @@ const plantas = {
 };
 
 const lugares = [
-    { nome: "Bloco A", tipo: "geral", categoria: "geral", andar: "terreo", y: 650, x: 1150, subponto: false },
-    { nome: "Bloco B", tipo: "geral", categoria: "mecanica", andar: "terreo", y: 710, x: 780, subponto: false },
-    { nome: "Bloco C", tipo: "geral", categoria: "edificacoes", andar: "terreo", y: 720, x: 640, subponto: false },
+    { nome: "Bloco A", tipo: "geral", categoria: "geral", andar: "terreo", y: 500, x: 1045, subponto: false },
+    { nome: "Bloco B", tipo: "geral", categoria: "mecanica", andar: "terreo", y: 670, x: 755, subponto: false },
+    { nome: "Bloco C", tipo: "geral", categoria: "edificacoes", andar: "terreo", y: 670, x: 585, subponto: false },
     { nome: "Bloco D", tipo: "geral", categoria: "administrativo", andar: "terreo", y: 630, x: 400, subponto: false },
     { nome: "Estacionamento interno A", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 380, x: 680, subponto: false },
     { nome: "Estacionamento interno B", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 980, x: 700, subponto: false },
@@ -126,7 +126,7 @@ const lugares = [
     { nome: "Bloco B - Núcleo NIAS (B416)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 910, x: 755, subponto: true },
     { nome: "Bloco B - Estúdio de Gravação (B402)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 680, x: 770, subponto: true },
     { nome: "Bloco B - Auditório", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 680, x: 700, subponto: true },
-    
+
        // --- BLOCO B - SUBSOLO (visível em "Subsolo Mec.") ---
     { nome: "Subsolo B - Laboratório de CNC (B419)", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 190, x: 480, subponto: true },
     { nome: "Subsolo B - Laboratório Industrial", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 600, x: 600, subponto: true },
