@@ -320,15 +320,21 @@ function aplicarFiltrosCombinados() {
     }
 
     // Aplicação do filtro por tipo de acessibilidade
-    if (filtroAtual) {
-        if (filtroAtual === "fisica") {
-            filtrados = filtrados.filter(l => l.tipo === "fisica" || l.tipo === "alerta");
-        } else if (filtroAtual === "auditiva") {
-            filtrados = filtrados.filter(l => l.tipo === "auditiva");
-        } else {
-            filtrados = filtrados.filter(l => l.tipo === filtroAtual);
-        }
+// Aplicação do filtro por tipo de acessibilidade
+if (filtroAtual) {
+    if (filtroAtual === "fisica") {
+        filtrados = filtrados.filter(l => l.tipo === "fisica" || l.tipo === "alerta");
+    } else if (filtroAtual === "auditiva") {
+        filtrados = filtrados.filter(l => l.tipo === "auditiva");
+    } else {
+        filtrados = filtrados.filter(l => l.tipo === filtroAtual);
     }
+
+    // No mapa geral, oculta itens que pertencem ao subsolo
+    if (alaAtual === "todos") {
+        filtrados = filtrados.filter(l => l.andar !== "subsolo");
+    }
+}
 
     limparMarcadores();
 
