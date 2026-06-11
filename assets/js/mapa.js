@@ -196,6 +196,7 @@ function getAndarDaAla() {
 }
 
 function getIcon(categoria, tipo, nomeLugar) {
+    // 1. Mantém o alerta como está
     if (tipo === "alerta") {
         return L.icon({
             iconUrl: 'assets/images/icone-alerta.png',
@@ -203,35 +204,41 @@ function getIcon(categoria, tipo, nomeLugar) {
             iconSize: [25, 25],
             iconAnchor: [12, 25],
             popupAnchor: [0, -22],
-            alt: `Ícone de alerta triangular amarelo indicando barreira arquitetônica em: ${nomeLugar}`
+            alt: `Alerta em: ${nomeLugar}`
         });
     }
 
-    let cor = "black";
-    let descricaoAlt = `Marcador de ponto de interesse: ${nomeLugar}`;
+    let cor = "black"; // Cor padrão para salas internas
+    let descricaoAlt = `Ponto de interesse: ${nomeLugar}`;
 
-    if (tipo === "auditiva") {
+    // 2. Lógica prioritária de cores
+    const nomeLower = nomeLugar.toLowerCase();
+
+    if (tipo === "fisica" && categoria === "banheiro_acessivel") {
+        cor = "green"; // PCD
+        descricaoAlt = `Banheiro acessível PCD em: ${nomeLugar}`;
+    } 
+    else if (nomeLower.includes("banheiro") && categoria !== "banheiro_acessivel") {
+        cor = "yellow"; // Banheiro normal
+        descricaoAlt = `Banheiro em: ${nomeLugar}`;
+    }
+    else if (tipo === "auditiva") {
         cor = "red";
-        descricaoAlt = `Ícone vermelho indicando acessibilidade auditiva em: ${nomeLugar}`;
-    } else if (tipo === "fisica") {
-        cor = "green";
-        if (categoria === "vaga_pcd") descricaoAlt = `Ícone verde indicando vaga exclusiva PCD em: ${nomeLugar}`;
-        else if (categoria === "banheiro_acessivel") descricaoAlt = `Ícone verde indicando banheiro acessível em: ${nomeLugar}`;
-        else descricaoAlt = `Ícone verde indicando estrutura de acessibilidade física em: ${nomeLugar}`;
-    } else {
-        if (categoria === "secretaria") cor = "red";
-        if (categoria === "mecanica") cor = "blue";
-        if (categoria === "biblioteca") cor = "red";
-        if (categoria === "edificacoes") cor = "green";
-        if (categoria === "informatica") cor = "red";
-        if (categoria === "geral") cor = "red";
-        if (categoria === "administrativo") {
-            cor = "violet";
-            descricaoAlt = `Ícone roxo indicando o Bloco D ou suas dependências em: ${nomeLugar}`;
-        }
-        if (["estacionamento","entrada","quadra","refeitorio","salas_externas"].includes(categoria)) {
-            cor = "orange";
-        }
+        descricaoAlt = `Acessibilidade auditiva em: ${nomeLugar}`;
+    }
+    else {
+        // Lógica original para blocos e áreas externas
+        if (categoria === "administrativo") cor = "violet";
+        else if (["estacionamento", "entrada", "quadra", "refeitorio", "rampa", "escada"].includes(categoria)) cor = "orange";
+        else if (categoria === "mecanica") cor = "blue";
+        else if (categoria === "edificacoes") cor = "green";
+        else if (categoria === "informatica") cor = "black";
+        else if (categoria === "secretaria") cor = "violet";
+        else if (categoria === "servidores") cor = "blue";
+        else if (categoria === "geral") cor = "violet";
+        else if (categoria === "biblioteca") cor = "grey";
+        // Salas internas (subpontos que não caíram acima) permanecem 'black'
+
     }
 
     return L.icon({
