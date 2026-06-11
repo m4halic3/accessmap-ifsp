@@ -168,12 +168,6 @@ const lugares = [
 
     // --- ACESSIBILIDADE E ALERTAS GERAIS (Mapa Geral) ---
     { nome: "Vagas Exclusivas PCD - Estacionamento", tipo: "fisica", categoria: "vaga_pcd", andar: "terreo", y: 470, x: 700, subponto: false },
-    { nome: "Alerta: Porta com Largura Reduzida na Entrada do Refeitório", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 400, x: 820, subponto: false },
-    { nome: "Alerta: Inclinação Excessiva na Rampa de Acesso à Quadra", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 550, x: 510, subponto: false },
-    { nome: "Alerta: Inclinação Excessiva na Rampa no Final do Bloco C", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 480, x: 700, subponto: false },
-    { nome: "Alerta: Piso Tátil Interrompido no Corredor Central", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 665, x: 950, subponto: false },
-    { nome: "Alerta: Porta com Largura Reduzida na Entrada do Refeitório", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 650, x: 820, subponto: false },
-    { nome: "Bloco A - Alerta: Ausência de Sinalização Sonora nos Laboratórios de Informática", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "informatica", y: 635, x: 1180, subponto: true },
 ];
 
 let mapa;
