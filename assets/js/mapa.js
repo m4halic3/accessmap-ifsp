@@ -28,6 +28,11 @@ const lugares = [
     { nome: "Refeitório", tipo: "geral", categoria: "refeitorio", andar: "terreo", y: 800, x: 300, subponto: false },
     { nome: "Canteiro", tipo: "geral", categoria: "canteiro", andar: "terreo", y: 900, x: 1200, subponto: false },
 
+    // --- ESTRUTURAS EXTERNAS / ÁREAS COMUNS ---
+{ nome: "Rampa Externa Norte", tipo: "fisica", categoria: "rampa", andar: "terreo", y: 450, x: 500, subponto: false },
+{ nome: "Rampa Externa Sul", tipo: "fisica", categoria: "rampa", andar: "terreo", y: 950, x: 400, subponto: false },
+{ nome: "Escada Principal Externa", tipo: "fisica", categoria: "escada", andar: "terreo", y: 550, x: 550, subponto: false },
+{ nome: "Alerta: Porta Pequena (Acesso Externo)", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 700, x: 500, subponto: false },
     // =========================================================================
     // DEPENDÊNCIAS INTERNAS / SUBPONTOS (subponto: true)
     // =========================================================================
@@ -456,6 +461,8 @@ function atualizarListaLateral(lista, termoDeBusca = "") {
         else if (categoriaAlvo === "administrativo" || lugar.nome.includes("Bloco D")) corBorda = "#4e0071";
         else if (lugar.tipo === "alerta") corBorda = "#e67e22";
         else if (categoriaAlvo === "estacionamento") corBorda = "#f39c12";
+        else if (lugar.categoria === "rampa" || lugar.categoria === "escada") corBorda = "#047c50"; // Azul para acessos
+else if (lugar.tipo === "alerta") corBorda = "#be5900";
 
         item.style.cssText = `
             border-left: 5px solid ${corBorda};
