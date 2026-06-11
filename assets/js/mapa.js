@@ -21,9 +21,9 @@ const lugares = [
     { nome: "Bloco B", tipo: "geral", categoria: "mecanica", andar: "terreo", y: 710, x: 780, subponto: false },
     { nome: "Bloco C", tipo: "geral", categoria: "edificacoes", andar: "terreo", y: 720, x: 640, subponto: false },
     { nome: "Bloco D", tipo: "geral", categoria: "administrativo", andar: "terreo", y: 630, x: 400, subponto: false },
-    { nome: "Estacionamento interno A", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 520, x: 750, subponto: false },
-    { nome: "Estacionamento interno B", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 500, x: 700, subponto: false },
-    { nome: "Estacionamento externo", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 300, x: 600, subponto: false },
+    { nome: "Estacionamento interno A", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 380, x: 680, subponto: false },
+    { nome: "Estacionamento interno B", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 980, x: 700, subponto: false },
+    { nome: "Estacionamento externo", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 100, x: 900, subponto: false },
     { nome: "Quadra", tipo: "geral", categoria: "quadra", andar: "terreo", y: 650, x: 150, subponto: false },
     { nome: "Refeitório", tipo: "geral", categoria: "refeitorio", andar: "terreo", y: 800, x: 300, subponto: false },
 
