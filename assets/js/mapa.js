@@ -17,9 +17,6 @@ const plantas = {
 };
 
 const lugares = [
-    // =========================================================================
-    // 1. PONTOS PRINCIPAIS / BLOCOS ÂNCORAS (ORDEM DO TOPO DA SIDEBAR)
-    // =========================================================================
     { nome: "Bloco A", tipo: "geral", categoria: "geral", andar: "terreo", y: 650, x: 1150, subponto: false },
     { nome: "Bloco B", tipo: "geral", categoria: "mecanica", andar: "terreo", y: 710, x: 780, subponto: false },
     { nome: "Bloco C", tipo: "geral", categoria: "edificacoes", andar: "terreo", y: 720, x: 640, subponto: false },
@@ -31,7 +28,7 @@ const lugares = [
     { nome: "Refeitório", tipo: "geral", categoria: "refeitorio", andar: "terreo", y: 800, x: 300, subponto: false },
 
     // =========================================================================
-    // 3. DEPENDÊNCIAS INTERNAS / SUBPONTOS (NÃO APARECEM NA SIDEBAR - subponto: true)
+    // DEPENDÊNCIAS INTERNAS / SUBPONTOS (NÃO APARECEM NA SIDEBAR - subponto: true)
     // =========================================================================
     
     // --- BLOCO A (VERMELHO) INFORMÁTICA ---
@@ -45,7 +42,7 @@ const lugares = [
     { nome: "Bloco A - Lab E (A204)", tipo: "geral", categoria: "informatica", andar: "terreo", bloco_pai: "informatica", y: 700, x: 1160, subponto: true },
     { nome: "Bloco A - Lab de Hardware (A203)", tipo: "geral", categoria: "informatica", andar: "terreo", bloco_pai: "informatica", y: 700, x: 1110, subponto: true },
 
-    // --- DEPENDÊNCIAS INTERNAS: ALA DA SECRETARIA (BLOCO A) ---
+    // --- ALA DA SECRETARIA (BLOCO A) ---
     { nome: "Bloco A - Banheiro Feminino (Secretaria)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 555, x: 1075, subponto: true },
     { nome: "Bloco A - Coordenação de Licenciaturas (A115)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 555, x: 1090, subponto: true },
     { nome: "Bloco A - CEX / CPI - Extensão, Pesquisa e Inovação (A114/A115)", tipo: "geral", categoria: "secretaria", andar: "terreo", bloco_pai: "informatica", y: 555, x: 1110, subponto: true },
@@ -59,45 +56,42 @@ const lugares = [
     { nome: "Bloco A - NAPNE (C501)", tipo: "geral", categoria: "secretaria", andar: "subsolo", bloco_pai: "informatica", y: 530, x: 1090, subponto: true },
     { nome: "Bloco A - NAPNE Atendimento", tipo: "geral", categoria: "secretaria", andar: "subsolo", bloco_pai: "informatica", y: 530, x: 1070, subponto: true },
 
-    // --- DEPENDÊNCIAS INTERNAS: ALA DE SALAS DE AULA / LABORATÓRIOS (BLOCO A) ---
+    // --- ALA DE SALAS DE AULA / LABORATÓRIOS (BLOCO A) ---
     { nome: "Bloco A - Lab de Química (A302)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 700, x: 990, subponto: true },
     { nome: "Bloco A - Sala Polímeros (A304)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 700, x: 960, subponto: true },
     { nome: "Bloco A - Sala A306", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 700, x: 930, subponto: true },
     { nome: "Bloco A - Sala A308", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 700, x: 900, subponto: true },
     { nome: "Bloco A - PIBID (A310)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 700, x: 870, subponto: true },
-    
     { nome: "Bloco A - Sala A303", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 630, x: 990, subponto: true },
     { nome: "Bloco A - Sala dos Professores (A305)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 630, x: 960, subponto: true },
     { nome: "Bloco A - Lab Maker (A307)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 630, x: 930, subponto: true },
     { nome: "Bloco A - Lab de Ensino de Matemática (A309)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 630, x: 900, subponto: true },
     { nome: "Bloco A - Fisbrink (A311)", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "informatica", y: 630, x: 870, subponto: true },
 
-    // --- DEPENDÊNCIAS INTERNAS: ÁREA GERAL / CONVIVÊNCIA (BLOCO A) ---
+    // --- ÁREA GERAL / CONVIVÊNCIA (BLOCO A) ---
     { nome: "Bloco A - Banheiro Masculino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 710, x: 1020, subponto: true },
     { nome: "Bloco A - Banheiro Feminino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 710, x: 1070, subponto: true },
     { nome: "Bloco A - Cantina", tipo: "geral", categoria: "refeitorio", andar: "terreo", bloco_pai: "informatica", y: 685, x: 1045, subponto: true },
     { nome: "Bloco A - Espaço de Lazer", tipo: "geral", categoria: "quadra", andar: "terreo", bloco_pai: "informatica", y: 800, x: 1045, subponto: true },
-
     { nome: "Bloco A - Saguão Principal", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 330, x: 1045, subponto: true },
     { nome: "Bloco A - Biblioteca", tipo: "geral", categoria: "biblioteca", andar: "terreo", bloco_pai: "informatica", y: 300, x: 1000, subponto: true },
     { nome: "Bloco A - Sala dos Professores (Geral)", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 440, x: 1000, subponto: true },
     { nome: "Bloco A - Alerta: Área em Construção", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "informatica", y: 550, x: 1000, subponto: true },
     { nome: "Bloco A - Entrada Principal", tipo: "geral", categoria: "entrada", andar: "terreo", bloco_pai: "informatica", y: 350, x: 500, subponto: true },
 
-    // --- NOVOS BANHEIROS DO SAGUÃO (CONVENCIONAIS E ACESSÍVEIS) ---
+    // --- BANHEIROS DO SAGUÃO ---
     { nome: "Bloco A - Banheiro Masculino (Saguão)", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 400, x: 1100, subponto: true },
     { nome: "Bloco A - Banheiro Feminino (Saguão)", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "informatica", y: 350, x: 1100, subponto: true },
     { nome: "Bloco A - Banheiro Acessível Masculino (Saguão)", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "informatica", y: 380, x: 1085, subponto: true },
     { nome: "Bloco A - Banheiro Acessível Feminino (Saguão)", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "informatica", y: 365, x: 1085, subponto: true },
 
-    // --- ACESSIBILIDADE NO BLOCO A GERAL ---
+    // --- ACESSIBILIDADE BLOCO A ---
     { nome: "Bloco A - Banheiro Acessível Feminino", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "informatica", y: 680, x: 1015, subponto: true },
     { nome: "Bloco A - Banheiro Acessível Masculino", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "informatica", y: 680, x: 1075, subponto: true },
     { nome: "Bloco A - Rampa de Acesso Principal", tipo: "fisica", categoria: "rampa", andar: "terreo", bloco_pai: "informatica", y: 550, x: 1045, subponto: true },
     { nome: "Bloco A - Alerta: Piso Tátil Estragado", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "informatica", y: 610, x: 1045, subponto: true },
 
-
-    // --- DEPENDÊNCIAS INTERNAS: ALA DOS SERVIDORES (BLOCO A) ---
+    // --- ALA DOS SERVIDORES (BLOCO A) ---
     { nome: "Bloco A - Movimento Estudantil (A102)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1070, subponto: true },
     { nome: "Bloco A - Setor Sociopedagógico (A103)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1102, subponto: true },
     { nome: "Bloco A - Cozinha dos Servidores (A106)", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 460, x: 1125, subponto: true },
@@ -115,14 +109,22 @@ const lugares = [
     { nome: "Bloco A - Garagem", tipo: "geral", categoria: "servidores", andar: "terreo", bloco_pai: "informatica", y: 380, x: 1200, subponto: true },
 
     // --- BLOCO B (AZUL) ---
-    { nome: "Bloco B - Sala de Aula Funcional 21", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 725, x: 785, subponto: true },
-    { nome: "Bloco B - Sala de Aula Funcional 22", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 715, x: 775, subponto: true },
-    { nome: "Bloco B - Sala de Aula Funcional 23", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 730, x: 790, subponto: true },
-    { nome: "Bloco B - Sala de Aula Funcional 24", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 710, x: 770, subponto: true },
-    { nome: "Bloco B - Sala de Aula Funcional 25", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 735, x: 795, subponto: true },
-    { nome: "Bloco B - Sala de Aula Funcional 26", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 705, x: 780, subponto: true },
-    { nome: "Bloco B - Sala de Aula Funcional 27", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 740, x: 785, subponto: true },
-    { nome: "Bloco B - Sala de Aula Funcional 28", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 700, x: 775, subponto: true },
+    { nome: "Bloco B - Estúdio de Gravação (B402)", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 680, x: 770, subponto: true },
+    { nome: "Bloco B - Auditório", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 680, x: 700, subponto: true },
+    { nome: "Bloco B - Banheiro Masculino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "mecanica", y: 680, x: 790, subponto: true },
+    { nome: "Bloco B - Banheiro Feminino", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "mecanica", y: 650, x: 790, subponto: true },
+    { nome: "Bloco B - Banheiro PCD", tipo: "fisica", categoria: "banheiro_acessivel", andar: "terreo", bloco_pai: "mecanica", y: 650, x: 790, subponto: true },
+    { nome: "Bloco B - Sala de Limpeza", tipo: "geral", categoria: "geral", andar: "terreo", bloco_pai: "mecanica", y: 680, x: 790, subponto: true },
+    { nome: "Bloco B - Elevador (Térreo)", tipo: "fisica", categoria: "elevador", andar: "terreo", bloco_pai: "mecanica", y: 720, x: 750, subponto: true },
+    { nome: "Bloco B - Escada (Térreo)", tipo: "fisica", categoria: "escada", andar: "terreo", bloco_pai: "mecanica", y: 720, x: 770, subponto: true },
+    { nome: "Bloco B - Lab de Metalografia (B409)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 250, x: 700, subponto: true },
+    { nome: "Bloco B - Lab de Materiais (B405)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 220, x: 700, subponto: true },
+    { nome: "Bloco B - Lab de Máquinas (B410)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 240, x: 700, subponto: true },
+    { nome: "Bloco B - Lab de Contenção e Automação (B408)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 260, x: 700, subponto: true },
+    { nome: "Bloco B - Pneumática e Hidráulica (B404)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 280, x: 700, subponto: true },
+    { nome: "Bloco B - Sala dos Professores (B406)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 890, x: 795, subponto: true },
+    { nome: "Bloco B - Sala de Coordenação (B407)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 700, x: 805, subponto: true },
+    { nome: "Bloco B - Núcleo NIAS (B416)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 910, x: 755, subponto: true },
     { nome: "Subsolo B - Laboratório de CNC (B419)", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 190, x: 480, subponto: true },
     { nome: "Subsolo B - Laboratório Industrial", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 600, x: 600, subponto: true },
     { nome: "Subsolo B - Sala B417", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 280, x: 840, subponto: true },
@@ -158,15 +160,11 @@ const lugares = [
     { nome: "Bloco D - Sala de Aula 33", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 610, x: 840, subponto: true },
     { nome: "Bloco D - Sala de Aula 34", tipo: "geral", categoria: "salas_aula", andar: "terreo", bloco_pai: "administrativo", y: 590, x: 860, subponto: true },
 
-    // =========================================================================
-    // 4. PONTOS DE ACESSIBILIDADE E ALERTAS ATUALIZADOS
-    // =========================================================================
     { nome: "Bloco A - Escadaria de Acesso Principal", tipo: "fisica", categoria: "escada", andar: "terreo", bloco_pai: "informatica", y: 360, x: 620, subponto: true },
     { nome: "Bloco C - Elevador (Verde)", tipo: "fisica", categoria: "elevador", andar: "terreo", bloco_pai: "edificacoes", y: 722, x: 642, subponto: true },
     { nome: "Vagas Exclusivas PCD - Estacionamento", tipo: "fisica", categoria: "vaga_pcd", andar: "terreo", y: 470, x: 700, subponto: false },
     { nome: "Bloco B - Alerta: Degrau sem Rampa", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "mecanica", y: 715, x: 775, subponto: true },
     { nome: "Alerta: Porta com Largura Reduzida na Entrada do Refeitório", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 400, x: 820, subponto: false },
-
     { nome: "Alerta: Inclinação Excessiva na Rampa de Acesso à Quadra", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 550, x: 510, subponto: false },
     { nome: "Alerta: Inclinação Excessiva na Rampa no Final do Bloco C", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 480, x: 700, subponto: false },
     { nome: "Alerta: Piso Tátil Interrompido no Corredor Central", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 665, x: 950, subponto: false }, 
@@ -179,6 +177,8 @@ let marcadores = [];
 let camadaImagem = null; 
 let filtroAtual = null;
 let alaAtual = "todos"; 
+// ✅ CORREÇÃO 1: andarAtual declarado corretamente como variável global com let
+let andarAtual = "terreo";
 let primeiraInicializacao = true; 
 
 
@@ -201,7 +201,6 @@ function getIcon(categoria, tipo, nomeLugar) {
         cor = "red"; 
         descricaoAlt = `Ícone vermelho indicando acessibilidade auditiva em: ${nomeLugar}`;
     } else if (tipo === "fisica") {
-        // AJUSTADO: "vaga_pcd" e "banheiro_acessivel" agora usam "green" para o filtro de acessibilidade física
         if (categoria === "vaga_pcd") {
             cor = "green"; 
             descricaoAlt = `Ícone verde indicando vaga exclusiva PCD em: ${nomeLugar}`;
@@ -220,7 +219,6 @@ function getIcon(categoria, tipo, nomeLugar) {
         if (categoria === "informatica") cor = "red"; 
         if (categoria === "geral") cor = "red";   
         
-        // --- ADICIONADO: COR ROXA (VIOLET) PARA O BLOCO D ---
         if (categoria === "administrativo") {
             cor = "violet";
             descricaoAlt = `Ícone roxo indicando o Bloco D ou suas dependências em: ${nomeLugar}`;
@@ -247,9 +245,6 @@ function getIcon(categoria, tipo, nomeLugar) {
     });
 }
 
-/**
- * INICIALIZAÇÃO DO MAPA
- */
 function initMap() {
     mapa = L.map('map', {
         crs: L.CRS.Simple,
@@ -265,9 +260,6 @@ function initMap() {
     });
 }
 
-/**
- * ATUALIZA A IMAGEM DE FUNDO ADICIONANDO TEXTO ALTERNATIVO (ALT)
- */
 function atualizarPlantaDeFundo() {
     if (camadaImagem) {
         mapa.removeLayer(camadaImagem);
@@ -288,8 +280,9 @@ function atualizarPlantaDeFundo() {
     aplicarFiltrosCombinados();
 }
 
-andarAtual = "subsolo"; // ou "terreo"
-aplicarFiltrosCombinados(); // chama a função para atualizar tudo
+// ✅ CORREÇÃO 2: As duas linhas soltas que estavam aqui foram REMOVIDAS:
+// andarAtual = "subsolo"; ← REMOVIDO
+// aplicarFiltrosCombinados(); ← REMOVIDO
 
 function aplicarFiltrosCombinados() {
     let filtrados = lugares;
@@ -297,20 +290,12 @@ function aplicarFiltrosCombinados() {
     const searchInput = document.getElementById('search-input');
     const termo = searchInput ? searchInput.value.toLowerCase().trim() : "";
 
-    // =========================================================================
-    // 1. FILTRAGEM POR ALA, ANDAR E EXCEÇÃO DE BUSCA
-    // =========================================================================
     if (termo) {
-        // SE HÁ BUSCA: Permite buscar QUALQUER lugar (inclusive subpontos e subsolo),
-        // mas ainda respeita o filtro de tipo (acessibilidade/alerta) se houver um ativo.
         filtrados = lugares; 
     } else {
-        // SEM BUSCA: Aplica as regras rígidas de navegação visual por cliques
         if (alaAtual === "todos") {
-            // Na planta geral, exibe apenas os pontos principais do térreo
             filtrados = filtrados.filter(l => l.subponto === false && l.andar !== "subsolo");
         } else {
-            // Em uma ala específica, exibe apenas o que pertence a ela e ao andar selecionado
             filtrados = filtrados.filter(l => 
                 (l.categoria === alaAtual || l.bloco_pai === alaAtual) && 
                 (l.andar === andarAtual)
@@ -318,29 +303,18 @@ function aplicarFiltrosCombinados() {
         }
     }
 
-    // =========================================================================
-    // 2. FILTRAGEM POR TIPO (ACESSIBILIDADE/ALERTA)
-    // =========================================================================
     if (filtroAtual) {
         filtrados = filtrados.filter(l => l.tipo === filtroAtual);
     }
 
-    // =========================================================================
-    // 3. BUSCA POR TEXTO AVANÇADA (Captura por Nome ou Número da Sala)
-    // =========================================================================
     if (termo) {
         filtrados = filtrados.filter(l => {
             const nomeNormalizado = l.nome.toLowerCase();
-            // Permite achar digitando direto "a202" ou "b419" mesmo que no array esteja com traço "A-202"
             const nomeSemHifens = nomeNormalizado.replace(/-/g, "");
-            
             return nomeNormalizado.includes(termo) || nomeSemHifens.includes(termo.replace(/-/g, ""));
         });
     }
 
-    // =========================================================================
-    // 4. RENDERIZAÇÃO
-    // =========================================================================
     limparMarcadores(); 
 
     if (alaAtual === "todos" && primeiraInicializacao && !termo && !filtroAtual) {
@@ -348,13 +322,10 @@ function aplicarFiltrosCombinados() {
         atualizarListaLateral(blocosPrincipais); 
     } else {
         mostrarLugares(filtrados);
-        // Passamos o 'termo' para a sidebar saber se deve ou não esconder os subpontos
         atualizarListaLateral(filtrados, termo); 
     }
 }
-/**
- * FUNÇÃO DE FILTRAGEM DOS BOTÕES DE ALA
- */
+
 function filtrarAla(ala, elemento) {
     primeiraInicializacao = false; 
 
@@ -368,17 +339,11 @@ function filtrarAla(ala, elemento) {
     atualizarPlantaDeFundo();
 }
 
-/**
- * RENDERIZA OS MARCADORES NO MAPA
- */
 function mostrarLugares(lista) {
     limparMarcadores();
     lista.forEach(lugar => adicionarMarcador(lugar));
 }
 
-/**
- * ADICIONA UM MARCADOR INDIVIDUAL AO MAPA
- */
 function adicionarMarcador(lugar) {
     const marcador = L.marker([lugar.y, lugar.x], {
         icon: getIcon(lugar.categoria, lugar.tipo, lugar.nome) 
@@ -409,9 +374,6 @@ function limparMarcadores() {
     marcadores = [];
 }
 
-/**
- * FILTRAR POR ACESSIBILIDADE OU ALERTA
- */
 function filtrar(tipo, elemento) {
     primeiraInicializacao = false; 
 
@@ -426,17 +388,11 @@ function filtrar(tipo, elemento) {
     aplicarFiltrosCombinados();
 }
 
-/**
- * BUSCA POR TEXTO
- */
 function pesquisarLugares() {
     primeiraInicializacao = false; 
     aplicarFiltrosCombinados();
 }
 
-/**
- * ATUALIZA A LISTA LATERAL TEXTUAL COM EXCEÇÃO PARA EXIBIR SUBPONTOS APENAS DURANTE A PESQUISA
- */
 function atualizarListaLateral(lista, termoDeBusca = "") {
     const container = document.getElementById("lista-lugares");
     if (!container) return;
@@ -445,15 +401,12 @@ function atualizarListaLateral(lista, termoDeBusca = "") {
 
     let listaParaExibir = [];
 
-    // LÓGICA CRÍTICA: Se o usuário estiver pesquisando algo, mostramos as salas internas.
-    // Se o campo estiver vazio, filtramos para exibir APENAS os pontos principais.
     if (termoDeBusca.length > 0) {
-        listaParaExibir = [...lista]; // Mostra tudo o que bateu com o termo digitado
+        listaParaExibir = [...lista];
     } else {
         listaParaExibir = lista.filter(lugar => lugar.subponto === false);
     }
 
-    // Ordem de prioridade fixa para o topo do sidebar (quando aplicável)
     const ordemDesejada = [
         "Bloco A", 
         "Bloco B", 
@@ -464,7 +417,6 @@ function atualizarListaLateral(lista, termoDeBusca = "") {
         "Estacionamento externo"
     ];
 
-    // Ordenação do sidebar
     listaParaExibir.sort((a, b) => {
         const indexA = ordemDesejada.indexOf(a.nome);
         const indexB = ordemDesejada.indexOf(b.nome);
@@ -475,7 +427,6 @@ function atualizarListaLateral(lista, termoDeBusca = "") {
         return 0; 
     });
 
-    // Renderização no HTML
     listaParaExibir.forEach(lugar => {
         const item = document.createElement("div");
         item.className = "item-lugar"; 
@@ -483,7 +434,6 @@ function atualizarListaLateral(lista, termoDeBusca = "") {
         let corBorda = "#ccc"; 
         const categoriaAlvo = lugar.bloco_pai || lugar.categoria;
         
-        // Definição de cores das bordas baseada no bloco/categoria
         if (categoriaAlvo === "informatica" || lugar.nome.includes("Bloco A")) {
             corBorda = "#790000"; 
         } else if (categoriaAlvo === "mecanica" || lugar.nome.includes("Bloco B") || lugar.nome.includes("Subsolo B")) {
@@ -519,62 +469,56 @@ function atualizarListaLateral(lista, termoDeBusca = "") {
         `;
         
         item.onclick = () => {
-    if (primeiraInicializacao) {
-        primeiraInicializacao = false;
-    }
-
-    limparMarcadores();
-
-    // Lista de blocos que possuem salas agrupadas pelo nome
-    const blocosComSubpontos = ["Bloco A", "Bloco B", "Bloco C", "Bloco D"];
-    
-    if (blocosComSubpontos.includes(lugar.nome)) {
-        const blocoRaiz = adicionarMarcador(lugar);
-        
-        // Filtra todas as salas internas que pertencem textualmente a este bloco
-        // E respeita o andar atual (exceto para o Bloco A e D que são focados no térreo)
-        const subSalas = lugares.filter(l => {
-            const pertenceAoBloco = l.nome.startsWith(`${lugar.nome} - `);
-            
-            if (lugar.nome === "Bloco A" || lugar.nome === "Bloco D") {
-                return pertenceAoBloco; // Traz todas as salas e alas internas deles
+            if (primeiraInicializacao) {
+                primeiraInicializacao = false;
             }
-            return pertenceAoBloco && l.andar === andarAtual;
-        });
 
-        subSalas.forEach(sala => adicionarMarcador(sala));
+            limparMarcadores();
 
-        mapa.setView([lugar.y, lugar.x], 1);
-        blocoRaiz.openPopup();
-        return;
-    }
+            const blocosComSubpontos = ["Bloco A", "Bloco B", "Bloco C", "Bloco D"];
+            
+            if (blocosComSubpontos.includes(lugar.nome)) {
+                const blocoRaiz = adicionarMarcador(lugar);
+                
+                const subSalas = lugares.filter(l => {
+                    const pertenceAoBloco = l.nome.startsWith(`${lugar.nome} - `);
+                    
+                    // ✅ CORREÇÃO 3: Bloco A e D trazem tudo (sem filtro de andar)
+                    // Bloco B e C respeitam o andarAtual atual selecionado pelo usuário
+                    if (lugar.nome === "Bloco A" || lugar.nome === "Bloco D") {
+                        return pertenceAoBloco;
+                    }
+                    // Bloco B e Bloco C: filtra pelo andar atualmente selecionado
+                    return pertenceAoBloco && l.andar === andarAtual;
+                });
 
-    // Caso seja uma sala individual clicada diretamente a partir da pesquisa
-    const marcadorUnico = adicionarMarcador(lugar);
-    mapa.setView([lugar.y, lugar.x], 1);
-    marcadorUnico.openPopup();
-};
+                subSalas.forEach(sala => adicionarMarcador(sala));
+
+                mapa.setView([lugar.y, lugar.x], 1);
+                blocoRaiz.openPopup();
+                return;
+            }
+
+            const marcadorUnico = adicionarMarcador(lugar);
+            mapa.setView([lugar.y, lugar.x], 1);
+            marcadorUnico.openPopup();
+        };
         
         container.appendChild(item);
     });
 }
-/**
- * MOSTRAR TODOS OS LOCAIS (Exclui os marcadores puros de acessibilidade e alertas)
- */
+
 function mostrarTodos() {
     filtroAtual = null;
     primeiraInicializacao = false;
 
     document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
 
-    // REMOVIDO: O filtro que excluía "fisica" e "auditiva"
     let listaFiltrada = lugares; 
 
     if (alaAtual === "todos") {
         listaFiltrada = listaFiltrada.filter(l => l.subponto === false);
     } else {
-        // Agora, se estiver em uma ala, ele mantém todos os pontos (físicos ou não)
-        // MAS respeita o andar atual (Térreo/Subsolo)
         listaFiltrada = listaFiltrada.filter(l => 
             (l.categoria === alaAtual || l.bloco_pai === alaAtual) && 
             l.andar === andarAtual
@@ -585,15 +529,13 @@ function mostrarTodos() {
     atualizarListaLateral(listaFiltrada);
 }
 
-/**
- * RESET COMPLETO DO MAPA (Limpa todos os marcadores e exibe apenas os blocos âncoras na lista)
- */
 function resetarMapaCompleto() {
     filtroAtual = null;
     alaAtual = "todos";
-    primeiraInicializacao = true; // Ativa a trava inicial
+    // ✅ CORREÇÃO 4: reseta andarAtual para "terreo" ao resetar o mapa
+    andarAtual = "terreo";
+    primeiraInicializacao = true;
 
-    // Limpa filtros visuais e campos de busca
     document.querySelectorAll(".filtro").forEach(el => el.classList.remove("ativo"));
     document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => btn.classList.remove("active"));
     
@@ -603,14 +545,12 @@ function resetarMapaCompleto() {
     const searchInput = document.getElementById('search-input');
     if (searchInput) searchInput.value = '';
 
-    // Limpa o mapa completamente
     limparMarcadores();
 
-    // Recarrega o fundo e monta a lista lateral limpa apenas com os blocos âncoras
     atualizarPlantaDeFundo();
 
-    // ADICIONADO: Força a atualização da lista lateral para o estado inicial "Ver Tudo"
     const blocosPrincipais = lugares.filter(l => l.subponto === false);
     atualizarListaLateral(blocosPrincipais);
 }
+
 window.onload = initMap;
