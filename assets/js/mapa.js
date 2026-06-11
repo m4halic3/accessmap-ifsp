@@ -33,9 +33,6 @@ const lugares = [
 { nome: "Rampa Externa Sul", tipo: "fisica", categoria: "rampa", andar: "terreo", y: 950, x: 400, subponto: false },
 { nome: "Escada Principal Externa", tipo: "fisica", categoria: "escada", andar: "terreo", y: 550, x: 550, subponto: false },
 { nome: "Alerta: Porta Pequena (Acesso Externo)", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 700, x: 500, subponto: false },
-    // =========================================================================
-    // DEPENDÊNCIAS INTERNAS / SUBPONTOS (subponto: true)
-    // =========================================================================
 
     // --- BLOCO A - ALA INFORMÁTICA ---
     { nome: "Bloco A - Auditório A202", tipo: "geral", categoria: "informatica", andar: "terreo", bloco_pai: "informatica", y: 630, x: 1110, subponto: true },
