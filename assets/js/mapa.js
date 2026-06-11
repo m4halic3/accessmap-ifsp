@@ -26,6 +26,7 @@ const lugares = [
     { nome: "Estacionamento externo", tipo: "geral", categoria: "estacionamento", andar: "terreo", y: 100, x: 900, subponto: false },
     { nome: "Quadra", tipo: "geral", categoria: "quadra", andar: "terreo", y: 650, x: 150, subponto: false },
     { nome: "Refeitório", tipo: "geral", categoria: "refeitorio", andar: "terreo", y: 800, x: 300, subponto: false },
+    { nome: "Canteiro", tipo: "geral", categoria: "canteiro", andar: "terreo", y: 900, x: 1200, subponto: false },
 
     // =========================================================================
     // DEPENDÊNCIAS INTERNAS / SUBPONTOS (subponto: true)
