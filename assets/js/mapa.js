@@ -319,7 +319,7 @@ function aplicarFiltrosCombinados() {
             if (filtroAtual) {
                 filtrados = [...lugares];
             } else {
-                filtrados = lugares.filter(l => l.subponto === false && l.andar === "terreo");
+                filtrados = lugares.filter(l => l.subponto === true && l.andar === "terreo");
             }
         } else {
             filtrados = lugares.filter(l =>
@@ -421,27 +421,20 @@ function atualizarListaLateral(lista, termoDeBusca = "") {
 
     container.innerHTML = "";
 
-    // -----------------------------------------------------------------
-    // CORREÇÃO: com busca ativa, exibe TODOS os resultados recebidos
-    // (incluindo subpontos) sem nenhum filtro adicional aqui.
-    // Sem busca e sem filtro: exibe apenas pontos principais (subponto false).
-    // -----------------------------------------------------------------
+    // LÓGICA DE FILTRAGEM:
+    // Se tem termo de busca, exibe TODOS os resultados encontrados.
+    // Se NÃO tem busca, mantém a restrição de apenas pontos principais (subponto: false).
     let listaParaExibir;
-
+    
     if (termoDeBusca.length > 0) {
-        // Busca ativa: mostra tudo que foi encontrado, inclusive subpontos
-        listaParaExibir = [...lista];
-    } else if (filtroAtual) {
-        // Filtro de acessibilidade ativo sem busca: mostra tudo
-        listaParaExibir = [...lista];
-    } else if (alaAtual !== "todos") {
-        // Ala de subsolo sem busca e sem filtro: mostra todos os subpontos daquela ala
+        // Busca ativa: exibe tudo o que o filtro de busca achou
         listaParaExibir = [...lista];
     } else {
-        // Estado padrão (mapa geral, sem busca, sem filtro): só pontos principais
+        // Estado normal: exibe apenas os blocos/lugares principais
         listaParaExibir = lista.filter(l => l.subponto === false);
     }
 
+    // Ordenação (mantendo a sua lógica original)
     const ordemDesejada = ["Bloco A", "Bloco B", "Bloco C", "Bloco D",
         "Estacionamento interno A", "Estacionamento interno B", "Estacionamento externo"];
 
@@ -498,6 +491,7 @@ else if (lugar.tipo === "alerta") corBorda = "#be5900";
         `;
 
         item.onclick = () => {
+            mapa.setView([lugar.y, lugar.x], 2);
             primeiraInicializacao = false;
             limparMarcadores();
 
