@@ -29,8 +29,9 @@ const lugares = [
     { nome: "Canteiro", tipo: "geral", categoria: "canteiro", andar: "terreo", y: 900, x: 1200, subponto: false },
 
     // --- ESTRUTURAS EXTERNAS / ÁREAS COMUNS ---
-{ nome: "Alerta: Falta de rampa Externa de acesso ao Estacionamento Interno B", tipo: "alerta", categoria: "fisica", andar: "terreo", y: 200, x: 550, subponto: false },
-{ nome: "Rampa Externa de acesso a quadra", tipo: "fisica", categoria: "rampa", andar: "terreo", y: 950, x: 400, subponto: false },
+{ nome: "Alerta: Falta de rampa Externa de acesso ao Estacionamento Interno B", tipo: "alerta", categoria: "fisica", andar: "terreo", y: 790, x: 670, subponto: false },
+{ nome: "Rampa Externa de acesso a quadra", tipo: "fisica", categoria: "rampa", andar: "terreo", y: 650, x: 300, subponto: false },
+{ nome: "Rampa Externa de acesso aos blocos", tipo: "fisica", categoria: "rampa", andar: "terreo", y: 660, x: 500, subponto: false },
 { nome: "Escada Externa de acesso ao Estacionamento Interno B", tipo: "fisica", categoria: "escada", andar: "terreo", y: 800, x: 670, subponto: false },
 { nome: "Alerta: Porta Pequena (Acesso Externo)", tipo: "alerta", categoria: "física", andar: "terreo", y: 700, x: 330, subponto: false },
 
