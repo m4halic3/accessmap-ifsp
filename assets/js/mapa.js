@@ -124,11 +124,10 @@ const lugares = [
     { nome: "Bloco B - Sala dos Professores (B406)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 890, x: 795, subponto: true },
     { nome: "Bloco B - Sala de Coordenação (B407)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 700, x: 805, subponto: true },
     { nome: "Bloco B - Núcleo NIAS (B416)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 910, x: 755, subponto: true },
-    { nome: "Bloco B - Alerta: Degrau sem Rampa", tipo: "alerta", categoria: "alerta", andar: "terreo", bloco_pai: "mecanica", y: 715, x: 775, subponto: true },
-
-    // --- BLOCO B - SUBSOLO (visível em "Subsolo Mec.") ---
-    { nome: "Bloco B - Estúdio de Gravação (B402)", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 680, x: 770, subponto: true },
-    { nome: "Bloco B - Auditório", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 680, x: 700, subponto: true },
+    { nome: "Bloco B - Estúdio de Gravação (B402)", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 680, x: 770, subponto: true },
+    { nome: "Bloco B - Auditório", tipo: "geral", categoria: "mecanica", andar: "terreo", bloco_pai: "mecanica", y: 680, x: 700, subponto: true },
+    
+       // --- BLOCO B - SUBSOLO (visível em "Subsolo Mec.") ---
     { nome: "Subsolo B - Laboratório de CNC (B419)", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 190, x: 480, subponto: true },
     { nome: "Subsolo B - Laboratório Industrial", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 600, x: 600, subponto: true },
     { nome: "Subsolo B - Sala B417", tipo: "geral", categoria: "mecanica", andar: "subsolo", bloco_pai: "mecanica", y: 280, x: 840, subponto: true },
