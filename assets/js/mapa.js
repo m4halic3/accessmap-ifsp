@@ -29,10 +29,10 @@ const lugares = [
     { nome: "Canteiro", tipo: "geral", categoria: "canteiro", andar: "terreo", y: 900, x: 1200, subponto: false },
 
     // --- ESTRUTURAS EXTERNAS / ÁREAS COMUNS ---
-{ nome: "Rampa Externa Norte", tipo: "fisica", categoria: "rampa", andar: "terreo", y: 450, x: 500, subponto: false },
-{ nome: "Rampa Externa Sul", tipo: "fisica", categoria: "rampa", andar: "terreo", y: 950, x: 400, subponto: false },
-{ nome: "Escada Principal Externa", tipo: "fisica", categoria: "escada", andar: "terreo", y: 550, x: 550, subponto: false },
-{ nome: "Alerta: Porta Pequena (Acesso Externo)", tipo: "alerta", categoria: "alerta", andar: "terreo", y: 700, x: 500, subponto: false },
+{ nome: "Alerta: Falta de rampa Externa de acesso ao Estacionamento Interno B", tipo: "alerta", categoria: "fisica", andar: "terreo", y: 200, x: 550, subponto: false },
+{ nome: "Rampa Externa de acesso a quadra", tipo: "fisica", categoria: "rampa", andar: "terreo", y: 950, x: 400, subponto: false },
+{ nome: "Escada Externa de acesso ao Estacionamento Interno B", tipo: "fisica", categoria: "escada", andar: "terreo", y: 800, x: 670, subponto: false },
+{ nome: "Alerta: Porta Pequena (Acesso Externo)", tipo: "alerta", categoria: "física", andar: "terreo", y: 700, x: 330, subponto: false },
 
     // --- BLOCO A - ALA INFORMÁTICA ---
     { nome: "Bloco A - Auditório A202", tipo: "geral", categoria: "informatica", andar: "terreo", bloco_pai: "informatica", y: 630, x: 1110, subponto: true },
