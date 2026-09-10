@@ -273,6 +273,15 @@ function initMap() {
         console.log(`y: ${e.latlng.lat.toFixed(0)}, x: ${e.latlng.lng.toFixed(0)}`);
     });
 
+    // Busca "ao vivo": conforme o usuário digita, a lista lateral (e os
+    // marcadores no mapa) já refletem o texto digitado, sem precisar
+    // apertar Enter. O Enter continua funcionando à parte (handleBuscaKeydown)
+    // para focar direto no primeiro resultado.
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', aplicarFiltrosCombinados);
+    }
+
     // Corrige o bug do mapa "sumindo"/desalinhando quando a janela
     // do navegador muda de tamanho (ex: ao trocar de aba pra gravar a tela).
     // Sem isso o Leaflet mantém o tamanho antigo do container em cache.
