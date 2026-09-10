@@ -77,25 +77,10 @@ function toggleAuth() {
   signup.classList.toggle("active");
 }
 
-function pesquisarLugares() {
-    let input = document.getElementById('search-input').value.toLowerCase();
-    let lista = document.getElementById('lista-lugares');
-    let itens = lista.getElementsByClassName('item-lugar');
+/* A busca de lugares do mapa agora vive inteiramente em mapa.js
+   (funções buscarEIrParaLocal / handleBuscaKeydown), para evitar
+   duas funções pesquisarLugares() com o mesmo nome brigando entre si. */
 
-    for (let i = 0; i < itens.length; i++) {
-        let nomeLugar = itens[i].getElementsByTagName('p')[0].innerText.toLowerCase();
-        
-        if (nomeLugar.includes(input)) {
-            itens[i].style.display = ""; 
-        } else {
-            itens[i].style.display = "none"; 
-        }
-    }
-}
-
-/* ==========================================================================
-   SISTEMA DE ACESSIBILIDADE NATIVA (Fontes e Alto Contraste)
-   ========================================================================== */
 
 let nivelFonte = 0; 
 const maxNivel = 3;  
@@ -143,10 +128,6 @@ window.addEventListener("DOMContentLoaded", () => {
         document.body.classList.add("alto-contraste");
     }
 });
-
-/* ==========================================================================
-   CONTROLE DO MODAL DE AJUDA / GUIA DO USUÁRIO
-   ========================================================================== */
 
 function abrirGuiaUsuario() {
     const modal = document.getElementById("modal-guia");
