@@ -363,7 +363,13 @@ if (filtroAtual) {
 
     limparMarcadores();
 
-    if (alaAtual === "todos" && primeiraInicializacao && !termo && !filtroAtual) {
+    if (alaAtual === "todos" && !termo && !filtroAtual) {
+        // Estado padrão do Mapa Geral: sem busca e sem filtro de acessibilidade
+        // ativo, o mapa fica vazio (sem marcadores) e a lateral mostra só os
+        // blocos principais. Antes isso só valia na primeira carga da página
+        // (dependia de `primeiraInicializacao`); agora vale sempre que essa
+        // combinação ocorrer — inclusive ao voltar pra aba "Mapa Geral" ou
+        // limpar a busca/o filtro depois de já ter navegado.
         const blocosPrincipais = lugares.filter(l => l.subponto === false && l.andar === "terreo");
         atualizarListaLateral(blocosPrincipais, "");
     } else {
