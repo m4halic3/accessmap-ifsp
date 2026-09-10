@@ -4,61 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <title>Mapa - AccessMap</title>
-    <link rel="icon" type="image/png" href="assets/images/logo-roxa.png">
-
-
-    <style>
-        .sidebar .fieldset-reset .btn-limpar-mapa {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            margin-top: 15px;
-            background-color: #007750; 
-            color: #ffffff;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 8px;
-            font-family: system-ui, -apple-system, sans-serif;
-            font-weight: 700;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar .fieldset-reset .btn-limpar-mapa:hover {
-            background-color: #007556; 
-            box-shadow: 0 4px 12px rgba(74, 85, 104, 0.25);
-            transform: translateY(-1px);
-        }
-
-        .sidebar .fieldset-reset .btn-limpar-mapa:active {
-            transform: scale(0.98);
-        }
-    </style>
+    <title>Tela do Admin</title>
 </head>
 <body>
+    <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/admin.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Admin - Locais - AccessMap</title>
+    <link rel="icon" type="image/png" href="assets/images/logo-roxa.png">
+</head>
+<body data-admin="sempre">
     <nav class="navbar" aria-label="Navegação Principal">
         <div class="logo">
-            <a href="./index.html"><img src="assets/images/logo-branca.png" alt="Logotipo do AccessMap mostrando linhas de rotas estilizadas" class="logo-img"></a>
+            <a href="./index.html"><img src="assets/images/logo-branca.png" alt="Logotipo do AccessMap" class="logo-img"></a>
             <span class="logo-text">ACCESSMAP</span>
+        </div>
+        <div style="margin-left:auto; padding-right:20px;">
+            <a href="admin-respostas.html" style="color:#fff; font-size:0.85rem; text-decoration:none; display:flex; align-items:center; gap:6px;">
+                <i class="fas fa-inbox" aria-hidden="true"></i> Respostas do formulário
+            </a>
         </div>
     </nav>
 
-    <main class="container-mapa" id="container-mapa-conteudo">
+    <main class="container-mapa" id="container-mapa-conteudo" style="position: relative;">
         <div class="sidebar">
             <h2>Resultados (geral)</h2>
-            
+
             <div class="search-container">
                 <label for="search-input" class="sr-only">Pesquisar local no campus</label>
-                <i class="fas fa-search search-icon" aria-hidden="true"></i> 
+                <i class="fas fa-search search-icon" aria-hidden="true"></i>
                 <input type="text" id="search-input" placeholder="Pesquisar local... (Enter para ir)" onkeydown="handleBuscaKeydown(event)">
             </div>
 
@@ -70,7 +50,7 @@
                     <button type="button" class="btn-type" aria-current="false" onclick="filtrarAla('mecanica', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Subsolo Mec.</button>
                 </div>
 
-                <button type="button" class="btn-limpar-mapa" onclick="resetarMapaCompleto()">
+                <button type="button" class="btn-limpar-mapa" onclick="resetarMapaCompleto()" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:15px;background-color:#007750;color:#ffffff;padding:10px 16px;border:none;border-radius:8px;font-family:system-ui,-apple-system,sans-serif;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;">
                     <i class="fas fa-eraser" aria-hidden="true"></i> Limpar Mapa e Filtros
                 </button>
             </div>
@@ -89,35 +69,56 @@
                 </div>
             </div>
 
-            <div id="lista-lugares" role="region" aria-live="polite" aria-label="Lista dinâmica de locais encontrados"></div>
+            <button type="button" id="btn-novo-local" class="btn-novo-local">
+                <i class="fas fa-plus" aria-hidden="true"></i> Adicionar novo local
+            </button>
+
+            <div id="lista-lugares-admin" role="region" aria-label="Lista de locais cadastrados"></div>
         </div>
 
-        <div id="map" aria-label="Mapa interativo do campus"></div>
+        <div id="map" aria-label="Mapa interativo do campus (modo admin)"></div>
+
+        <!-- Painel "Inserir / Atualizar Local" -->
+        <div id="overlay-form" class="overlay-form oculto">
+            <div class="form-local-card">
+                <div class="form-local-header">
+                    <i class="fas fa-map-pin" aria-hidden="true"></i>
+                    <span id="form-titulo">Inserir / Atualizar Local</span>
+                    <button type="button" id="btn-fechar-form" class="btn-fechar-form" aria-label="Fechar formulário">&times;</button>
+                </div>
+                <div class="form-local-body">
+                    <label for="form-nome">Nome do local</label>
+                    <input type="text" id="form-nome" placeholder="Ex: Bloco A - Biblioteca">
+
+                    <label for="form-coords">Coordenadas (X, Y - Leaflet)</label>
+                    <div class="coord-row">
+                        <span id="form-coords">X: —, Y: —</span>
+                        <button type="button" id="btn-auto-coords" class="btn-auto-coords">Auto</button>
+                    </div>
+                    <p class="dica-coords">Clique em qualquer ponto do mapa pra marcar a posição, depois clique em "Auto".</p>
+
+                    <label for="form-bloco">Bloco / Setor</label>
+                    <select id="form-bloco"></select>
+
+                    <label>Atributos</label>
+                    <div class="atributos-row">
+                        <label><input type="checkbox" id="form-acessivel"> Acessível</label>
+                        <label><input type="checkbox" id="form-alerta"> Alerta</label>
+                    </div>
+
+                    <div class="form-local-actions">
+                        <button type="button" id="btn-excluir-local" class="btn-excluir oculto">Excluir</button>
+                        <button type="button" id="btn-salvar-local" class="btn-salvar">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="assets/js/mapa.js"></script>
-
-    <div vw class="enabled">
-        <div vw-access-button class="active"></div>
-        <div vw-plugin-wrapper>
-            <div class="vw-plugin-top-wrapper"></div>
-        </div>
-    </div>
-    
-    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles manuais de acessibilidade visual">
-        <button type="button" id="btn-aumentar" onclick="mudarFonte(1)" aria-label="Aumentar tamanho do texto">A+</button>
-        <button type="button" id="btn-diminuir" onclick="mudarFonte(-1)" aria-label="Diminuir tamanho do texto">A-</button>
-        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alternar alto contraste da página">
-            <i class="fas fa-adjust" aria-hidden="true"></i>
-        </button>
-    </div>
-
-    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <script>
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-    </script>
-
-    <script src="assets/js/script.js"></script>
+    <script src="assets/js/admin.js"></script>
+</body>
+</html>
 </body>
 </html>

@@ -67,6 +67,19 @@
                     background-color: $color-white;
                     box-shadow: 0 4px 12px rgba($color-pink, 0.1);
                 }
+
+                // Feedback rápido quando a busca (Enter) não acha nenhum local
+                &.busca-sem-resultado {
+                    border-color: #c0392b;
+                    box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.15);
+                    animation: shake-busca 0.3s ease-in-out;
+                }
+            }
+
+            @keyframes shake-busca {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-4px); }
+                75% { transform: translateX(4px); }
             }
         }
 
@@ -302,8 +315,6 @@
         height: auto !important;
         padding: 20px !important;
 
-        // Aqui forçamos a lista a ter uma altura específica no mobile
-        // para que ela não ocupe a tela toda e force o scroll apenas nela.
         #lista-lugares {
             max-height: 40vh; // Define que a lista ocupará no máximo 40% da altura da tela
             overflow-y: auto; // Garante a barra de rolagem dentro da lista

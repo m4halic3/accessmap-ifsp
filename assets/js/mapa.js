@@ -251,6 +251,14 @@ function getIcon(categoria, tipo, nomeLugar) {
     });
 }
 
+function normalizarTexto(txt) {
+    return txt
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // remove acentos (ex: "Auditório" -> "Auditorio")
+        .toLowerCase()
+        .trim();
+}
+
 function initMap() {
     mapa = L.map('map', {
         crs: L.CRS.Simple,
@@ -263,6 +271,13 @@ function initMap() {
 
     mapa.on('click', function(e) {
         console.log(`y: ${e.latlng.lat.toFixed(0)}, x: ${e.latlng.lng.toFixed(0)}`);
+    });
+
+    // Corrige o bug do mapa "sumindo"/desalinhando quando a janela
+    // do navegador muda de tamanho (ex: ao trocar de aba pra gravar a tela).
+    // Sem isso o Leaflet mantém o tamanho antigo do container em cache.
+    window.addEventListener("resize", () => {
+        if (mapa) mapa.invalidateSize();
     });
 }
 
@@ -410,11 +425,6 @@ function filtrar(tipo, elemento) {
     aplicarFiltrosCombinados();
 }
 
-function pesquisarLugares() {
-    primeiraInicializacao = false;
-    aplicarFiltrosCombinados();
-}
-
 function atualizarListaLateral(lista, termoDeBusca = "") {
     const container = document.getElementById("lista-lugares");
     if (!container) return;
@@ -490,47 +500,93 @@ else if (lugar.tipo === "alerta") corBorda = "#be5900";
             <span style="font-size: 12px; color: #666;">${labelAcessibilidade}</span>
         `;
 
-        item.onclick = () => {
-            mapa.setView([lugar.y, lugar.x], 2);
-            primeiraInicializacao = false;
-            limparMarcadores();
-
-            const blocosRaiz = ["Bloco A", "Bloco B", "Bloco C", "Bloco D"];
-
-            if (blocosRaiz.includes(lugar.nome)) {
-                const blocoRaiz = adicionarMarcador(lugar);
-
-                const mapaBlocoPai = {
-                    "Bloco A": "informatica",
-                    "Bloco B": "mecanica",
-                    "Bloco C": "edificacoes",
-                    "Bloco D": "administrativo"
-                };
-                const blocoPaiAlvo = mapaBlocoPai[lugar.nome];
-                const andarDaAla = getAndarDaAla();
-
-                const subSalas = lugares.filter(l => {
-                    if (!l.subponto) return false;
-                    if (l.bloco_pai !== blocoPaiAlvo) return false;
-                    if (lugar.nome === "Bloco A" || lugar.nome === "Bloco D") {
-                        return l.andar === "terreo";
-                    }
-                    return l.andar === andarDaAla;
-                });
-
-                subSalas.forEach(sala => adicionarMarcador(sala));
-                mapa.setView([lugar.y, lugar.x], 1);
-                blocoRaiz.openPopup();
-                return;
-            }
-
-            const marcadorUnico = adicionarMarcador(lugar);
-            mapa.setView([lugar.y, lugar.x], 1);
-            marcadorUnico.openPopup();
-        };
+        item.onclick = () => focarNoLugar(lugar);
 
         container.appendChild(item);
     });
+}
+
+// Navega o mapa até um lugar específico, mostrando seu marcador
+// (e, se for um Bloco raiz, também as salas internas dele).
+// Usada tanto pelo clique num item da lista quanto pela busca (Enter).
+function focarNoLugar(lugar) {
+    mapa.setView([lugar.y, lugar.x], 2);
+    primeiraInicializacao = false;
+    limparMarcadores();
+
+    const blocosRaiz = ["Bloco A", "Bloco B", "Bloco C", "Bloco D"];
+
+    if (blocosRaiz.includes(lugar.nome)) {
+        const blocoRaiz = adicionarMarcador(lugar);
+
+        const mapaBlocoPai = {
+            "Bloco A": "informatica",
+            "Bloco B": "mecanica",
+            "Bloco C": "edificacoes",
+            "Bloco D": "administrativo"
+        };
+        const blocoPaiAlvo = mapaBlocoPai[lugar.nome];
+        const andarDaAla = getAndarDaAla();
+
+        const subSalas = lugares.filter(l => {
+            if (!l.subponto) return false;
+            if (l.bloco_pai !== blocoPaiAlvo) return false;
+            if (lugar.nome === "Bloco A" || lugar.nome === "Bloco D") {
+                return l.andar === "terreo";
+            }
+            return l.andar === andarDaAla;
+        });
+
+        subSalas.forEach(sala => adicionarMarcador(sala));
+        mapa.setView([lugar.y, lugar.x], 1);
+        blocoRaiz.openPopup();
+        return;
+    }
+
+    const marcadorUnico = adicionarMarcador(lugar);
+    mapa.setView([lugar.y, lugar.x], 1);
+    marcadorUnico.openPopup();
+}
+
+// Busca por nome de sala/bloco e vai direto pro local no mapa.
+// Prioriza correspondência exata; se não achar, usa a primeira
+// correspondência parcial (ex: "auditorio" acha "Bloco A - Auditório A202").
+function buscarEIrParaLocal() {
+    const searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
+
+    const termo = normalizarTexto(searchInput.value);
+    if (!termo) return;
+
+    const encontrado =
+        lugares.find(l => normalizarTexto(l.nome) === termo) ||
+        lugares.find(l => normalizarTexto(l.nome).includes(termo));
+
+    searchInput.classList.remove("busca-sem-resultado");
+
+    if (encontrado) {
+        // Se o local buscado é um subsolo, troca a planta pra ala certa antes de focar
+        if (encontrado.andar === "subsolo" && encontrado.bloco_pai && encontrado.bloco_pai !== alaAtual) {
+            alaAtual = encontrado.bloco_pai;
+            document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
+                btn.classList.remove("active");
+                btn.setAttribute("aria-current", "false");
+            });
+            atualizarPlantaDeFundo();
+        }
+        focarNoLugar(encontrado);
+    } else {
+        // Feedback visual rápido de "não encontrado" (sem popup/alert intrusivo)
+        searchInput.classList.add("busca-sem-resultado");
+        setTimeout(() => searchInput.classList.remove("busca-sem-resultado"), 1200);
+    }
+}
+
+function handleBuscaKeydown(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        buscarEIrParaLocal();
+    }
 }
 
 function mostrarTodos() {
