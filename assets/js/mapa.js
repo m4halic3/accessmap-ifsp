@@ -332,7 +332,15 @@ function aplicarFiltrosCombinados() {
     let filtrados;
 
     if (termo) {
-        filtrados = lugares.filter(l => {
+        // Fora do Mapa Geral (ou seja, dentro de um subsolo), a busca fica
+        // restrita aos locais daquele subsolo — não faz sentido achar (e
+        // tentar marcar) uma sala de outra planta enquanto se está vendo
+        // a de Mecânica ou Edificações.
+        const candidatos = (alaAtual === "todos")
+            ? lugares
+            : lugares.filter(l => l.bloco_pai === alaAtual && l.andar === "subsolo");
+
+        filtrados = candidatos.filter(l => {
             const nomeNormalizado = l.nome.toLowerCase();
             const nomeSemHifens = nomeNormalizado.replace(/-/g, "");
             return nomeNormalizado.includes(termo) || nomeSemHifens.includes(termo.replace(/-/g, ""));
@@ -360,6 +368,13 @@ if (filtroAtual) {
         filtrados = filtrados.filter(l => l.tipo === "fisica" || l.tipo === "alerta");
     } else if (filtroAtual === "auditiva") {
         filtrados = filtrados.filter(l => l.tipo === "auditiva");
+    } else if (filtroAtual === "acessibilidade") {
+        // Usado pelo botão "Ver Todos": junta todos os tipos de
+        // acessibilidade (física, auditiva e alertas) do mapa atualmente
+        // exibido — Mapa Geral ou um subsolo específico, sem misturar
+        // pontos de um mapa com os de outro (isso já é garantido pelo
+        // escopo de `filtrados` calculado acima, por ala/andar).
+        filtrados = filtrados.filter(l => l.tipo === "fisica" || l.tipo === "auditiva" || l.tipo === "alerta");
     } else {
         filtrados = filtrados.filter(l => l.tipo === filtroAtual);
     }
@@ -375,19 +390,30 @@ if (filtroAtual) {
     if (alaAtual === "todos" && !termo && !filtroAtual) {
         // Estado padrão do Mapa Geral: sem busca e sem filtro de acessibilidade
         // ativo, o mapa fica vazio (sem marcadores) e a lateral mostra só os
-        // blocos principais. Antes isso só valia na primeira carga da página
-        // (dependia de `primeiraInicializacao`); agora vale sempre que essa
-        // combinação ocorrer — inclusive ao voltar pra aba "Mapa Geral" ou
-        // limpar a busca/o filtro depois de já ter navegado.
+        // blocos principais. Vale sempre que essa combinação ocorrer —
+        // inclusive ao voltar pra aba "Mapa Geral" ou limpar a busca/o filtro
+        // depois de já ter navegado.
         const blocosPrincipais = lugares.filter(l => l.subponto === false && l.andar === "terreo");
         atualizarListaLateral(blocosPrincipais, "");
+    } else if (alaAtual !== "todos" && !termo && !filtroAtual) {
+        // Estado padrão de uma ala de subsolo (Mecânica / Edificações): mesma
+        // ideia do Mapa Geral — sem busca e sem filtro ativo, o mapa fica
+        // vazio (sem marcadores), mas a lateral já mostra todos os locais
+        // daquele subsolo. Como esses locais não têm uma hierarquia
+        // bloco > sala (todos são subponto:true), usamos `mostrarTodosOsItens`
+        // pra não escondê-los.
+        atualizarListaLateral(filtrados, "", true);
     } else {
         mostrarLugares(filtrados);
         // -----------------------------------------------------------------
-        // CORREÇÃO: passa `termo` para atualizarListaLateral em todos os casos,
-        // garantindo que a lista lateral não filtre subpontos quando há busca
+        // Passa `termo` normalmente, e além disso avisa a lateral pra exibir
+        // tudo sem restrição de subponto quando estamos numa ala de subsolo
+        // OU quando um filtro de acessibilidade está ativo — em ambos os
+        // casos queremos ver a lista completa dos locais encontrados, e não
+        // só os pontos "principais" (essa restrição só faz sentido no estado
+        // padrão do Mapa Geral, sem busca e sem filtro).
         // -----------------------------------------------------------------
-        atualizarListaLateral(filtrados, termo);
+        atualizarListaLateral(filtrados, termo, (alaAtual !== "todos") || !!filtroAtual);
     }
 }
 
@@ -440,7 +466,7 @@ function filtrar(tipo, elemento) {
     aplicarFiltrosCombinados();
 }
 
-function atualizarListaLateral(lista, termoDeBusca = "") {
+function atualizarListaLateral(lista, termoDeBusca = "", mostrarTodosOsItens = false) {
     const container = document.getElementById("lista-lugares");
     if (!container) return;
 
@@ -448,14 +474,18 @@ function atualizarListaLateral(lista, termoDeBusca = "") {
 
     // LÓGICA DE FILTRAGEM:
     // Se tem termo de busca, exibe TODOS os resultados encontrados.
-    // Se NÃO tem busca, mantém a restrição de apenas pontos principais (subponto: false).
+    // Se `mostrarTodosOsItens` for true (usado nas alas de subsolo, onde não
+    // existe hierarquia bloco > sala e todo item é subponto:true), também
+    // exibe tudo, sem restrição.
+    // Caso contrário (Mapa Geral sem busca), mantém a restrição de apenas
+    // pontos principais (subponto: false).
     let listaParaExibir;
     
-    if (termoDeBusca.length > 0) {
-        // Busca ativa: exibe tudo o que o filtro de busca achou
+    if (termoDeBusca.length > 0 || mostrarTodosOsItens) {
+        // Busca ativa (ou lista de subsolo): exibe tudo o que foi passado
         listaParaExibir = [...lista];
     } else {
-        // Estado normal: exibe apenas os blocos/lugares principais
+        // Estado normal do Mapa Geral: exibe apenas os blocos/lugares principais
         listaParaExibir = lista.filter(l => l.subponto === false);
     }
 
@@ -604,14 +634,28 @@ function handleBuscaKeydown(event) {
     }
 }
 
-function mostrarTodos() {
-    filtroAtual = null;
+function mostrarTodos(elemento) {
+    // "Ver Todos": mostra todos os pontos de acessibilidade (física,
+    // auditiva e alertas) do mapa que estiver aberto no momento — Mapa
+    // Geral ou um subsolo específico. Clicar de novo desativa e volta pro
+    // estado padrão (vazio no Mapa Geral / lista completa sem marcadores
+    // no subsolo), igual aos outros botões de filtro.
     primeiraInicializacao = false;
 
     document.querySelectorAll(".filtro").forEach(el => {
         el.classList.remove("ativo");
         el.setAttribute("aria-pressed", "false");
     });
+
+    if (filtroAtual === "acessibilidade") {
+        filtroAtual = null;
+    } else {
+        filtroAtual = "acessibilidade";
+        if (elemento) {
+            elemento.classList.add("ativo");
+            elemento.setAttribute("aria-pressed", "true");
+        }
+    }
 
     aplicarFiltrosCombinados();
 }
