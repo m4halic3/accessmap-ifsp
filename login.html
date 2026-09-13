@@ -17,10 +17,10 @@
             <a href="index.html" class="back-link">Voltar</a>
         </header>
 
-        <main class="auth-card active" id="form-login">
+        <main class="auth-card active" id="card-login">
             <h2>Log in</h2>
             
-            <form action="#" method="POST">
+            <form id="form-login" action="#" method="POST">
                 <div class="input-group">
                     <label for="user-login" class="sr-only">Nome de usuário</label>
                     <input type="text" id="user-login" placeholder="Nome de usuário" required>
@@ -35,6 +35,8 @@
                     <label><input type="checkbox"> Lembre-me</label>
                     <a href="#">Esqueceu a senha?</a>
                 </div>
+
+                <p id="msg-erro" style="color:red; display:none;"></p>
                 
                 <button type="submit" class="btn-auth">Log in</button>
             </form>
@@ -63,5 +65,6 @@
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
     <script src="assets/js/script.js"></script>
+    <script src="assets/js/authentication.js"></script>
 </body>
 </html>
