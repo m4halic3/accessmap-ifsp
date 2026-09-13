@@ -50,6 +50,21 @@ $transition-fast: 0.3s;
         font-weight: 800;
         color: $color-white;
         font-size: 1.2rem;
+        text-decoration: none;
+
+        &,
+        &:link,
+        &:visited,
+        &:hover,
+        &:active {
+            text-decoration: none;
+            color: $color-white;
+        }
+
+        &:focus-visible {
+            outline: 2px solid $color-white;
+            outline-offset: 4px;
+        }
 
         .logo-img { height: 40px; width: auto; }
 

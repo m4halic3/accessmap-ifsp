@@ -1,11 +1,27 @@
-// dashboard.js — filtros da tela de respostas do admin (AccessMap)
-// Trabalha em cima dos cards já renderizados no HTML (.resposta-card),
-// sem depender de backend. Quando houver uma API de respostas, basta
-// trocar a leitura de `document.querySelectorAll('.resposta-card')`
-// pelos dados vindos do servidor e re-renderizar os cards antes de
-// chamar aplicarFiltros().
+// dashboard.js — painel do admin (AccessMap)
+// Lê e escreve em localStorage (chave 'accessmap_respostas'), a mesma
+// usada pelo formulário de colaboração da página principal (index.html).
+// Quando existir um backend, troque lerRespostas()/salvarRespostas()/
+// removerResposta() pelas chamadas à API correspondente.
 
+const CHAVE_RESPOSTAS = 'accessmap_respostas';
 let categoriaAtual = null;
+
+function lerRespostas() {
+    try {
+        return JSON.parse(localStorage.getItem(CHAVE_RESPOSTAS)) || [];
+    } catch {
+        return [];
+    }
+}
+
+function salvarRespostas(lista) {
+    localStorage.setItem(CHAVE_RESPOSTAS, JSON.stringify(lista));
+}
+
+function removerResposta(id) {
+    salvarRespostas(lerRespostas().filter(r => r.id !== id));
+}
 
 function normalizarTexto(txt) {
     return txt
@@ -15,48 +31,84 @@ function normalizarTexto(txt) {
         .trim();
 }
 
-function aplicarFiltros() {
-    const termoLocal = normalizarTexto(document.getElementById('filtro-local')?.value || '');
-    const termoRelato = normalizarTexto(document.getElementById('filtro-relato')?.value || '');
-    const ordenacao = document.getElementById('filtro-ordenacao')?.value || 'recentes';
+function formatarData(isoString) {
+    return new Date(isoString).toLocaleDateString('pt-BR');
+}
 
+function rotuloCategoria(categoria) {
+    return categoria === 'fisica' ? 'Física' : 'Auditiva';
+}
+
+function escaparHtml(texto) {
+    const div = document.createElement('div');
+    div.textContent = texto;
+    return div.innerHTML;
+}
+
+function criarCard(resposta) {
+    const article = document.createElement('article');
+    article.className = 'resposta-card';
+    article.dataset.categoria = resposta.categoria;
+    article.dataset.id = resposta.id;
+
+    article.innerHTML = `
+        <div class="resposta-card-header">
+            <span class="resposta-local">
+                <i class="fas fa-map-pin" aria-hidden="true"></i>
+                ${escaparHtml(resposta.local)}
+            </span>
+            <span class="resposta-tag tag-${resposta.categoria}">${rotuloCategoria(resposta.categoria)}</span>
+        </div>
+        <p class="resposta-texto">${escaparHtml(resposta.relato)}</p>
+        <div class="resposta-card-footer">
+            <span class="resposta-data">
+                <i class="fas fa-clock" aria-hidden="true"></i>
+                ${formatarData(resposta.data)}
+            </span>
+            <button type="button" class="btn-excluir-resposta" aria-label="Excluir esta resposta">
+                <i class="fas fa-trash" aria-hidden="true"></i>
+            </button>
+        </div>
+    `;
+
+    article.querySelector('.btn-excluir-resposta').addEventListener('click', () => {
+        removerResposta(resposta.id);
+        renderizarRespostas();
+    });
+
+    return article;
+}
+
+function renderizarRespostas() {
     const lista = document.getElementById('respostas-lista');
     const vazio = document.getElementById('respostas-vazio');
     const contador = document.getElementById('contador-respostas');
     if (!lista) return;
 
-    const cards = Array.from(lista.querySelectorAll('.resposta-card'));
-    let visiveis = 0;
+    const termoLocal = normalizarTexto(document.getElementById('filtro-local')?.value || '');
+    const termoRelato = normalizarTexto(document.getElementById('filtro-relato')?.value || '');
+    const ordenacao = document.getElementById('filtro-ordenacao')?.value || 'recentes';
 
-    cards.forEach(card => {
-        const local = normalizarTexto(card.querySelector('.resposta-local')?.textContent || '');
-        const relato = normalizarTexto(card.querySelector('.resposta-texto')?.textContent || '');
-        const categoria = card.dataset.categoria;
-
-        const bateLocal = !termoLocal || local.includes(termoLocal);
-        const bateRelato = !termoRelato || relato.includes(termoRelato);
-        const bateCategoria = !categoriaAtual || categoria === categoriaAtual;
-
-        const visivel = bateLocal && bateRelato && bateCategoria;
-        card.hidden = !visivel;
-        if (visivel) visiveis++;
+    let respostas = lerRespostas().filter(r => {
+        const bateLocal = !termoLocal || normalizarTexto(r.local).includes(termoLocal);
+        const bateRelato = !termoRelato || normalizarTexto(r.relato).includes(termoRelato);
+        const bateCategoria = !categoriaAtual || r.categoria === categoriaAtual;
+        return bateLocal && bateRelato && bateCategoria;
     });
 
-    // Ordenação simples pela ordem atual dos cards no DOM
     if (ordenacao === 'antigos') {
-        [...cards].reverse().forEach(card => lista.insertBefore(card, vazio));
+        respostas.sort((a, b) => new Date(a.data) - new Date(b.data));
     } else if (ordenacao === 'local') {
-        [...cards]
-            .sort((a, b) => {
-                const la = a.querySelector('.resposta-local')?.textContent.trim() || '';
-                const lb = b.querySelector('.resposta-local')?.textContent.trim() || '';
-                return la.localeCompare(lb, 'pt-BR');
-            })
-            .forEach(card => lista.insertBefore(card, vazio));
+        respostas.sort((a, b) => a.local.localeCompare(b.local, 'pt-BR'));
+    } else {
+        respostas.sort((a, b) => new Date(b.data) - new Date(a.data));
     }
 
-    if (vazio) vazio.hidden = visiveis > 0;
-    if (contador) contador.textContent = `${visiveis} resposta${visiveis === 1 ? '' : 's'}`;
+    lista.querySelectorAll('.resposta-card').forEach(card => card.remove());
+    respostas.forEach(r => lista.insertBefore(criarCard(r), vazio));
+
+    if (vazio) vazio.hidden = respostas.length > 0;
+    if (contador) contador.textContent = `${respostas.length} resposta${respostas.length === 1 ? '' : 's'}`;
 }
 
 function alternarCategoria(botao) {
@@ -73,7 +125,7 @@ function alternarCategoria(botao) {
         botao.setAttribute('aria-pressed', 'true');
     }
 
-    aplicarFiltros();
+    renderizarRespostas();
 }
 
 function limparFiltros() {
@@ -90,32 +142,20 @@ function limparFiltros() {
         btn.setAttribute('aria-pressed', 'false');
     });
 
-    aplicarFiltros();
-}
-
-function excluirResposta(botao) {
-    const card = botao.closest('.resposta-card');
-    if (card) {
-        card.remove();
-        aplicarFiltros();
-    }
+    renderizarRespostas();
 }
 
 function iniciarDashboard() {
-    document.getElementById('filtro-local')?.addEventListener('input', aplicarFiltros);
-    document.getElementById('filtro-relato')?.addEventListener('input', aplicarFiltros);
-    document.getElementById('filtro-ordenacao')?.addEventListener('change', aplicarFiltros);
+    document.getElementById('filtro-local')?.addEventListener('input', renderizarRespostas);
+    document.getElementById('filtro-relato')?.addEventListener('input', renderizarRespostas);
+    document.getElementById('filtro-ordenacao')?.addEventListener('change', renderizarRespostas);
     document.getElementById('btn-limpar-filtros')?.addEventListener('click', limparFiltros);
 
     document.querySelectorAll('.filtro-categoria').forEach(btn => {
         btn.addEventListener('click', () => alternarCategoria(btn));
     });
 
-    document.querySelectorAll('.btn-excluir-resposta').forEach(btn => {
-        btn.addEventListener('click', () => excluirResposta(btn));
-    });
-
-    aplicarFiltros();
+    renderizarRespostas();
 }
 
 window.addEventListener('DOMContentLoaded', iniciarDashboard);

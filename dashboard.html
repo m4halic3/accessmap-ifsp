@@ -13,11 +13,11 @@
 
 <body class="pagina-dashboard">
     <nav class="navbar navbar-admin" aria-label="Navegação do Painel Administrativo">
-        <div class="logo">
-            <img src="assets/images/logo-branca.png" alt="Logotipo AccessMap com símbolo de localização" class="logo-img">
-            <span class="logo-text">ACCESSMAP</span>
-            <span class="badge-admin">ADMIN</span>
-        </div>
+<a href="index.html" class="logo">
+    <img src="assets/images/logo-branca.png" alt="Logotipo AccessMap com símbolo de localização" class="logo-img">
+    <span class="logo-text">ACCESSMAP</span>
+    <span class="badge-admin">ADMIN</span>
+</a>
 
         <div class="nav-right">
             <span class="admin-user">
@@ -91,103 +91,13 @@
                     <h1>Respostas Coletadas</h1>
                     <p>Relatos enviados pelo formulário de colaboração da página principal.</p>
                 </div>
-                <span class="contador-respostas" id="contador-respostas">4 respostas</span>
+                <span class="contador-respostas" id="contador-respostas">0 respostas</span>
             </header>
 
             <div class="respostas-lista" id="respostas-lista">
-
-                <article class="resposta-card" data-categoria="fisica">
-                    <div class="resposta-card-header">
-                        <span class="resposta-local">
-                            <i class="fas fa-map-pin" aria-hidden="true"></i>
-                            Bloco A - Auditório A202
-                        </span>
-                        <span class="resposta-tag tag-fisica">Física</span>
-                    </div>
-                    <p class="resposta-texto">
-                        Falta rampa de acesso na entrada lateral do auditório, apenas escada disponível.
-                    </p>
-                    <div class="resposta-card-footer">
-                        <span class="resposta-data">
-                            <i class="fas fa-clock" aria-hidden="true"></i>
-                            12/09/2026
-                        </span>
-                        <button type="button" class="btn-excluir-resposta" aria-label="Excluir esta resposta">
-                            <i class="fas fa-trash" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                </article>
-
-                <article class="resposta-card" data-categoria="auditiva">
-                    <div class="resposta-card-header">
-                        <span class="resposta-local">
-                            <i class="fas fa-map-pin" aria-hidden="true"></i>
-                            Bloco A - NAPNE Atendimento
-                        </span>
-                        <span class="resposta-tag tag-auditiva">Auditiva</span>
-                    </div>
-                    <p class="resposta-texto">
-                        Não há sinalização visual de emergência na sala de atendimento, apenas sonora.
-                    </p>
-                    <div class="resposta-card-footer">
-                        <span class="resposta-data">
-                            <i class="fas fa-clock" aria-hidden="true"></i>
-                            10/09/2026
-                        </span>
-                        <button type="button" class="btn-excluir-resposta" aria-label="Excluir esta resposta">
-                            <i class="fas fa-trash" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                </article>
-
-                <article class="resposta-card" data-categoria="fisica">
-                    <div class="resposta-card-header">
-                        <span class="resposta-local">
-                            <i class="fas fa-map-pin" aria-hidden="true"></i>
-                            Estacionamento Interno B
-                        </span>
-                        <span class="resposta-tag tag-fisica">Física</span>
-                    </div>
-                    <p class="resposta-texto">
-                        Não existe rampa externa de acesso ao estacionamento, só escada.
-                    </p>
-                    <div class="resposta-card-footer">
-                        <span class="resposta-data">
-                            <i class="fas fa-clock" aria-hidden="true"></i>
-                            08/09/2026
-                        </span>
-                        <button type="button" class="btn-excluir-resposta" aria-label="Excluir esta resposta">
-                            <i class="fas fa-trash" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                </article>
-
-                <article class="resposta-card" data-categoria="fisica">
-                    <div class="resposta-card-header">
-                        <span class="resposta-local">
-                            <i class="fas fa-map-pin" aria-hidden="true"></i>
-                            Bloco A - Rampa de Acesso Principal
-                        </span>
-                        <span class="resposta-tag tag-fisica">Física</span>
-                    </div>
-                    <p class="resposta-texto">
-                        Piso tátil próximo à rampa principal está danificado em vários trechos.
-                    </p>
-                    <div class="resposta-card-footer">
-                        <span class="resposta-data">
-                            <i class="fas fa-clock" aria-hidden="true"></i>
-                            05/09/2026
-                        </span>
-                        <button type="button" class="btn-excluir-resposta" aria-label="Excluir esta resposta">
-                            <i class="fas fa-trash" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                </article>
-
                 <p class="respostas-vazio" id="respostas-vazio" hidden>
                     Nenhuma resposta encontrada para os filtros selecionados.
                 </p>
-
             </div>
         </section>
 
