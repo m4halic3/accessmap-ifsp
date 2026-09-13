@@ -1,0 +1,509 @@
+@use "sass:color";
+@use 'variables' as *;
+
+// =========================================================================
+// PAINEL DO ADMINISTRADOR — DASHBOARD DE RESPOSTAS
+// =========================================================================
+// Reaproveita a paleta oficial (_variables.scss):
+//   - $color-purple  -> navbar / títulos / botão de ir pro mapa
+//   - $color-pink    -> destaque (badge ADMIN, hover, foco)
+//   - $color-teal    -> tag "Física"
+//   - $color-orange  -> tag "Auditiva" / ações de atenção (excluir)
+//   - $color-grey / $color-bg-light -> fundos e bordas neutras
+// =========================================================================
+
+$navbar-height: 60px;
+$sidebar-width: 300px;
+
+$radius-sm: 8px;
+$radius-md: 14px;
+$radius-lg: 20px;
+
+$shadow-card: 0 4px 20px rgba($color-dark, 0.12);
+$shadow-hover: 0 8px 24px rgba($color-dark, 0.18);
+
+$transition-fast: 0.3s;
+
+// -------------------------------------------------------------------
+// Navbar do admin (versão reduzida da .navbar principal)
+// -------------------------------------------------------------------
+.navbar-admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8%;
+    height: $navbar-height;
+    background: $color-purple;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 100;
+    box-shadow: $shadow-card;
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-family: $font-primary;
+        font-weight: 800;
+        color: $color-white;
+        font-size: 1.2rem;
+
+        .logo-img { height: 40px; width: auto; }
+
+        .logo-text {
+            display: flex;
+            align-items: center;
+        }
+
+        .badge-admin {
+            background: $color-pink;
+            color: $color-white;
+            font-family: $font-primary;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            text-transform: uppercase;
+        }
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba($color-white, 0.85);
+            font-family: $font-secondary;
+            font-size: 0.85rem;
+        }
+
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: $color-white;
+            font-family: $font-primary;
+            font-weight: 700;
+            font-size: 0.82rem;
+            background: rgba($color-white, 0.12);
+            padding: 9px 16px;
+            border-radius: $radius-sm;
+            transition: background $transition-fast;
+
+            &:hover { background: $color-pink; }
+            &:focus-visible { outline: 2px solid $color-white; outline-offset: 4px; }
+        }
+    }
+}
+
+.pagina-dashboard {
+    padding-top: $navbar-height;
+    background-color: $color-bg-light;
+}
+
+// -------------------------------------------------------------------
+// Layout: sidebar de filtros + caixa central rolável
+// -------------------------------------------------------------------
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: $sidebar-width 1fr;
+    gap: 28px;
+    max-width: 1280px;
+    margin: 32px auto;
+    padding: 0 24px 40px;
+    align-items: start;
+}
+
+// ---------- Sidebar ----------
+.dashboard-sidebar {
+    background: $color-white;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-card;
+    padding: 26px 22px;
+    position: sticky;
+    top: $navbar-height + 24px;
+    display: flex;
+    flex-direction: column;
+
+    .sidebar-title {
+        margin: 0 0 20px;
+        font-family: $font-primary;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: $color-purple;
+    }
+
+    .filtro-grupo {
+        margin-bottom: 18px;
+
+        label,
+        .label-style {
+            display: block;
+            font-family: $font-secondary;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: color.adjust($color-dark, $lightness: 45%);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        &.fieldset-reset {
+            border: none;
+            padding: 0;
+            margin: 0 0 18px;
+        }
+    }
+
+    // Reaproveita a estrutura .input-wrapper já usada no formulário do index.html
+    .input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1.5px solid $color-grey;
+        border-radius: $radius-sm;
+        padding: 10px 14px;
+        background: $color-bg-light;
+        transition: border-color $transition-fast;
+
+        i { color: $color-purple; font-size: 0.95rem; }
+
+        input,
+        select {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-family: $font-secondary;
+            font-size: 0.9rem;
+            color: $color-dark;
+        }
+
+        &:focus-within { border-color: $color-purple; }
+
+        &.select-wrapper select { cursor: pointer; appearance: none; }
+    }
+
+    // Botões FÍSICA / AUDITIVA — mesma base .btn-type do formulário principal
+    .type-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .btn-type {
+        flex: 1;
+        min-width: 100px;
+        border: 1.5px solid $color-grey;
+        background: $color-white;
+        border-radius: $radius-sm;
+        padding: 9px 10px;
+        font-family: $font-primary;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        cursor: pointer;
+        transition: all $transition-fast;
+
+        &:hover { transform: translateY(-1px); }
+        &:focus-visible { outline: 2px solid $color-purple; outline-offset: 2px; }
+
+        &.btn-fisica {
+            color: $color-teal;
+            &[aria-pressed="true"] {
+                background: $color-teal;
+                border-color: $color-teal;
+                color: $color-white;
+            }
+        }
+
+        &.btn-auditiva {
+            color: $color-orange;
+            &[aria-pressed="true"] {
+                background: $color-orange;
+                border-color: $color-orange;
+                color: $color-white;
+            }
+        }
+    }
+
+    .btn-limpar-filtros {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 4px;
+        width: 100%;
+        background: transparent;
+        border: 1.5px dashed $color-grey;
+        border-radius: $radius-sm;
+        color: color.adjust($color-dark, $lightness: 45%);
+        font-family: $font-secondary;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 10px;
+        cursor: pointer;
+        transition: all $transition-fast;
+
+        &:hover { border-color: $color-pink; color: $color-pink; }
+        &:focus-visible { outline: 2px solid $color-purple; outline-offset: 2px; }
+    }
+
+    .sidebar-divider {
+        height: 1px;
+        background: $color-grey;
+        margin: 22px 0;
+    }
+
+    // Botão fixo abaixo dos filtros — vai para a tela de edição do mapa
+    .btn-editar-mapa {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: $color-purple;
+        color: $color-white;
+        text-decoration: none;
+        font-family: $font-primary;
+        font-weight: 700;
+        font-size: 0.88rem;
+        padding: 13px 16px;
+        border-radius: $radius-sm;
+        text-align: center;
+        box-shadow: $shadow-card;
+        transition: transform $transition-fast, box-shadow $transition-fast, background $transition-fast;
+
+        i { font-size: 1rem; }
+
+        &:hover {
+            background: color.adjust($color-purple, $lightness: -8%);
+            transform: translateY(-2px);
+            box-shadow: $shadow-hover;
+        }
+        &:focus-visible { outline: 2px solid $color-pink; outline-offset: 3px; }
+    }
+}
+
+// ---------- Caixa central (respostas) ----------
+.dashboard-central {
+    background: $color-white;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-card;
+    padding: 26px 26px 10px;
+    height: calc(100vh - #{$navbar-height} - 64px);
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid $color-grey;
+    margin-bottom: 6px;
+
+    h1 {
+        margin: 0 0 4px;
+        font-family: $font-primary;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: $color-purple;
+    }
+
+    p {
+        margin: 0;
+        font-family: $font-secondary;
+        font-size: 0.85rem;
+        color: color.adjust($color-dark, $lightness: 45%);
+    }
+
+    .contador-respostas {
+        background: rgba($color-purple, 0.1);
+        color: $color-purple;
+        font-family: $font-primary;
+        font-weight: 700;
+        font-size: 0.8rem;
+        padding: 6px 14px;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+}
+
+// Área que efetivamente rola
+.respostas-lista {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 6px 18px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    &::-webkit-scrollbar { width: 8px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb {
+        background: rgba($color-purple, 0.25);
+        border-radius: $radius-sm;
+        &:hover { background: rgba($color-purple, 0.45); }
+    }
+    scrollbar-width: thin;
+    scrollbar-color: rgba($color-purple, 0.25) transparent;
+}
+
+.resposta-card {
+    background: $color-bg-light;
+    border: 1px solid $color-grey;
+    border-radius: $radius-md;
+    padding: 18px 20px;
+    transition: box-shadow $transition-fast, transform $transition-fast;
+
+    &:hover {
+        box-shadow: $shadow-hover;
+        transform: translateY(-2px);
+    }
+
+    .resposta-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+
+        .resposta-local {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: $font-primary;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: $color-dark;
+
+            i { color: $color-purple; }
+        }
+
+        .resposta-tag {
+            font-family: $font-primary;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            color: $color-white;
+
+            &.tag-fisica { background: $color-teal; }
+            &.tag-auditiva { background: $color-orange; }
+        }
+    }
+
+    .resposta-texto {
+        margin: 0 0 14px;
+        font-family: $font-secondary;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        color: $color-dark;
+    }
+
+    .resposta-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+
+        .resposta-data {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: $font-secondary;
+            font-size: 0.78rem;
+            color: color.adjust($color-dark, $lightness: 45%);
+        }
+
+        .btn-excluir-resposta {
+            background: transparent;
+            border: none;
+            color: color.adjust($color-dark, $lightness: 45%);
+            font-size: 0.95rem;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: $radius-sm;
+            transition: all $transition-fast;
+
+            &:hover { color: $color-white; background: $color-orange; }
+            &:focus-visible { outline: 2px solid $color-purple; outline-offset: 2px; }
+        }
+    }
+}
+
+.respostas-vazio {
+    text-align: center;
+    font-family: $font-secondary;
+    color: color.adjust($color-dark, $lightness: 45%);
+    font-size: 0.9rem;
+    padding: 40px 0;
+}
+
+// =========================================================================
+// RESPONSIVIDADE MOBILE (mesmo breakpoint do _nav.scss)
+// =========================================================================
+@media (max-width: 768px) {
+    .navbar-admin {
+        padding: 0 5%;
+
+        .admin-user { display: none; }
+    }
+
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+        margin: 20px auto;
+        padding: 0 5% 30px;
+        gap: 20px;
+    }
+
+    .dashboard-sidebar {
+        position: static;
+        order: 1;
+    }
+
+    .dashboard-central {
+        order: 2;
+        height: 65vh;
+        padding: 22px 20px 8px;
+    }
+
+    .dashboard-header {
+        h1 { font-size: 1.2rem; }
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-admin {
+        .logo-text { display: none; }
+    }
+
+    .dashboard-sidebar .type-buttons {
+        flex-direction: column;
+
+        .btn-type { width: 100%; }
+    }
+
+    .resposta-card-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    .resposta-card-footer {
+        flex-wrap: wrap;
+    }
+}
