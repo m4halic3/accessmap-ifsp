@@ -11,7 +11,7 @@
     <link rel="icon" type="image/png" href="assets/images/logo-roxa.png">
 </head>
 
-<body>    
+<body>
     <nav class="navbar" aria-label="Navegação Principal">
         <div class="logo">
             <img src="assets/images/logo-branca.png" alt="Logotipo AccessMap com símbolo de localização" class="logo-img">
@@ -52,24 +52,24 @@
 
     <main id="conteudo-principal">
 
-<section class="secao-carrossel" aria-label="Destaques Informativos">
-    <div class="carousel-container">
-        <div class="slides-wrapper" id="slider">
-            <div class="slide"><img src="assets/images/motivacao.png" alt="Logo AccessMap: Encontre blocos e laboratórios no campus de forma rápida."></div>
-            <div class="slide"><img src="assets/images/simbolos.png" alt="Infográfico: Símbolos universais de acessibilidade física e auditiva."></div>
-            <div class="slide"><img src="assets/images/slide-final.png" alt="Mapa do campus com pinos de localização: Mova-se com autonomia."></div>
-        </div>
+        <section class="secao-carrossel" aria-label="Destaques Informativos">
+            <div class="carousel-container">
+                <div class="slides-wrapper" id="slider">
+                    <div class="slide"><img src="assets/images/motivacao.png" alt="Logo AccessMap: Encontre blocos e laboratórios no campus de forma rápida."></div>
+                    <div class="slide"><img src="assets/images/simbolos.png" alt="Infográfico: Símbolos universais de acessibilidade física e auditiva."></div>
+                    <div class="slide"><img src="assets/images/slide-final.png" alt="Mapa do campus com pinos de localização: Mova-se com autonomia."></div>
+                </div>
 
-        <button class="seta esquerda" onclick="btnMove(-1)" aria-label="Slide Anterior">❮</button>
-        <button class="seta direita" onclick="btnMove(1)" aria-label="Próximo Slide">❯</button>
+                <button class="seta esquerda" onclick="btnMove(-1)" aria-label="Slide Anterior">❮</button>
+                <button class="seta direita" onclick="btnMove(1)" aria-label="Próximo Slide">❯</button>
 
-        <div class="indicadores" role="tablist" aria-label="Indicadores dos slides">
-            <button class="dot active" onclick="jumpToSlide(0)" role="tab" aria-selected="true" aria-label="Ir para o slide 1"></button>
-            <button class="dot" onclick="jumpToSlide(1)" role="tab" aria-selected="false" aria-label="Ir para o slide 2"></button>
-            <button class="dot" onclick="jumpToSlide(2)" role="tab" aria-selected="false" aria-label="Ir para o slide 3"></button>
-        </div>
-    </div>
-</section>
+                <div class="indicadores" role="tablist" aria-label="Indicadores dos slides">
+                    <button class="dot active" onclick="jumpToSlide(0)" role="tab" aria-selected="true" aria-label="Ir para o slide 1"></button>
+                    <button class="dot" onclick="jumpToSlide(1)" role="tab" aria-selected="false" aria-label="Ir para o slide 2"></button>
+                    <button class="dot" onclick="jumpToSlide(2)" role="tab" aria-selected="false" aria-label="Ir para o slide 3"></button>
+                </div>
+            </div>
+        </section>
 
         <section id="mapa" class="map-section" aria-label="Mapa Interativo">
             <div class="map-container">
@@ -87,50 +87,50 @@
             </div>
         </section>
 
-<section id="estatisticas" class="stats-section">
-    <h2 class="stats-title">DADOS DE ACESSO</h2>
+        <section id="estatisticas" class="stats-section">
+            <h2 class="stats-title">DADOS DE ACESSO</h2>
 
-    <div class="stats-container">
-        <div class="stats-cards">
+            <div class="stats-container">
+                <div class="stats-cards">
 
-            <div class="stat-card">
-                <div class="card-content">
-                    <span class="card-number">15</span>
-                    <span class="card-label">Foco: Corpo</span>
+                    <div class="stat-card">
+                        <div class="card-content">
+                            <span class="card-number">15</span>
+                            <span class="card-label">Foco: Corpo</span>
+                        </div>
+                        <div class="card-icon">
+                            <img src="assets/images/simbolo-fisica-branca.png" alt="Ícone de acessibilidade física">
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="card-content">
+                            <span class="card-number">02</span>
+                            <span class="card-label">Foco: Som</span>
+                        </div>
+                        <div class="card-icon">
+                            <img src="assets/images/simbolo-auditiva-branca.png" alt="Ícone de acessibilidade auditiva">
+                        </div>
+                    </div>
+
                 </div>
-                <div class="card-icon">
-                    <img src="assets/images/simbolo-fisica-branca.png" alt="Ícone de acessibilidade física">
+
+                <div class="stats-chart" aria-label="Comparativo de acessibilidade">
+                    <div class="chart-container">
+                        <div class="chart-ring"></div>
+                        <div class="chart-legend-inner">
+                            <span class="main-stat">17</span>
+                            <span class="sub-text">Pontos<br>no Total</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="stat-card">
-                <div class="card-content">
-                    <span class="card-number">02</span>
-                    <span class="card-label">Foco: Som</span>
-                </div>
-                <div class="card-icon">
-                    <img src="assets/images/simbolo-auditiva-branca.png" alt="Ícone de acessibilidade auditiva">
-                </div>
-            </div>
-
-        </div>
-
-        <div class="stats-chart" aria-label="Comparativo de acessibilidade">
-            <div class="chart-container">
-                <div class="chart-ring"></div>
-                <div class="chart-legend-inner">
-                    <span class="main-stat">17</span>
-                    <span class="sub-text">Pontos<br>no Total</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+        </section>
 
         <section id="contato" class="contact-section">
             <div class="contact-container">
                 <div class="contact-card">
-                    <form action="#" method="POST">
+                    <form id="form-contato" action="#" method="POST">
                         <div class="form-group">
                             <label for="local-ocorrencia">Local da Ocorrência</label>
                             <div class="input-wrapper">
@@ -142,8 +142,8 @@
                         <fieldset class="form-group fieldset-reset">
                             <legend class="label-style">Categoria de Acessibilidade</legend>
                             <div class="type-buttons" role="group" aria-label="Escolha o tipo de acessibilidade afetada">
-                                <button type="button" class="btn-type btn-fisica" aria-pressed="false">FÍSICA</button>
-                                <button type="button" class="btn-type btn-auditiva" aria-pressed="false">AUDITIVA</button>
+                                <button type="button" class="btn-type btn-fisica" data-categoria="fisica" aria-pressed="false">FÍSICA</button>
+                                <button type="button" class="btn-type btn-auditiva" data-categoria="auditiva" aria-pressed="false">AUDITIVA</button>
                             </div>
                         </fieldset>
 
@@ -154,6 +154,8 @@
                                 <textarea id="relato-sugestao" placeholder="Descreva aqui o problema de acessibilidade encontrado..." required></textarea>
                             </div>
                         </div>
+
+                        <p id="msg-contato" class="msg-feedback" style="display:none;"></p>
 
                         <button type="submit" class="btn-submit">ENVIAR COLABORAÇÃO</button>
                     </form>
