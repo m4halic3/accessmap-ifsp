@@ -281,3 +281,53 @@ function ligarEventosAdmin() {
 }
 
 window.addEventListener("load", iniciarAdmin);
+
+/* =========================================================
+   ACESSIBILIDADE: FONTE E CONTRASTE
+   ========================================================= */
+let nivelFonte = 0;
+const maxNivel = 3;
+const minNivel = -2;
+
+function mudarFonte(direcao) {
+    const novoNivel = nivelFonte + direcao;
+
+    if (novoNivel > maxNivel || novoNivel < minNivel) return;
+
+    nivelFonte = novoNivel;
+    const htmlElement = document.documentElement;
+
+    switch (nivelFonte) {
+        case 0:
+            htmlElement.style.fontSize = "100%";
+            break;
+        case 1:
+            htmlElement.style.fontSize = "110%";
+            break;
+        case 2:
+            htmlElement.style.fontSize = "120%";
+            break;
+        case 3:
+            htmlElement.style.fontSize = "130%";
+            break;
+        case -1:
+            htmlElement.style.fontSize = "90%";
+            break;
+        case -2:
+            htmlElement.style.fontSize = "80%";
+            break;
+    }
+}
+
+function toggleContraste() {
+    document.body.classList.toggle("alto-contraste");
+
+    const estadoAtivo = document.body.classList.contains("alto-contraste");
+    localStorage.setItem("altoContrasteState", estadoAtivo);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem("altoContrasteState") === "true") {
+        document.body.classList.add("alto-contraste");
+    }
+});
