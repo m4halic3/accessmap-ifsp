@@ -1,121 +1,154 @@
-// dashboard.js — filtros da tela de respostas do admin (AccessMap)
-// Trabalha em cima dos cards já renderizados no HTML (.resposta-card),
-// sem depender de backend. Quando houver uma API de respostas, basta
-// trocar a leitura de `document.querySelectorAll('.resposta-card')`
-// pelos dados vindos do servidor e re-renderizar os cards antes de
-// chamar aplicarFiltros().
+function menuOnClick() {
+    const menuBar = document.getElementById("menu-bar");
+    const nav = document.getElementById("nav");
+    const menuBg = document.getElementById("menu-bg");
 
-let categoriaAtual = null;
-
-function normalizarTexto(txt) {
-    return txt
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .trim();
+    if (menuBar) menuBar.classList.toggle("change");
+    if (nav) nav.classList.toggle("change");
+    if (menuBg) menuBg.classList.toggle("change-bg");
 }
 
-function aplicarFiltros() {
-    const termoLocal = normalizarTexto(document.getElementById('filtro-local')?.value || '');
-    const termoRelato = normalizarTexto(document.getElementById('filtro-relato')?.value || '');
-    const ordenacao = document.getElementById('filtro-ordenacao')?.value || 'recentes';
+let indexAtivo = 0;
+let isMoving = false; 
+const slider = document.getElementById("slider");
+const bolinhas = document.querySelectorAll(".dot");
+const totalSlides = bolinhas.length;
 
-    const lista = document.getElementById('respostas-lista');
-    const vazio = document.getElementById('respostas-vazio');
-    const contador = document.getElementById('contador-respostas');
-    if (!lista) return;
-
-    const cards = Array.from(lista.querySelectorAll('.resposta-card'));
-    let visiveis = 0;
-
-    cards.forEach(card => {
-        const local = normalizarTexto(card.querySelector('.resposta-local')?.textContent || '');
-        const relato = normalizarTexto(card.querySelector('.resposta-texto')?.textContent || '');
-        const categoria = card.dataset.categoria;
-
-        const bateLocal = !termoLocal || local.includes(termoLocal);
-        const bateRelato = !termoRelato || relato.includes(termoRelato);
-        const bateCategoria = !categoriaAtual || categoria === categoriaAtual;
-
-        const visivel = bateLocal && bateRelato && bateCategoria;
-        card.hidden = !visivel;
-        if (visivel) visiveis++;
-    });
-
-    // Ordenação simples pela ordem atual dos cards no DOM
-    if (ordenacao === 'antigos') {
-        [...cards].reverse().forEach(card => lista.insertBefore(card, vazio));
-    } else if (ordenacao === 'local') {
-        [...cards]
-            .sort((a, b) => {
-                const la = a.querySelector('.resposta-local')?.textContent.trim() || '';
-                const lb = b.querySelector('.resposta-local')?.textContent.trim() || '';
-                return la.localeCompare(lb, 'pt-BR');
-            })
-            .forEach(card => lista.insertBefore(card, vazio));
+function atualizarCarrossel() {
+    if (slider) {
+        slider.style.transform = `translateX(-${indexAtivo * 100}%)`;
     }
-
-    if (vazio) vazio.hidden = visiveis > 0;
-    if (contador) contador.textContent = `${visiveis} resposta${visiveis === 1 ? '' : 's'}`;
+    bolinhas.forEach((dot, i) => {
+        dot.classList.toggle("active", i === indexAtivo);
+    });
 }
 
-function alternarCategoria(botao) {
-    const categoria = botao.dataset.categoria;
+function btnMove(direcao) {
+    if (isMoving) return; 
 
-    document.querySelectorAll('.filtro-categoria').forEach(btn => {
-        btn.setAttribute('aria-pressed', 'false');
-    });
+    isMoving = true;
+    indexAtivo += direcao;
 
-    if (categoriaAtual === categoria) {
-        categoriaAtual = null;
-    } else {
-        categoriaAtual = categoria;
-        botao.setAttribute('aria-pressed', 'true');
+    if (indexAtivo >= totalSlides) {
+        indexAtivo = 0;
+    } else if (indexAtivo < 0) {
+        indexAtivo = totalSlides - 1;
     }
+    
+    atualizarCarrossel();
+    reiniciarTimer();
 
-    aplicarFiltros();
+    setTimeout(() => {
+        isMoving = false;
+    }, 1200); 
 }
 
-function limparFiltros() {
-    const filtroLocal = document.getElementById('filtro-local');
-    const filtroRelato = document.getElementById('filtro-relato');
-    const filtroOrdenacao = document.getElementById('filtro-ordenacao');
+function jumpToSlide(n) {
+    if (isMoving || indexAtivo === n) return;
 
-    if (filtroLocal) filtroLocal.value = '';
-    if (filtroRelato) filtroRelato.value = '';
-    if (filtroOrdenacao) filtroOrdenacao.value = 'recentes';
+    isMoving = true;
+    indexAtivo = n;
+    atualizarCarrossel();
+    reiniciarTimer();
 
-    categoriaAtual = null;
-    document.querySelectorAll('.filtro-categoria').forEach(btn => {
-        btn.setAttribute('aria-pressed', 'false');
-    });
-
-    aplicarFiltros();
+    setTimeout(() => {
+        isMoving = false;
+    }, 1200);
 }
 
-function excluirResposta(botao) {
-    const card = botao.closest('.resposta-card');
-    if (card) {
-        card.remove();
-        aplicarFiltros();
+let autoPlay = setInterval(() => {
+    btnMove(1);
+}, 5000);
+
+function reiniciarTimer() {
+    clearInterval(autoPlay);
+    autoPlay = setInterval(() => {
+        btnMove(1);
+    }, 5000);
+}
+
+/*Parte Login*/
+
+function toggleAuth() {
+  const login = document.getElementById("loginCard");
+  const signup = document.getElementById("signupCard");
+
+  login.classList.toggle("active");
+  signup.classList.toggle("active");
+}
+
+/* A busca de lugares do mapa agora vive inteiramente em mapa.js
+   (funções buscarEIrParaLocal / handleBuscaKeydown), para evitar
+   duas funções pesquisarLugares() com o mesmo nome brigando entre si. */
+
+
+let nivelFonte = 0; 
+const maxNivel = 3;  
+const minNivel = -2; 
+
+function mudarFonte(direcao) {
+    const novoNivel = nivelFonte + direcao;
+    
+    if (novoNivel > maxNivel || novoNivel < minNivel) return;
+    
+    nivelFonte = novoNivel;
+    const htmlElement = document.documentElement;
+    
+    switch (nivelFonte) {
+        case 0:
+            htmlElement.style.fontSize = "100%";
+            break;
+        case 1:
+            htmlElement.style.fontSize = "110%";
+            break;
+        case 2:
+            htmlElement.style.fontSize = "120%";
+            break;
+        case 3:
+            htmlElement.style.fontSize = "130%";
+            break;
+        case -1:
+            htmlElement.style.fontSize = "90%";
+            break;
+        case -2:
+            htmlElement.style.fontSize = "80%" ;
+            break;
     }
 }
 
-function iniciarDashboard() {
-    document.getElementById('filtro-local')?.addEventListener('input', aplicarFiltros);
-    document.getElementById('filtro-relato')?.addEventListener('input', aplicarFiltros);
-    document.getElementById('filtro-ordenacao')?.addEventListener('change', aplicarFiltros);
-    document.getElementById('btn-limpar-filtros')?.addEventListener('click', limparFiltros);
-
-    document.querySelectorAll('.filtro-categoria').forEach(btn => {
-        btn.addEventListener('click', () => alternarCategoria(btn));
-    });
-
-    document.querySelectorAll('.btn-excluir-resposta').forEach(btn => {
-        btn.addEventListener('click', () => excluirResposta(btn));
-    });
-
-    aplicarFiltros();
+function toggleContraste() {
+    document.body.classList.toggle("alto-contraste");
+    
+    const estadoAtivo = document.body.classList.contains("alto-contraste");
+    localStorage.setItem("altoContrasteState", estadoAtivo);
 }
 
-window.addEventListener('DOMContentLoaded', iniciarDashboard);
+window.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem("altoContrasteState") === "true") {
+        document.body.classList.add("alto-contraste");
+    }
+});
+
+function abrirGuiaUsuario() {
+    const modal = document.getElementById("modal-guia");
+    if (modal) {
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden"; // Trava o scroll do fundo
+    }
+}
+
+function fecharGuiaUsuario() {
+    const modal = document.getElementById("modal-guia");
+    if (modal) {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto"; // Libera o scroll do fundo
+    }
+}
+
+// Fecha o modal caso o usuário clique fora da caixa de conteúdo técnico
+window.onclick = function(event) {
+    const modal = document.getElementById("modal-guia");
+    if (event.target === modal) {
+        fecharGuiaUsuario();
+    }
+};

@@ -4,29 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/css/style.css">
-    <title>Tela do Admin</title>
-</head>
-<body>
-    <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/admin.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <title>Admin - Locais - AccessMap</title>
     <link rel="icon" type="image/png" href="assets/images/logo-roxa.png">
 </head>
 <body data-admin="sempre">
     <nav class="navbar" aria-label="Navegação Principal">
-        <div class="logo">
-            <a href="./index.html"><img src="assets/images/logo-branca.png" alt="Logotipo do AccessMap" class="logo-img"></a>
+        <a href="index.html" class="logo">
+            <img src="assets/images/logo-branca.png" alt="Logotipo do AccessMap" class="logo-img">
             <span class="logo-text">ACCESSMAP</span>
-        </div>
-        <div style="margin-left:auto; padding-right:20px;">
-            <a href="admin-respostas.html" style="color:#fff; font-size:0.85rem; text-decoration:none; display:flex; align-items:center; gap:6px;">
+        </a>
+        <div class="nav-right desktop-only" style="margin-left:auto;">
+            <a href="dashboard.html" class="nav-admin-link">
                 <i class="fas fa-inbox" aria-hidden="true"></i> Respostas do formulário
             </a>
         </div>
@@ -113,12 +104,26 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal de confirmação (adicionar / atualizar / excluir) -->
+        <div id="overlay-confirmacao" class="overlay-form oculto" aria-hidden="true">
+            <div class="confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirm-titulo" aria-describedby="confirm-texto">
+                <div class="confirm-icon" aria-hidden="true">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+                <h2 id="confirm-titulo">Confirmar ação</h2>
+                <p id="confirm-texto">Tem certeza?</p>
+                <div class="confirm-actions">
+                    <button type="button" id="btn-confirmar-cancelar" class="btn-confirm-cancelar">Cancelar</button>
+                    <button type="button" id="btn-confirmar-ok" class="btn-confirm-ok">Confirmar</button>
+                </div>
+            </div>
+        </div>
     </main>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="assets/js/mapa.js"></script>
-    <script src="assets/js/admin.js"></script>
-</body>
-</html>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="assets/js/dados-lugares.js"></script>
+<script src="assets/js/mapa.js"></script>
+<script src="assets/js/admin.js"></script>
 </body>
 </html>

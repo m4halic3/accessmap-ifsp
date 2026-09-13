@@ -1,27 +1,34 @@
 /* ==========================================================================
    ADMIN — Inserir / Atualizar / Excluir locais
    --------------------------------------------------------------------------
-   Este arquivo DEPENDE do mapa.js já ter sido carregado antes dele na
-   página (precisa vir depois de <script src="assets/js/mapa.js">).
-   Ele reaproveita as variáveis e funções globais que o mapa.js já define:
-   `lugares`, `mapa`, `alaAtual`, `filtroAtual`, `primeiraInicializacao`,
-   `aplicarFiltrosCombinados()`, `focarNoLugar()`.
+   Este arquivo DEPENDE de dados-lugares.js e mapa.js já terem sido
+   carregados antes dele na página, nessa ordem:
+   <script src="assets/js/dados-lugares.js">
+   <script src="assets/js/mapa.js">
+   <script src="assets/js/admin.js">
 
-   Funciona em dois contextos:
-   - admin-locais.html: o painel de admin fica sempre ativo
-     (a página tem <body data-admin="sempre">).
-   - mapa.html (página pública): o painel só aparece se a URL tiver
-     ?admin=1 (ex: mapa.html?admin=1) — pensado como um jeito simples de
-     alternar entre "modo visitante" e "modo admin" sem precisar de login
-     de verdade ainda. Quando isso existir de verdade (backend/login),
-     é só trocar essa checagem por algo como "usuarioLogado.isAdmin".
+   Ele reaproveita as variáveis e funções globais que mapa.js/dados-lugares.js
+   já definem: `lugares`, `mapa`, `alaAtual`, `filtroAtual`,
+   `primeiraInicializacao`, `aplicarFiltrosCombinados()`, `focarNoLugar()`.
+
+   admin.html é a MESMA tela de mapa.html (mesmo mapa, mesmos filtros,
+   mesma lista lateral). A diferença é só que aqui o modo admin está
+   sempre ativo (data-admin="sempre"), o que faz este arquivo:
+   - trocar a renderização da lista lateral para renderizarListaAdmin()
+     (com o lápis de editar ao lado de cada local);
+   - liberar o botão "Adicionar novo local";
+   - abrir o formulário de inserir/editar ao clicar no lápis;
+   - exigir confirmação antes de salvar ou excluir qualquer local.
+
+   Antes de qualquer inserção, atualização ou exclusão de local, o admin
+   passa por uma confirmação (abrirConfirmacao), como uma segunda etapa
+   explícita antes de alterar os dados.
    ========================================================================== */
 
 const modoAdmin =
     document.body.dataset.admin === "sempre" ||
     new URLSearchParams(window.location.search).get("admin") === "1";
 
-// Mapeia o valor salvo em bloco_pai para o texto mostrado no <select>
 const OPCOES_BLOCO = [
     { valor: "", texto: "Nenhum (área externa)" },
     { valor: "informatica", texto: "Bloco A" },
@@ -30,11 +37,12 @@ const OPCOES_BLOCO = [
     { valor: "administrativo", texto: "Bloco D" }
 ];
 
-let indiceEmEdicao = null; // índice em `lugares` sendo editado; null = criando um novo
-let coordsClicadas = null; // { x, y } do último clique no mapa, em modo admin
+let indiceEmEdicao = null;
+let coordsClicadas = null;
+let elementoComFocoAntesDoModal = null;
 
 function iniciarAdmin() {
-    if (!modoAdmin) return; // nada do admin roda pro visitante comum
+    if (!modoAdmin) return;
 
     document.querySelectorAll(".somente-admin").forEach(el => el.classList.remove("somente-admin-oculto"));
     const decoracao = document.querySelector(".sidebar-decoracao");
@@ -44,13 +52,9 @@ function iniciarAdmin() {
     renderizarListaAdmin();
     ligarEventosAdmin();
 
-    // Mostra todos os pontos de cara — o admin precisa ver tudo pra gerenciar,
-    // diferente do visitante comum que só vê algo depois de buscar/filtrar.
     primeiraInicializacao = false;
     aplicarFiltrosCombinados();
 
-    // Escuta cliques no mapa pra capturar a coordenada em modo admin
-    // (o mapa.js já tem o dele próprio pra console.log — os dois convivem numa boa).
     mapa.on("click", (e) => {
         coordsClicadas = {
             x: Math.round(e.latlng.lng),
@@ -130,6 +134,64 @@ function fecharFormulario() {
     coordsClicadas = null;
 }
 
+// ---------- Modal de confirmação genérico ----------
+function abrirConfirmacao(titulo, texto, aoConfirmar) {
+    const overlay = document.getElementById("overlay-confirmacao");
+    const tituloEl = document.getElementById("confirm-titulo");
+    const textoEl = document.getElementById("confirm-texto");
+    const btnOk = document.getElementById("btn-confirmar-ok");
+    const btnCancelar = document.getElementById("btn-confirmar-cancelar");
+
+    tituloEl.textContent = titulo;
+    textoEl.textContent = texto;
+
+    elementoComFocoAntesDoModal = document.activeElement;
+
+    overlay.classList.remove("oculto");
+    overlay.setAttribute("aria-hidden", "false");
+    btnCancelar.focus();
+
+    function limpar() {
+        overlay.classList.add("oculto");
+        overlay.setAttribute("aria-hidden", "true");
+        btnOk.removeEventListener("click", onConfirmar);
+        btnCancelar.removeEventListener("click", onCancelar);
+        overlay.removeEventListener("keydown", onKeydown);
+        if (elementoComFocoAntesDoModal) elementoComFocoAntesDoModal.focus();
+    }
+
+    function onConfirmar() {
+        limpar();
+        aoConfirmar();
+    }
+
+    function onCancelar() {
+        limpar();
+    }
+
+    function onKeydown(e) {
+        if (e.key === "Escape") {
+            onCancelar();
+            return;
+        }
+        if (e.key === "Tab") {
+            const focaveis = [btnCancelar, btnOk];
+            const indice = focaveis.indexOf(document.activeElement);
+            e.preventDefault();
+            if (e.shiftKey) {
+                focaveis[(indice - 1 + focaveis.length) % focaveis.length].focus();
+            } else {
+                focaveis[(indice + 1) % focaveis.length].focus();
+            }
+        }
+    }
+
+    btnOk.addEventListener("click", onConfirmar);
+    btnCancelar.addEventListener("click", onCancelar);
+    overlay.addEventListener("keydown", onKeydown);
+}
+
+// ---------- Salvar (com confirmação antes) ----------
 function salvarLocal() {
     const nome = document.getElementById("form-nome").value.trim();
 
@@ -142,12 +204,19 @@ function salvarLocal() {
         return;
     }
 
+    const acao = indiceEmEdicao !== null ? "atualizar" : "adicionar";
+    abrirConfirmacao(
+        indiceEmEdicao !== null ? "Atualizar local" : "Adicionar local",
+        `Tem certeza que deseja ${acao} o local "${nome}"?`,
+        confirmarSalvarLocal
+    );
+}
+
+function confirmarSalvarLocal() {
+    const nome = document.getElementById("form-nome").value.trim();
     const blocoPai = document.getElementById("form-bloco").value;
     const acessivel = document.getElementById("form-acessivel").checked;
     const alerta = document.getElementById("form-alerta").checked;
-    // "Alerta" e "Acessível" são simplificações do campo `tipo` original
-    // (que também tem "auditiva") — dá pra trocar os checkboxes por um
-    // <select> com as 3 opções depois, se precisar cobrir isso também.
     const tipo = alerta ? "alerta" : (acessivel ? "fisica" : "geral");
 
     const dados = {
@@ -172,11 +241,19 @@ function salvarLocal() {
     aplicarFiltrosCombinados();
 }
 
+// ---------- Excluir (com confirmação antes) ----------
 function excluirLocal() {
     if (indiceEmEdicao === null) return;
     const nomeLocal = lugares[indiceEmEdicao].nome;
-    if (!confirm(`Tem certeza que quer excluir "${nomeLocal}"? Essa ação não pode ser desfeita.`)) return;
 
+    abrirConfirmacao(
+        "Excluir local",
+        `Tem certeza que quer excluir "${nomeLocal}"? Essa ação não pode ser desfeita.`,
+        confirmarExcluirLocal
+    );
+}
+
+function confirmarExcluirLocal() {
     lugares.splice(indiceEmEdicao, 1);
     fecharFormulario();
     renderizarListaAdmin();
@@ -198,14 +275,9 @@ function ligarEventosAdmin() {
             `X: ${coordsClicadas.x}px, Y: ${coordsClicadas.y}px`;
     };
 
-    // Fecha o formulário clicando fora do card, sem fechar sem querer
-    // ao clicar dentro dele
     document.getElementById("overlay-form").addEventListener("click", (e) => {
         if (e.target.id === "overlay-form") fecharFormulario();
     });
 }
 
-// mapa.js usa `window.onload = initMap`. Aqui usamos addEventListener
-// (em vez de reatribuir window.onload) justamente pra não sobrescrever
-// esse listener — os dois rodam, initMap primeiro, iniciarAdmin depois.
 window.addEventListener("load", iniciarAdmin);
