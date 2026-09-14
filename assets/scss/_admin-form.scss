@@ -1,17 +1,8 @@
 @use 'sass:color';
 @use 'variables' as *;
 
-// =========================================================================
-// TELA DE ADMIN (admin.html) — navbar, sidebar, lista de locais e
-// formulário "Inserir/Atualizar Local"
-// =========================================================================
-
 $card-radius: 22px;
 
-// -------------------------------------------------------------------
-// Navbar (admin.html reaproveita a .navbar pública, só ajustamos aqui
-// o link da logo — que virou <a> — e o link "Respostas do formulário")
-// -------------------------------------------------------------------
 .navbar .logo {
     text-decoration: none;
 
@@ -45,9 +36,6 @@ $card-radius: 22px;
     }
 }
 
-// -------------------------------------------------------------------
-// Sidebar do admin — botão "Adicionar novo local" e lista de locais
-// -------------------------------------------------------------------
 .btn-novo-local {
     width: 100%;
     display: flex;
@@ -85,6 +73,7 @@ $card-radius: 22px;
     gap: 10px;
     overflow-y: auto;
     padding-right: 4px;
+    max-height: 280px;
 
     &::-webkit-scrollbar {
         width: 6px;
@@ -162,50 +151,58 @@ $card-radius: 22px;
     }
 }
 
-// -------------------------------------------------------------------
-// Overlay (fundo escurecido por trás do card do formulário / modal)
-// -------------------------------------------------------------------
+.mapa-e-painel {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    position: relative;
+}
+
+#map {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+}
+
 @keyframes formAparecer {
     from {
         opacity: 0;
-        transform: translateY(-12px) scale(0.97);
+        transform: translateX(12px);
     }
     to {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translateX(0);
     }
 }
 
-.overlay-form {
-    position: fixed;
-    inset: 0;
-    background: rgba($color-dark, 0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 24px;
+.painel-lateral {
+    width: 360px;
+    flex-shrink: 0;
+    height: 100%;
+    border-left: 1px solid $color-grey;
+    background: $color-white;
+    overflow-y: auto;
+    transition: width 0.25s ease, opacity 0.2s ease;
 
     &.oculto {
-        display: none;
+        width: 0;
+        opacity: 0;
+        overflow: hidden;
+        border: none;
+        pointer-events: none;
     }
 
-    &:not(.oculto) .form-local-card,
-    &:not(.oculto) .confirm-card {
+    &:not(.oculto) .form-local-card {
         animation: formAparecer 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 }
 
-// ---------- Card "Inserir/Atualizar Local" ----------
 .form-local-card {
-    width: 100%;
-    max-width: 460px;
+    width: 360px;
+    box-sizing: border-box;
     background: $color-white;
-    border-radius: $card-radius;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba($color-dark, 0.25);
     font-family: $font-secondary;
-    border: 1px solid rgba($color-dark, 0.06);
 }
 
 .form-local-header {
@@ -283,6 +280,11 @@ $card-radius: 22px;
             border-color: $color-dark;
             background: $color-white;
         }
+
+        &:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
     }
 
     select {
@@ -296,41 +298,14 @@ $card-radius: 22px;
 }
 
 .coord-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
     border: 1.5px solid $color-grey;
     border-radius: 12px;
     background: $color-bg-light;
     padding: 12px 14px;
 
     #form-coords {
-        flex: 1;
         font-size: 0.85rem;
         color: color.adjust($color-dark, $lightness: 20%);
-    }
-}
-
-.btn-auto-coords {
-    flex-shrink: 0;
-    background: $color-dark;
-    color: $color-white;
-    border: none;
-    border-radius: 8px;
-    padding: 7px 16px;
-    font-family: $font-primary;
-    font-size: 0.78rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-        background: color.adjust($color-dark, $lightness: 15%);
-    }
-
-    &:focus-visible {
-        outline: 2px solid $color-purple;
-        outline-offset: 2px;
     }
 }
 
@@ -421,7 +396,25 @@ $card-radius: 22px;
     }
 }
 
-// ---------- Modal de confirmação (adicionar/atualizar/excluir) ----------
+.overlay-form {
+    position: fixed;
+    inset: 0;
+    background: rgba($color-dark, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 24px;
+
+    &.oculto {
+        display: none;
+    }
+
+    &:not(.oculto) .confirm-card {
+        animation: formAparecer 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+}
+
 .confirm-card {
     width: 100%;
     max-width: 400px;
@@ -501,10 +494,63 @@ $card-radius: 22px;
     }
 }
 
-@media (max-width: 600px) {
-    .form-local-card,
+@media (max-width: 992px) {
+    .container-mapa {
+        flex-direction: column !important;
+        height: auto !important;
+    }
+
+    .sidebar {
+        width: 100% !important;
+        height: auto !important;
+        padding: 20px !important;
+
+        #lista-lugares-admin {
+            max-height: 40vh;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+    }
+
+    .mapa-e-painel {
+        width: 100% !important;
+        flex-direction: column !important;
+        height: auto !important;
+    }
+
+    #map {
+        width: 100% !important;
+        height: 400px !important;
+        flex: none !important;
+    }
+
+    .painel-lateral {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 45vh;
+        border-left: none;
+        border-top: 1px solid $color-grey;
+
+        &.oculto {
+            width: 100% !important;
+            height: 0 !important;
+            max-height: 0;
+            border: none;
+        }
+    }
+
+    .form-local-card {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
     .confirm-card {
         max-width: 100%;
+    }
+
+    .form-local-body {
+        padding: 20px 18px 18px;
     }
 
     .atributos-row {

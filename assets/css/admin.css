@@ -1,0 +1,510 @@
+.navbar .logo {
+  text-decoration: none;
+}
+.navbar .logo:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+
+.nav-admin-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  text-decoration: none;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: background-color 0.2s ease;
+}
+.nav-admin-link:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+.nav-admin-link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.btn-novo-local {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #44025c;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.btn-novo-local:hover {
+  background-color: rgb(15.0921985816%, 0.4438881936%, 20.4188569045%);
+  transform: translateY(-1px);
+}
+.btn-novo-local:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+#lista-lugares-admin {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  padding-right: 4px;
+  max-height: 280px;
+}
+#lista-lugares-admin::-webkit-scrollbar {
+  width: 6px;
+}
+#lista-lugares-admin::-webkit-scrollbar-thumb {
+  background: rgba(68, 2, 92, 0.25);
+  border-radius: 10px;
+}
+
+.item-lugar-admin {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background-color: #F4F4F4;
+  border: 1px solid #cbcbcb;
+  border-left: 4px solid #44025c;
+  border-radius: 10px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.item-lugar-admin:hover {
+  background-color: #fff;
+  transform: translateX(2px);
+}
+
+.item-lugar-admin-info {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+.item-lugar-admin-info p {
+  margin: 0 0 2px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.item-lugar-admin-info span {
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.72rem;
+  color: #666666;
+}
+
+.btn-editar-local {
+  margin-left: auto;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #cbcbcb;
+  background: #fff;
+  color: #44025c;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.btn-editar-local:hover {
+  background-color: #44025c;
+  color: #fff;
+}
+.btn-editar-local:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+.mapa-e-painel {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  position: relative;
+}
+
+#map {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+@keyframes formAparecer {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.painel-lateral {
+  width: 360px;
+  flex-shrink: 0;
+  height: 100%;
+  border-left: 1px solid #cbcbcb;
+  background: #fff;
+  overflow-y: auto;
+  transition: width 0.25s ease, opacity 0.2s ease;
+}
+.painel-lateral.oculto {
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  border: none;
+  pointer-events: none;
+}
+.painel-lateral:not(.oculto) .form-local-card {
+  animation: formAparecer 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.form-local-card {
+  width: 360px;
+  box-sizing: border-box;
+  background: #fff;
+  font-family: "Open Sans", sans-serif;
+}
+
+.form-local-header {
+  background: #000000;
+  color: #fff;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.form-local-header i.fa-map-pin {
+  font-size: 1rem;
+}
+.form-local-header span {
+  flex: 1;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.btn-fechar-form {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 6px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+.btn-fechar-form:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+.btn-fechar-form:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.form-local-body {
+  padding: 26px 24px 24px;
+}
+.form-local-body label {
+  display: block;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #000000;
+  margin: 18px 0 8px;
+}
+.form-local-body label:first-child {
+  margin-top: 0;
+}
+.form-local-body input[type=text],
+.form-local-body select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border: 1.5px solid #cbcbcb;
+  border-radius: 12px;
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.9rem;
+  color: #000000;
+  background: #F4F4F4;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.form-local-body input[type=text]:focus,
+.form-local-body select:focus {
+  outline: none;
+  border-color: #000000;
+  background: #fff;
+}
+.form-local-body input[type=text]:disabled,
+.form-local-body select:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.form-local-body select {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%23333' stroke-width='1.6' fill='none' fill-rule='evenodd'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+
+.coord-row {
+  border: 1.5px solid #cbcbcb;
+  border-radius: 12px;
+  background: #F4F4F4;
+  padding: 12px 14px;
+}
+.coord-row #form-coords {
+  font-size: 0.85rem;
+  color: #333333;
+}
+
+.dica-coords {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  color: rgb(45%, 45%, 45%);
+}
+
+.atributos-row {
+  display: flex;
+  gap: 24px;
+}
+.atributos-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-weight: 500;
+  font-family: "Open Sans", sans-serif;
+  cursor: pointer;
+}
+.atributos-row input[type=checkbox] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #44025c;
+}
+
+.form-local-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.btn-excluir {
+  background: #fff;
+  color: #A32D2D;
+  border: 1.5px solid #A32D2D;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-excluir:hover {
+  background: #A32D2D;
+  color: #fff;
+}
+.btn-excluir:focus-visible {
+  outline: 2px solid #44025c;
+  outline-offset: 2px;
+}
+.btn-excluir.oculto {
+  display: none;
+}
+
+.btn-salvar {
+  flex: 1;
+  background: #44025c;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s ease;
+}
+.btn-salvar:hover {
+  background: rgb(15.0921985816%, 0.4438881936%, 20.4188569045%);
+}
+.btn-salvar:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+.overlay-form {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+.overlay-form.oculto {
+  display: none;
+}
+.overlay-form:not(.oculto) .confirm-card {
+  animation: formAparecer 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.confirm-card {
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  border-radius: 22px;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  font-family: "Open Sans", sans-serif;
+}
+
+.confirm-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: rgba(201, 81, 6, 0.12);
+  color: #c95106;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.confirm-card h2 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: #000000;
+}
+
+.confirm-card p {
+  font-size: 0.9rem;
+  color: #333333;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+}
+.confirm-actions button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: none;
+}
+.confirm-actions button:focus-visible {
+  outline: 3px solid #44025c;
+  outline-offset: 2px;
+}
+
+.btn-confirm-cancelar {
+  background: #fff;
+  color: #000000;
+  border: 1.5px solid #cbcbcb !important;
+}
+.btn-confirm-cancelar:hover {
+  background: #F4F4F4;
+}
+
+.btn-confirm-ok {
+  background: #000000;
+  color: #fff;
+}
+.btn-confirm-ok:hover {
+  background: rgb(15%, 15%, 15%);
+}
+
+@media (max-width: 992px) {
+  .container-mapa {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  .sidebar {
+    width: 100% !important;
+    height: auto !important;
+    padding: 20px !important;
+  }
+  .sidebar #lista-lugares-admin {
+    max-height: 40vh;
+    overflow-y: auto;
+    margin-bottom: 20px;
+  }
+  .mapa-e-painel {
+    width: 100% !important;
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  #map {
+    width: 100% !important;
+    height: 400px !important;
+    flex: none !important;
+  }
+  .painel-lateral {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 45vh;
+    border-left: none;
+    border-top: 1px solid #cbcbcb;
+  }
+  .painel-lateral.oculto {
+    width: 100% !important;
+    height: 0 !important;
+    max-height: 0;
+    border: none;
+  }
+  .form-local-card {
+    width: 100%;
+  }
+}
+@media (max-width: 480px) {
+  .confirm-card {
+    max-width: 100%;
+  }
+  .form-local-body {
+    padding: 20px 18px 18px;
+  }
+  .atributos-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/*# sourceMappingURL=admin.css.map */

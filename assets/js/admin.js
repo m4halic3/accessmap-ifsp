@@ -62,12 +62,38 @@ function popularSelectBlocos() {
     });
 }
 
+// -----------------------------------------------------------------------
+// Lista lateral do admin: por padrão (sem busca) mostra só os pontos
+// essenciais — os mesmos "principais" que o mapa público usa como estado
+// inicial (subponto: false: blocos, estacionamentos, quadra, etc.) — pra
+// não poluir a barra lateral com centenas de salas internas de uma vez.
+//
+// Quando há um termo de busca, a lista passa a procurar em TODO o array
+// `lugares`, sem nenhuma restrição de ala/andar/subponto — no admin faz
+// sentido encontrar (e poder editar) qualquer local do sistema, mesmo um
+// que pertença a uma planta diferente da que está aberta no momento.
+// -----------------------------------------------------------------------
+function obterLugaresParaListaAdmin() {
+    const searchInput = document.getElementById("search-input");
+    const termo = searchInput ? normalizarTexto(searchInput.value) : "";
+
+    if (termo) {
+        return lugares.filter(l => normalizarTexto(l.nome).includes(termo));
+    }
+
+    return lugares.filter(l => l.subponto === false);
+}
+
 function renderizarListaAdmin() {
     const container = document.getElementById("lista-lugares-admin");
     if (!container) return;
     container.innerHTML = "";
 
-    lugares.forEach((lugar, indice) => {
+    const listaParaExibir = obterLugaresParaListaAdmin();
+
+    listaParaExibir.forEach((lugar) => {
+        const indice = lugares.indexOf(lugar);
+
         const item = document.createElement("div");
         item.className = "item-lugar-admin";
 
@@ -315,6 +341,14 @@ function ligarEventosAdmin() {
             document.getElementById("btn-confirmar-cancelar").click();
         }
     });
+
+    // A busca já dispara aplicarFiltrosCombinados() a cada tecla (via
+    // listener registrado em mapa.js); aqui só garantimos que a lista
+    // lateral do admin também reaja em tempo real ao que for digitado.
+    const searchInput = document.getElementById("search-input");
+    if (searchInput) {
+        searchInput.addEventListener("input", renderizarListaAdmin);
+    }
 }
 
 window.addEventListener("load", iniciarAdmin);
