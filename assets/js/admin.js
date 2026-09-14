@@ -92,6 +92,21 @@ function renderizarListaAdmin() {
     });
 }
 
+// -----------------------------------------------------------------------
+// Rótulo do campo "Bloco / Setor". Quando o admin está inserindo um local
+// direto dentro de um subsolo (Subsolo Mec. / Subsolo Edif.), o campo fica
+// travado no bloco daquela ala — não dá pra escolher outro bloco enquanto
+// se está fisicamente naquela planta, senão o local nasce com bloco_pai e
+// andar inconsistentes entre si e nunca aparece em nenhuma aba do mapa.
+// -----------------------------------------------------------------------
+function atualizarLabelBloco(travado, nomeBlocoTravado) {
+    const label = document.querySelector('label[for="form-bloco"]');
+    if (!label) return;
+    label.textContent = travado
+        ? `Bloco / Setor (fixo: ${nomeBlocoTravado})`
+        : "Bloco / Setor";
+}
+
 function abrirFormulario(lugar = null, indice = null, coordsForcadas = null) {
     indiceEmEdicao = indice;
     coordsClicadas = lugar ? { x: lugar.x, y: lugar.y } : coordsForcadas;
@@ -99,7 +114,22 @@ function abrirFormulario(lugar = null, indice = null, coordsForcadas = null) {
     document.getElementById("form-titulo").textContent = lugar ? "Atualizar Local" : "Inserir Local";
     document.getElementById("form-nome").value = lugar ? lugar.nome : "";
     atualizarTextoCoords();
-    document.getElementById("form-bloco").value = lugar ? (lugar.bloco_pai || "") : "";
+
+    const selectBloco = document.getElementById("form-bloco");
+
+    if (!lugar && alaAtual !== "todos") {
+        // Inserindo direto num subsolo: trava o bloco pra bater com a ala aberta,
+        // evitando bloco_pai/andar inconsistentes.
+        selectBloco.value = alaAtual;
+        selectBloco.disabled = true;
+        const opcaoAtual = OPCOES_BLOCO.find(op => op.valor === alaAtual);
+        atualizarLabelBloco(true, opcaoAtual ? opcaoAtual.texto : alaAtual);
+    } else {
+        selectBloco.value = lugar ? (lugar.bloco_pai || "") : "";
+        selectBloco.disabled = false;
+        atualizarLabelBloco(false);
+    }
+
     document.getElementById("form-acessivel").checked = !!lugar && lugar.tipo === "fisica";
     document.getElementById("form-alerta").checked = !!lugar && lugar.tipo === "alerta";
 
@@ -115,6 +145,11 @@ function fecharFormulario() {
     indiceEmEdicao = null;
     coordsClicadas = null;
     limparMarcadorTemporario();
+
+    // Restaura o select pro estado padrão (destravado) pra próxima abertura
+    const selectBloco = document.getElementById("form-bloco");
+    selectBloco.disabled = false;
+    atualizarLabelBloco(false);
 }
 
 function atualizarTextoCoords() {
