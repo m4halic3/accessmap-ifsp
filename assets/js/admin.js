@@ -1,30 +1,3 @@
-/* ==========================================================================
-   ADMIN — Inserir / Atualizar / Excluir locais
-   --------------------------------------------------------------------------
-   Este arquivo DEPENDE de dados-lugares.js e mapa.js já terem sido
-   carregados antes dele na página, nessa ordem:
-   <script src="assets/js/dados-lugares.js">
-   <script src="assets/js/mapa.js">
-   <script src="assets/js/admin.js">
-
-   Ele reaproveita as variáveis e funções globais que mapa.js/dados-lugares.js
-   já definem: `lugares`, `mapa`, `alaAtual`, `filtroAtual`,
-   `primeiraInicializacao`, `aplicarFiltrosCombinados()`, `focarNoLugar()`.
-
-   admin.html é a MESMA tela de mapa.html (mesmo mapa, mesmos filtros,
-   mesma lista lateral). A diferença é só que aqui o modo admin está
-   sempre ativo (data-admin="sempre"), o que faz este arquivo:
-   - trocar a renderização da lista lateral para renderizarListaAdmin()
-     (com o lápis de editar ao lado de cada local);
-   - liberar o botão "Adicionar novo local";
-   - abrir o formulário de inserir/editar ao clicar no lápis;
-   - exigir confirmação antes de salvar ou excluir qualquer local.
-
-   Antes de qualquer inserção, atualização ou exclusão de local, o admin
-   passa por uma confirmação (abrirConfirmacao), como uma segunda etapa
-   explícita antes de alterar os dados.
-   ========================================================================== */
-
 const modoAdmin =
     document.body.dataset.admin === "sempre" ||
     new URLSearchParams(window.location.search).get("admin") === "1";
@@ -40,6 +13,7 @@ const OPCOES_BLOCO = [
 let indiceEmEdicao = null;
 let coordsClicadas = null;
 let elementoComFocoAntesDoModal = null;
+let marcadorTemporario = null;
 
 function iniciarAdmin() {
     if (!modoAdmin) return;
@@ -56,15 +30,23 @@ function iniciarAdmin() {
     aplicarFiltrosCombinados();
 
     mapa.on("click", (e) => {
-        coordsClicadas = {
+        const coords = {
             x: Math.round(e.latlng.lng),
             y: Math.round(e.latlng.lat)
         };
+
         const painelAberto = !document.getElementById("overlay-form").classList.contains("oculto");
-        if (painelAberto) {
-            document.getElementById("form-coords").textContent =
-                `X: ${coordsClicadas.x}px, Y: ${coordsClicadas.y}px (clique em "Auto" pra confirmar)`;
+
+        if (!painelAberto) {
+            // Nenhum formulário aberto: o clique já inicia a inserção nesse ponto
+            abrirFormulario(null, null, coords);
+            return;
         }
+
+        // Painel já aberto (inserindo ou editando): só reposiciona o ponto
+        coordsClicadas = coords;
+        atualizarTextoCoords();
+        mostrarMarcadorTemporario();
     });
 }
 
@@ -110,15 +92,13 @@ function renderizarListaAdmin() {
     });
 }
 
-function abrirFormulario(lugar = null, indice = null) {
+function abrirFormulario(lugar = null, indice = null, coordsForcadas = null) {
     indiceEmEdicao = indice;
-    coordsClicadas = lugar ? { x: lugar.x, y: lugar.y } : null;
+    coordsClicadas = lugar ? { x: lugar.x, y: lugar.y } : coordsForcadas;
 
     document.getElementById("form-titulo").textContent = lugar ? "Atualizar Local" : "Inserir Local";
     document.getElementById("form-nome").value = lugar ? lugar.nome : "";
-    document.getElementById("form-coords").textContent = lugar
-        ? `X: ${lugar.x}px, Y: ${lugar.y}px`
-        : "X: —, Y: —";
+    atualizarTextoCoords();
     document.getElementById("form-bloco").value = lugar ? (lugar.bloco_pai || "") : "";
     document.getElementById("form-acessivel").checked = !!lugar && lugar.tipo === "fisica";
     document.getElementById("form-alerta").checked = !!lugar && lugar.tipo === "alerta";
@@ -126,12 +106,41 @@ function abrirFormulario(lugar = null, indice = null) {
     document.getElementById("btn-excluir-local").classList.toggle("oculto", lugar === null);
     document.getElementById("overlay-form").classList.remove("oculto");
     document.getElementById("form-nome").focus();
+
+    mostrarMarcadorTemporario();
 }
 
 function fecharFormulario() {
     document.getElementById("overlay-form").classList.add("oculto");
     indiceEmEdicao = null;
     coordsClicadas = null;
+    limparMarcadorTemporario();
+}
+
+function atualizarTextoCoords() {
+    const el = document.getElementById("form-coords");
+    el.textContent = coordsClicadas
+        ? `X: ${coordsClicadas.x}px, Y: ${coordsClicadas.y}px`
+        : "Clique no mapa para marcar a posição";
+}
+
+function mostrarMarcadorTemporario() {
+    limparMarcadorTemporario();
+    if (!coordsClicadas) return;
+    marcadorTemporario = L.circleMarker([coordsClicadas.y, coordsClicadas.x], {
+        radius: 9,
+        color: "#ff5900",
+        weight: 3,
+        fillColor: "#fff",
+        fillOpacity: 0.9
+    }).addTo(mapa);
+}
+
+function limparMarcadorTemporario() {
+    if (marcadorTemporario) {
+        mapa.removeLayer(marcadorTemporario);
+        marcadorTemporario = null;
+    }
 }
 
 // ---------- Modal de confirmação genérico ----------
@@ -200,7 +209,7 @@ function salvarLocal() {
         return;
     }
     if (!coordsClicadas) {
-        alert('Clique em um ponto do mapa e depois em "Auto" pra definir a posição.');
+        alert('Clique em um ponto do mapa pra definir a posição.');
         return;
     }
 
@@ -266,17 +275,10 @@ function ligarEventosAdmin() {
     document.getElementById("btn-salvar-local").onclick = salvarLocal;
     document.getElementById("btn-excluir-local").onclick = excluirLocal;
 
-    document.getElementById("btn-auto-coords").onclick = () => {
-        if (!coordsClicadas) {
-            alert("Clique em um ponto do mapa primeiro.");
-            return;
+    document.getElementById("overlay-confirmacao").addEventListener("click", (e) => {
+        if (e.target.id === "overlay-confirmacao") {
+            document.getElementById("btn-confirmar-cancelar").click();
         }
-        document.getElementById("form-coords").textContent =
-            `X: ${coordsClicadas.x}px, Y: ${coordsClicadas.y}px`;
-    };
-
-    document.getElementById("overlay-form").addEventListener("click", (e) => {
-        if (e.target.id === "overlay-form") fecharFormulario();
     });
 }
 
