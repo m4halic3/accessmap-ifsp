@@ -1,3 +1,78 @@
+# AccessMap
+
+**Mapeamento colaborativo de acessibilidade em espaços públicos**
+
+> Projeto de Extensão — Tecnologia em Sistemas para Internet
+> IFSP Campus Itapetininga — 2026/2027
+
+---
+
+## Sumário
+
+- [Sobre o Projeto](#sobre-o-projeto)
+- [Motivação](#motivação)
+- [Impacto e Gestão Pública](#impacto-e-gestão-pública)
+- [Funcionalidades](#funcionalidades)
+- [Tecnologias Utilizadas](#tecnologias-utilizadas)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Arquitetura da Versão Atual (v1 — sem banco de dados)](#arquitetura-da-versão-atual-v1--sem-banco-de-dados)
+- [Modelo de Dados](#modelo-de-dados)
+  - [Visão Geral das Entidades](#visão-geral-das-entidades)
+  - [Diagrama Entidade-Relacionamento](#diagrama-entidade-relacionamento)
+  - [Dicionário de Dados](#dicionário-de-dados)
+  - [Migração para Banco de Dados Real](#migração-para-banco-de-dados-real)
+- [Fluxos do Sistema](#fluxos-do-sistema)
+- [Acesso Administrativo (Ambiente de Avaliação)](#acesso-administrativo-ambiente-de-avaliação)
+- [Como Executar Localmente](#como-executar-localmente)
+- [Acessibilidade](#acessibilidade)
+- [Roadmap](#roadmap)
+- [Autoria e Desenvolvimento](#autoria-e-desenvolvimento)
+- [Licença](#licença)
+
+---
+
+## Sobre o Projeto
+
+O **AccessMap** é um projeto de extensão que visa mapear e catalogar pontos de acessibilidade dentro do **campus do IFSP Itapetininga**, promovendo a inclusão em sua forma mais ampla. Esta primeira versão do sistema foi pensada, modelada e implementada especificamente para a realidade do campus, servindo como piloto para validar a proposta.
+
+Esta iniciativa surge da necessidade de oferecer suporte e orientação a alunos, servidores e visitantes. O campus recebe pessoas em contextos variados — do dia a dia letivo a eventos de grande porte que atraem públicos diversos — e ter um suporte de acessibilidade claro é essencial para garantir que todos tenham uma experiência inclusiva e autônoma no espaço.
+
+O objetivo central vai além de facilitar a locomoção física: o AccessMap também contempla o suporte a dificuldades auditivas e visuais, unindo mapeamento geográfico, categorização de barreiras e um canal aberto de comunicação com a comunidade.
+
+Embora o foco atual do projeto seja exclusivamente o campus do IFSP Itapetininga, pretende-se futuramente avaliar uma versão adaptável do AccessMap para outros espaços públicos, conforme detalhado no [Roadmap](#roadmap).
+
+## Motivação
+
+Espaços públicos — sejam eles instituições de ensino, órgãos públicos, parques ou centros culturais — frequentemente carecem de informação estruturada sobre suas condições de acessibilidade. Rampas mal sinalizadas, ausência de recursos para pessoas com deficiência auditiva, falta de rotas alternativas: tudo isso poderia ser mapeado e comunicado de forma simples, colaborativa e visual.
+
+O AccessMap nasce dessa lacuna, propondo uma ferramenta que:
+
+1. **Informa** — apresenta um mapa navegável com pontos de acessibilidade já identificados no campus;
+2. **Escuta** — permite que qualquer visitante relate barreiras ou sugira melhorias, sem necessidade de cadastro;
+3. **Organiza** — centraliza esses relatos em um painel administrativo, permitindo à gestão do campus priorizar ações.
+
+## Impacto e Gestão Pública
+
+Os dados coletados pelo AccessMap possuem um papel importante para a comunidade e para a gestão do campus:
+
+- **Mapeamento de Necessidades** — identificação real do que precisa ser melhorado, a partir da voz de quem utiliza o espaço no dia a dia.
+- **Propostas de Melhoria** — as informações coletadas podem ser estruturadas em relatórios para fundamentar pedidos de verba, emendas parlamentares ou projetos de captação de recursos.
+- **Transparência** — demonstração clara e baseada em dados de onde os investimentos em infraestrutura inclusiva devem ser priorizados.
+
+## Funcionalidades
+
+### Área Pública (sem necessidade de login)
+
+- Página inicial institucional com carrossel informativo, seção de estatísticas e apresentação do projeto.
+- Mapa interativo do campus, com possibilidade futura de marcadores por categoria de acessibilidade.
+- Formulário de colaboração, no qual qualquer visitante pode relatar um problema ou sugerir uma melhoria, informando:
+  - Local da ocorrência;
+  - Categoria de acessibilidade (física ou auditiva, com plano de expansão para outras categorias);
+  - Relato ou sugestão em texto livre.
+- Widget de acessibilidade nativo (aumento/diminuição de fonte e alto contraste) e integração com o **VLibras**, tradutor de Libras do Governo Federal.
+
+### Área Administrativa (restrita, mediante login)
+
 Levantada na Fase 1 do cronograma do projeto, a área administrativa deve atender aos seguintes requisitos:
 
 - O sistema deve exibir uma tela de dashboard com fácil visualização dos dados, contendo barra de rolagem e filtro de respostas para melhorar a usabilidade do administrador;
@@ -35,24 +110,25 @@ Nesta versão, os requisitos acima estão implementados da seguinte forma:
 
 ## Estrutura do Projeto
 
+```
 accessmap-ifsp/
 ├── assets/
-│ ├── css/
-│ │ └── style.css # CSS compilado a partir do SCSS
-│ ├── images/ # Logos, ícones, fotos da equipe, slides
-│ └── js/
-│ ├── script.js # Menu, carrossel, acessibilidade, formulário público
-│ ├── authentication.js # Autenticação do administrador
-│ ├── dashboard.js # Leitura/filtro/exclusão de respostas no painel
-│ └── mapa.js # Busca, navegação e clique para cadastro de pontos no mapa
-├── index.html # Página institucional / pública
-├── login.html # Login exclusivo do administrador
-├── dashboard.html # Painel administrativo (protegido)
-├── admin.html # Edição de pontos do mapa (protegido)
-├── mapa.html # Mapa interativo do campus
+│   ├── css/
+│   │   └── style.css          # CSS compilado a partir do SCSS
+│   ├── images/                # Logos, ícones, fotos da equipe, slides
+│   └── js/
+│       ├── script.js          # Menu, carrossel, acessibilidade, formulário público
+│       ├── authentication.js  # Autenticação do administrador
+│       ├── dashboard.js       # Leitura/filtro/exclusão de respostas no painel
+│       └── mapa.js            # Busca, navegação e clique para cadastro de pontos no mapa
+├── index.html                 # Página institucional / pública
+├── login.html                 # Login exclusivo do administrador
+├── dashboard.html              # Painel administrativo (protegido)
+├── admin.html                  # Edição de pontos do mapa (protegido)
+├── mapa.html                    # Mapa interativo do campus
 ├── README.md
 └── LICENSE
-
+```
 
 ## Arquitetura da Versão Atual (v1 — sem banco de dados)
 
@@ -249,9 +325,10 @@ Quando o projeto avançar para uma versão com back-end, a proposta é que a tra
 
 Para fins de avaliação acadêmica da disciplina, foi disponibilizada uma conta de teste com perfil de administrador, criada exclusivamente para esse propósito — **não é uma credencial pessoal nem reutilizada em outros sistemas**:
 
+```
 Usuário: admin.teste
-Senha: Avaliacao@2025
-
+Senha:   Avaliacao@2025
+```
 
 Essa conta permite o acesso completo às telas e funcionalidades da área administrativa (backend visual do sistema), incluindo o dashboard de colaborações recebidas pelo formulário público e a edição de pontos do mapa.
 
@@ -262,14 +339,14 @@ Essa conta permite o acesso completo às telas e funcionalidades da área admini
 Por não depender de back-end ou banco de dados, o projeto pode ser executado inteiramente no navegador:
 
 1. Clone o repositório:
-```bash
+   ```bash
    git clone https://github.com/m4halic3/accessmap-ifsp.git
    cd accessmap-ifsp
-```
+   ```
 2. Abra o arquivo `index.html` diretamente no navegador, ou sirva a pasta com um servidor local simples, por exemplo:
-```bash
+   ```bash
    npx serve .
-```
+   ```
 3. Para acessar a área administrativa, use a [conta de teste](#acesso-administrativo-ambiente-de-avaliação) na tela de login.
 
 ## Acessibilidade
@@ -295,8 +372,8 @@ O AccessMap foi desenvolvido com preocupação constante em ser acessível enqua
 
 Ambas as autoras são estudantes de Tecnologia em Sistemas para Internet no IFSP Campus Itapetininga:
 
-- **Mariana Alice** — Proprietária inicial do projeto, responsável pela arquitetura de software, codificação completa da v1 (HTML, SCSS, JavaScript) e co-autora da prototipagem.
-- **Yasmim Vitória** — Autora da etapa de prototipagem e design inicial do projeto.
+- **Mariana Alice**
+- **Yasmim Vitória**
 
 ## Licença
 
