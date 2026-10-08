@@ -1,0 +1,209 @@
+@use 'sass:color';
+@use 'variables' as *;
+
+// -----------------------------------------------------------------------
+// Atualizar imagem do mapa (admin) — botão da sidebar + modal de envio.
+// Os seletores usam duas classes de propósito: este parcial é compilado
+// ANTES das regras de _admin-form.scss, então precisamos de especificidade
+// maior para sobrescrever .btn-novo-local e .form-local-card.
+// -----------------------------------------------------------------------
+$planta-radius: 22px;
+$planta-aviso-texto: color.adjust($color-orange, $lightness: -14%);
+$planta-erro: #A32D2D;
+
+.btn-novo-local.btn-novo-local--secundario {
+    background-color: $color-white;
+    color: $color-purple;
+    border: 2px solid $color-purple;
+    margin-top: -6px; // aproxima do botão "Adicionar novo local"
+
+    &:hover {
+        background-color: rgba($color-purple, 0.08);
+    }
+}
+
+.planta-status {
+    margin: -6px 0 16px;
+    font-family: $font-secondary;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: $color-green;
+
+    &:empty {
+        display: none;
+    }
+}
+
+.form-local-card.planta-card {
+    width: 100%;
+    max-width: 480px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    border-radius: $planta-radius;
+    box-shadow: 0 20px 60px rgba($color-dark, 0.25);
+
+    [hidden] {
+        display: none !important;
+    }
+
+    .form-local-header i.fa-image {
+        font-size: 1rem;
+    }
+
+    .dica-coords {
+        line-height: 1.4;
+    }
+
+    input[type="file"].planta-arquivo {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1.5px dashed $color-grey;
+        border-radius: 12px;
+        background: $color-bg-light;
+        font-family: $font-secondary;
+        font-size: 0.85rem;
+        color: $color-dark;
+        cursor: pointer;
+
+        &:focus-visible {
+            outline: 3px solid $color-purple;
+            outline-offset: 2px;
+        }
+
+        &::file-selector-button {
+            margin-right: 12px;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            background: $color-purple;
+            color: $color-white;
+            font-family: $font-primary;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+    }
+
+    select:focus-visible,
+    input[type="text"]:focus-visible {
+        outline: 3px solid $color-purple;
+        outline-offset: 2px;
+    }
+
+    .btn-salvar:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.planta-preview {
+    margin-top: 14px;
+    padding: 10px;
+    border: 1.5px solid $color-grey;
+    border-radius: 12px;
+    background: $color-bg-light;
+
+    img {
+        display: block;
+        width: 100%;
+        max-height: 150px;
+        object-fit: contain;
+        border-radius: 8px;
+        background: $color-white;
+    }
+}
+
+.planta-info {
+    margin: 8px 2px 0;
+    font-family: $font-secondary;
+    font-size: 0.75rem;
+    color: color.adjust($color-dark, $lightness: 25%);
+    word-break: break-word;
+}
+
+// Bloco "Mapa anterior guardado" (miniatura + botão de voltar)
+.planta-anterior {
+    margin-top: 14px;
+    padding: 10px;
+    border: 1.5px solid $color-grey;
+    border-radius: 12px;
+    background: $color-bg-light;
+
+    .planta-anterior-titulo {
+        margin: 0 2px 8px;
+        font-family: $font-primary;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: $color-dark;
+    }
+
+    img {
+        display: block;
+        width: 100%;
+        max-height: 110px;
+        object-fit: contain;
+        border-radius: 8px;
+        background: $color-white;
+    }
+}
+
+.form-local-card.planta-card .btn-voltar-planta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 16px;
+    border: 2px solid $color-purple;
+    border-radius: 8px;
+    background: $color-white;
+    color: $color-purple;
+    font-family: $font-primary;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba($color-purple, 0.08);
+    }
+
+    &:focus-visible {
+        outline: 3px solid $color-purple;
+        outline-offset: 2px;
+    }
+}
+
+.planta-aviso,
+.planta-erro {
+    margin: 14px 0 0;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-family: $font-secondary;
+    font-size: 0.8rem;
+    line-height: 1.45;
+}
+
+.planta-aviso {
+    background: rgba($color-orange, 0.12);
+    color: $planta-aviso-texto;
+    border-left: 4px solid $color-orange;
+}
+
+.planta-erro {
+    background: rgba($planta-erro, 0.1);
+    color: $planta-erro;
+    border-left: 4px solid $planta-erro;
+}
+
+@media (max-width: 480px) {
+    .planta-actions {
+        flex-direction: column-reverse;
+
+        button {
+            width: 100%;
+        }
+    }
+}

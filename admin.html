@@ -64,6 +64,11 @@
                 <i class="fas fa-plus" aria-hidden="true"></i> Adicionar novo local
             </button>
 
+            <button type="button" id="btn-atualizar-planta" class="btn-novo-local btn-novo-local--secundario" aria-haspopup="dialog">
+                <i class="fas fa-image" aria-hidden="true"></i> Atualizar imagem do mapa
+            </button>
+            <p id="planta-status" class="planta-status" role="status" aria-live="polite"></p>
+
             <div id="lista-lugares-admin" role="region" aria-label="Lista de locais cadastrados"></div>
         </div>
 
@@ -105,6 +110,56 @@
             </div>
         </div>
 
+        <!-- Modal "Atualizar imagem do mapa" (enviar nova planta do campus) -->
+        <div id="overlay-planta" class="overlay-form oculto" aria-hidden="true">
+            <div class="form-local-card planta-card" role="dialog" aria-modal="true" aria-labelledby="planta-titulo">
+                <div class="form-local-header">
+                    <i class="fas fa-image" aria-hidden="true"></i>
+                    <span id="planta-titulo">Atualizar imagem do mapa</span>
+                    <button type="button" id="btn-fechar-planta" class="btn-fechar-form" aria-label="Fechar janela de atualização do mapa">&times;</button>
+                </div>
+                <div class="form-local-body">
+                    <label for="planta-alvo">Qual mapa será atualizado?</label>
+                    <select id="planta-alvo">
+                        <option value="todos">Mapa Geral (campus)</option>
+                        <option value="edificacoes">Subsolo Edificações (Bloco C)</option>
+                        <option value="mecanica">Subsolo Mecânica (Bloco B)</option>
+                    </select>
+                    <p id="planta-origem" class="dica-coords"></p>
+
+                    <div id="planta-anterior-area" class="planta-anterior" hidden>
+                        <p class="planta-anterior-titulo">Mapa anterior guardado</p>
+                        <img id="planta-anterior-img" alt="Pré-visualização do mapa anterior">
+                        <p id="planta-anterior-info" class="planta-info"></p>
+                        <button type="button" id="btn-voltar-planta" class="btn-voltar-planta">
+                            <i class="fas fa-rotate-left" aria-hidden="true"></i> Voltar ao mapa anterior
+                        </button>
+                    </div>
+
+                    <label for="planta-arquivo">Nova imagem do mapa</label>
+                    <input type="file" id="planta-arquivo" class="planta-arquivo" accept="image/png,image/jpeg,image/webp" aria-describedby="planta-dica">
+                    <p id="planta-dica" class="dica-coords">PNG, JPG ou WEBP, até 10 MB. Use a mesma proporção e o mesmo enquadramento do mapa atual, para que os pontos já cadastrados continuem no lugar certo.</p>
+
+                    <div id="planta-preview-area" class="planta-preview" hidden>
+                        <img id="planta-preview" alt="Pré-visualização da nova imagem do mapa">
+                        <p id="planta-info" class="planta-info"></p>
+                    </div>
+
+                    <p id="planta-aviso" class="planta-aviso" role="alert" hidden></p>
+                    <p id="planta-erro" class="planta-erro" role="alert" hidden></p>
+
+                    <label for="planta-alt">Descrição da imagem (texto alternativo)</label>
+                    <input type="text" id="planta-alt" maxlength="250" placeholder="Ex: Mapa do campus com o novo Bloco E">
+                    <p class="dica-coords">Opcional, mas recomendado: descreve o mapa para quem usa leitor de tela.</p>
+
+                    <div class="form-local-actions planta-actions">
+                        <button type="button" id="btn-restaurar-planta" class="btn-excluir" hidden>Restaurar original</button>
+                        <button type="button" id="btn-publicar-planta" class="btn-salvar" disabled>Publicar novo mapa</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Modal de confirmação (adicionar / atualizar / excluir) -->
         <div id="overlay-confirmacao" class="overlay-form oculto" aria-hidden="true">
             <div class="confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirm-titulo" aria-describedby="confirm-texto">
@@ -135,7 +190,9 @@
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="assets/js/plantas-storage.js"></script>
 <script src="assets/js/mapa.js"></script>
 <script src="assets/js/admin.js"></script>
+<script src="assets/js/admin-planta.js"></script>
 </body>
 </html>

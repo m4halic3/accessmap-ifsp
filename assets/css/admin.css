@@ -1,3 +1,180 @@
+.btn-novo-local.btn-novo-local--secundario {
+  background-color: #fff;
+  color: #44025c;
+  border: 2px solid #44025c;
+  margin-top: -6px;
+}
+.btn-novo-local.btn-novo-local--secundario:hover {
+  background-color: rgba(68, 2, 92, 0.08);
+}
+
+.planta-status {
+  margin: -6px 0 16px;
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #007844;
+}
+.planta-status:empty {
+  display: none;
+}
+
+.form-local-card.planta-card {
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  border-radius: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+.form-local-card.planta-card [hidden] {
+  display: none !important;
+}
+.form-local-card.planta-card .form-local-header i.fa-image {
+  font-size: 1rem;
+}
+.form-local-card.planta-card .dica-coords {
+  line-height: 1.4;
+}
+.form-local-card.planta-card input[type=file].planta-arquivo {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1.5px dashed #cbcbcb;
+  border-radius: 12px;
+  background: #F4F4F4;
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.85rem;
+  color: #000000;
+  cursor: pointer;
+}
+.form-local-card.planta-card input[type=file].planta-arquivo:focus-visible {
+  outline: 3px solid #44025c;
+  outline-offset: 2px;
+}
+.form-local-card.planta-card input[type=file].planta-arquivo::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #44025c;
+  color: #fff;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.form-local-card.planta-card select:focus-visible,
+.form-local-card.planta-card input[type=text]:focus-visible {
+  outline: 3px solid #44025c;
+  outline-offset: 2px;
+}
+.form-local-card.planta-card .btn-salvar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.planta-preview {
+  margin-top: 14px;
+  padding: 10px;
+  border: 1.5px solid #cbcbcb;
+  border-radius: 12px;
+  background: #F4F4F4;
+}
+.planta-preview img {
+  display: block;
+  width: 100%;
+  max-height: 150px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.planta-info {
+  margin: 8px 2px 0;
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.75rem;
+  color: rgb(25%, 25%, 25%);
+  word-break: break-word;
+}
+
+.planta-anterior {
+  margin-top: 14px;
+  padding: 10px;
+  border: 1.5px solid #cbcbcb;
+  border-radius: 12px;
+  background: #f4f4f4;
+}
+.planta-anterior .planta-anterior-titulo {
+  margin: 0 2px 8px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #000;
+}
+.planta-anterior img {
+  display: block;
+  width: 100%;
+  max-height: 110px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.form-local-card.planta-card .btn-voltar-planta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 16px;
+  border: 2px solid #44025c;
+  border-radius: 8px;
+  background: #fff;
+  color: #44025c;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.form-local-card.planta-card .btn-voltar-planta:hover {
+  background: rgba(68, 2, 92, 0.08);
+}
+.form-local-card.planta-card .btn-voltar-planta:focus-visible {
+  outline: 3px solid #44025c;
+  outline-offset: 2px;
+}
+
+.planta-aviso,
+.planta-erro {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.planta-aviso {
+  background: rgba(201, 81, 6, 0.12);
+  color: rgb(51.6351236147%, 20.8081841432%, 1.5413469736%);
+  border-left: 4px solid #c95106;
+}
+
+.planta-erro {
+  background: rgba(163, 45, 45, 0.1);
+  color: #A32D2D;
+  border-left: 4px solid #A32D2D;
+}
+
+@media (max-width: 480px) {
+  .planta-actions {
+    flex-direction: column-reverse;
+  }
+  .planta-actions button {
+    width: 100%;
+  }
+}
 .navbar .logo {
   text-decoration: none;
 }
