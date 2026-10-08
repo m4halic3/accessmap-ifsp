@@ -17,14 +17,20 @@ const ADMIN_TESTE = {
 // Chave usada para guardar a sessão no navegador
 const CHAVE_SESSAO = 'accessmap_admin_logado';
 
+// Páginas que exigem login (com e sem ".html", pois servidores como o
+// `npx serve` removem a extensão da URL)
+const PAGINAS_PROTEGIDAS = ['dashboard', 'admin'];
+
+// Roda já no carregamento do script (no <head>), antes de a página
+// protegida ser exibida
+protegerPaginaAdmin();
+
 document.addEventListener('DOMContentLoaded', () => {
     const formLogin = document.getElementById('form-login');
 
     if (formLogin) {
         formLogin.addEventListener('submit', tratarLogin);
     }
-
-    protegerPaginaAdmin();
 });
 
 /**
@@ -68,18 +74,18 @@ function exibirErro(elemento, mensagem) {
 }
 
 /**
- * Protege a página do dashboard: se o usuário tentar acessar
- * dashboard.html sem estar logado, ele é redirecionado de volta
- * para o login.
+ * Protege as páginas administrativas (dashboard.html e admin.html):
+ * se o usuário tentar acessá-las sem estar logado, ele é redirecionado
+ * de volta para o login.
  */
 function protegerPaginaAdmin() {
-    const paginaAtual = window.location.pathname.split('/').pop();
+    const paginaAtual = window.location.pathname.split('/').pop().replace(/\.html$/, '');
 
-    if (paginaAtual === 'dashboard.html') {
+    if (PAGINAS_PROTEGIDAS.includes(paginaAtual)) {
         const estaLogado = sessionStorage.getItem(CHAVE_SESSAO) === 'true';
 
         if (!estaLogado) {
-            window.location.href = 'login.html';
+            window.location.replace('login.html');
         }
     }
 }

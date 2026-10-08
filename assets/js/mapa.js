@@ -251,6 +251,13 @@ function getIcon(categoria, tipo, nomeLugar) {
     });
 }
 
+// Escapa texto antes de inserir via innerHTML (nomes podem ser digitados pelo admin)
+function escaparHtml(texto) {
+    const div = document.createElement("div");
+    div.textContent = texto;
+    return div.innerHTML;
+}
+
 function normalizarTexto(txt) {
     return txt
         .normalize("NFD")
@@ -301,6 +308,9 @@ function atualizarPlantaDeFundo() {
     let textAltPlanta = "Mapa do Campus Geral com distribuição dos blocos e caminhos.";
     if (alaAtual === "edificacoes") textAltPlanta = "Planta baixa detalhada do Subsolo do Bloco C (Edificações).";
     if (alaAtual === "mecanica") textAltPlanta = "Planta baixa detalhada do Subsolo do Bloco B (Mecânica).";
+
+    // Se o admin enviou uma imagem nova com descrição, usa a descrição dele
+    if (dadosPlanta.alt) textAltPlanta = dadosPlanta.alt;
 
     camadaImagem = L.imageOverlay(dadosPlanta.url, limites, {
         alt: textAltPlanta
@@ -434,7 +444,7 @@ function adicionarMarcador(lugar) {
 
     marcador.bindPopup(`
         <div style="text-align:center;">
-            <strong style="font-size:14px; color:#5a2a83;">${lugar.nome}</strong><br>
+            <strong style="font-size:14px; color:#5a2a83;">${escaparHtml(lugar.nome)}</strong><br>
             <span style="color:#333333; font-size:12px;">${textoPopup}</span>
         </div>
     `);
@@ -541,7 +551,7 @@ else if (lugar.tipo === "alerta") corBorda = "#be5900";
         }
 
         item.innerHTML = `
-            <p style="margin: 0 0 5px 0;"><strong>${lugar.nome}</strong></p>
+            <p style="margin: 0 0 5px 0;"><strong>${escaparHtml(lugar.nome)}</strong></p>
             <span style="font-size: 12px; color: #666;">${labelAcessibilidade}</span>
         `;
 
@@ -690,4 +700,16 @@ function resetarMapaCompleto() {
     atualizarListaLateral(blocosPrincipais, "");
 }
 
-window.onload = initMap;
+// Promise resolvida quando o mapa já foi criado. Antes de criar o mapa,
+// aplica as imagens de planta enviadas pelo admin (IndexedDB), se houver,
+// para não exibir a planta antiga e depois trocar. Os scripts do admin
+// (admin.js / admin-planta.js) esperam por ela antes de usar `mapa`.
+const mapaPronto = new Promise((resolve) => {
+    window.addEventListener("load", async () => {
+        if (window.PlantasStorage) {
+            await PlantasStorage.aplicarEm(plantas); // nunca lança erro
+        }
+        initMap();
+        resolve();
+    });
+});

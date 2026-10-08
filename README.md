@@ -343,11 +343,22 @@ Por não depender de back-end ou banco de dados, o projeto pode ser executado in
    git clone https://github.com/m4halic3/accessmap-ifsp.git
    cd accessmap-ifsp
    ```
-2. Abra o arquivo `index.html` diretamente no navegador, ou sirva a pasta com um servidor local simples, por exemplo:
+2. Sirva a pasta com um servidor local simples (recomendado, pois alguns navegadores restringem `localStorage`/IndexedDB em arquivos abertos via `file://`), por exemplo:
    ```bash
-   npx serve .
+   python3 -m http.server 8000
+   # ou: npx serve .
    ```
+   e acesse `http://localhost:8000`.
 3. Para acessar a área administrativa, use a [conta de teste](#acesso-administrativo-ambiente-de-avaliação) na tela de login.
+
+### Testando a atualização da imagem do mapa
+
+1. Faça login e clique em **Ir para Edição do Mapa** (`admin.html`).
+2. Clique em **Atualizar imagem do mapa**, escolha qual planta será trocada (Mapa Geral ou um dos subsolos) e selecione uma imagem PNG, JPG ou WEBP (até 10 MB, mínimo 300×300 px). Para os pontos continuarem no lugar, use a mesma proporção da planta atual.
+3. Clique em **Publicar novo mapa** e confirme. A nova imagem aparece na hora no admin e também em `mapa.html` (no mesmo navegador).
+4. Para desfazer, abra o mesmo modal e use **Voltar ao mapa anterior** ou **Restaurar original**.
+
+> As imagens enviadas ficam guardadas no IndexedDB do navegador (`accessmap` → `plantas`), seguindo a mesma limitação da v1: valem apenas para o navegador/dispositivo onde foram enviadas.
 
 ## Acessibilidade
 

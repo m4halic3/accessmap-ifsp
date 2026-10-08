@@ -99,7 +99,7 @@ function renderizarListaAdmin() {
 
         const info = document.createElement("div");
         info.className = "item-lugar-admin-info";
-        info.innerHTML = `<p>${lugar.nome}</p><span>Ponto de Interesse</span>`;
+        info.innerHTML = `<p>${escaparHtml(lugar.nome)}</p><span>Ponto de Interesse</span>`;
         info.onclick = () => focarNoLugar(lugar);
 
         const btnEditar = document.createElement("button");
@@ -351,7 +351,7 @@ function ligarEventosAdmin() {
     }
 }
 
-window.addEventListener("load", iniciarAdmin);
+mapaPronto.then(iniciarAdmin);
 
 /* =========================================================
    ACESSIBILIDADE: FONTE E CONTRASTE
