@@ -94,7 +94,7 @@ Nesta versão, os requisitos acima estão implementados da seguinte forma:
   - Ordenação (mais recentes, mais antigos, ordem alfabética por local);
   - Exclusão de respostas já tratadas.
 - Edição de pontos do mapa (`admin.html`), incluindo a inserção de novos pontos por clique direto sobre o mapa, com captura automática de latitude e longitude.
-- **Lista de pontos do admin**: mostra todos os pontos cadastrados, agrupados por mapa (Mapa Geral, Subsolo Edificações, Subsolo Mecânica), com campo próprio para filtrar por nome e contador "Mostrando X de Y".
+- **Lista de pontos do admin**: mostra todos os pontos cadastrados, agrupados por mapa (Mapa Geral, Subsolo Edificações, Subsolo Mecânica), filtrada em tempo real pela busca do topo da barra lateral, com contador "Mostrando X de Y".
 - **Reposicionar pontos de interesse** (`admin.html` → botão de alvo ao lado do lápis, na lista de locais): quando a imagem do mapa muda e as coordenadas deixam de bater, o administrador escolhe o ponto na lista e clica no mapa onde ele fica na nova imagem. O sistema vai para o mapa em que o ponto está, mostra a posição antiga (círculo tracejado), pede confirmação e salva. Alterações de pontos (reposicionar, editar, adicionar, excluir) agora ficam salvas no navegador e aparecem no mapa público.
 - **Atualização da imagem do mapa** (`admin.html` → botão "Atualizar imagem do mapa"):
   - Permite escolher qual mapa será atualizado: Mapa Geral, Subsolo Edificações (Bloco C) ou Subsolo Mecânica (Bloco B);

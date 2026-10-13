@@ -93,10 +93,8 @@ function popularSelectBlocos() {
 // sentido encontrar (e poder editar/reposicionar) qualquer local do
 // sistema, mesmo um que pertença a uma planta diferente da aberta agora.
 //
-// Como são muitos pontos, há um campo próprio para filtrar a lista
-// (#busca-lista-admin) e um contador "Mostrando X de Y". A busca do topo
-// da barra lateral continua filtrando a lista também; quando os dois
-// campos têm texto, o ponto precisa combinar com os dois.
+// Como são muitos pontos, a busca do topo da barra lateral (#search-input)
+// filtra a lista em tempo real, e um contador mostra "Mostrando X de Y".
 // -----------------------------------------------------------------------
 const GRUPOS_LISTA_ADMIN = [
     { ala: "todos", titulo: "Mapa Geral" },
@@ -112,21 +110,13 @@ const ROTULOS_TIPO_LISTA_ADMIN = {
     geral: "Ponto de interesse"
 };
 
-function termoNormalizado(idCampo) {
-    const campo = document.getElementById(idCampo);
-    return campo ? normalizarTexto(campo.value) : "";
-}
-
 function obterLugaresParaListaAdmin() {
-    const termos = [termoNormalizado("busca-lista-admin"), termoNormalizado("search-input")]
-        .filter(Boolean);
+    const campo = document.getElementById("search-input");
+    const termo = campo ? normalizarTexto(campo.value) : "";
 
-    if (termos.length === 0) return [...lugares];
+    if (!termo) return [...lugares];
 
-    return lugares.filter((l) => {
-        const nome = normalizarTexto(l.nome);
-        return termos.every((t) => nome.includes(t));
-    });
+    return lugares.filter((l) => normalizarTexto(l.nome).includes(termo));
 }
 
 function criarItemListaAdmin(lugar) {
@@ -590,12 +580,6 @@ function ligarEventosAdmin() {
     const searchInput = document.getElementById("search-input");
     if (searchInput) {
         searchInput.addEventListener("input", renderizarListaAdmin);
-    }
-
-    // Campo próprio para filtrar só a lista de pontos (não mexe no mapa)
-    const buscaLista = document.getElementById("busca-lista-admin");
-    if (buscaLista) {
-        buscaLista.addEventListener("input", renderizarListaAdmin);
     }
 }
 

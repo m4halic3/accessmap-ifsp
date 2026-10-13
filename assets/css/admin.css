@@ -757,37 +757,6 @@
   }
 }
 
-.busca-lista-admin {
-  position: relative;
-  margin-bottom: 8px;
-}
-.busca-lista-admin i {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #000;
-  opacity: 0.6;
-  pointer-events: none;
-  font-size: 0.8rem;
-}
-.busca-lista-admin input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 10px 14px 10px 36px;
-  border: 2px solid #cbcbcb;
-  border-radius: 10px;
-  background: #F4F4F4;
-  font-family: "Open Sans", sans-serif;
-  font-size: 0.85rem;
-  color: #000;
-}
-.busca-lista-admin input:focus {
-  outline: none;
-  border-color: #44025c;
-  background: #fff;
-}
-
 .contador-lista-admin {
   margin: 0 0 8px 2px;
   font-family: "Open Sans", sans-serif;

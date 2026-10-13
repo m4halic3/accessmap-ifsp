@@ -561,41 +561,7 @@ $card-radius: 22px;
     }
 }
 
-// Filtro e contador da lista de pontos
-.busca-lista-admin {
-    position: relative;
-    margin-bottom: 8px;
-
-    i {
-        position: absolute;
-        left: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: $color-dark;
-        opacity: 0.6;
-        pointer-events: none;
-        font-size: 0.8rem;
-    }
-
-    input {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 10px 14px 10px 36px;
-        border: 2px solid $color-grey;
-        border-radius: 10px;
-        background: $color-bg-light;
-        font-family: $font-secondary;
-        font-size: 0.85rem;
-        color: $color-dark;
-
-        &:focus {
-            outline: none;
-            border-color: $color-purple;
-            background: $color-white;
-        }
-    }
-}
-
+// Contador da lista de pontos
 .contador-lista-admin {
     margin: 0 0 8px 2px;
     font-family: $font-secondary;
