@@ -80,6 +80,7 @@ Levantada na Fase 1 do cronograma do projeto, a área administrativa deve atende
 - O sistema deve permitir que o administrador edite os locais já cadastrados no campus, considerando eventuais alterações físicas do espaço;
 - O sistema deve permitir que o administrador remova locais já pontuados no mapa;
 - O sistema deve permitir que o administrador adicione novos locais na planta atual do campus apenas por meio de um clique no ponto desejado dentro do mapa;
+- O sistema deve permitir que o administrador envie uma nova imagem do mapa (planta) quando o campus for alterado, por exemplo, com a construção de um novo prédio;
 - O sistema deve garantir uma experiência intuitiva para o administrador ao longo de todo o fluxo administrativo;
 - O sistema deve permitir que o administrador organize e exclua as respostas recebidas pelo formulário principal de feedback, de modo a manter esse fluxo de respostas mais claro e gerenciável.
 
@@ -93,6 +94,16 @@ Nesta versão, os requisitos acima estão implementados da seguinte forma:
   - Ordenação (mais recentes, mais antigos, ordem alfabética por local);
   - Exclusão de respostas já tratadas.
 - Edição de pontos do mapa (`admin.html`), incluindo a inserção de novos pontos por clique direto sobre o mapa, com captura automática de latitude e longitude.
+- **Lista de pontos do admin**: mostra todos os pontos cadastrados, agrupados por mapa (Mapa Geral, Subsolo Edificações, Subsolo Mecânica), com campo próprio para filtrar por nome e contador "Mostrando X de Y".
+- **Reposicionar pontos de interesse** (`admin.html` → botão de alvo ao lado do lápis, na lista de locais): quando a imagem do mapa muda e as coordenadas deixam de bater, o administrador escolhe o ponto na lista e clica no mapa onde ele fica na nova imagem. O sistema vai para o mapa em que o ponto está, mostra a posição antiga (círculo tracejado), pede confirmação e salva. Alterações de pontos (reposicionar, editar, adicionar, excluir) agora ficam salvas no navegador e aparecem no mapa público.
+- **Atualização da imagem do mapa** (`admin.html` → botão "Atualizar imagem do mapa"):
+  - Permite escolher qual mapa será atualizado: Mapa Geral, Subsolo Edificações (Bloco C) ou Subsolo Mecânica (Bloco B);
+  - Aceita imagens PNG, JPG ou WEBP de até 10 MB (mínimo de 300×300 px), com pré-visualização antes de publicar;
+  - Avisa quando a proporção da nova imagem é diferente da atual (os pontos já cadastrados podem sair do lugar);
+  - Campo opcional de texto alternativo, para que o mapa novo seja descrito a quem usa leitor de tela;
+  - Confirmação antes de publicar e botão para **restaurar a imagem original** do projeto;
+  - **Voltar ao mapa anterior**: ao publicar uma nova imagem, a versão que estava em uso é guardada. Se o administrador enviou a imagem errada, basta abrir o modal, conferir a miniatura do mapa anterior e clicar em "Voltar ao mapa anterior" (com confirmação). A imagem **e os pontos de interesse** voltam como estavam antes da atualização. Guarda-se apenas a versão imediatamente anterior;
+  - A nova imagem passa a ser exibida no mapa público (`mapa.html`) logo na próxima abertura.
 
 ## Tecnologias Utilizadas
 
@@ -101,7 +112,7 @@ Nesta versão, os requisitos acima estão implementados da seguinte forma:
 | Estrutura | **HTML5** | Marcação semântica e acessível |
 | Estilo | **SASS (SCSS)** | Estilização avançada, arquitetura modular e design responsivo |
 | Interatividade | **JavaScript (Vanilla)** | Carrossel, menus, autenticação, formulário, dashboard, interação com o mapa |
-| Persistência (atual) | **Web Storage API** (`localStorage` / `sessionStorage`) | Simulação de banco de dados no navegador enquanto não há back-end |
+| Persistência (atual) | **Web Storage API** (`localStorage` / `sessionStorage`) e **IndexedDB** | Simulação de banco de dados no navegador enquanto não há back-end (o IndexedDB guarda as imagens de mapa enviadas pelo admin) |
 | Ícones | **Font Awesome 6** | Iconografia da interface |
 | Acessibilidade | **VLibras** (Governo Federal) | Tradução de conteúdo para Libras |
 | Mapas | **Leaflet** | Visualização geográfica interativa do campus |
@@ -120,7 +131,10 @@ accessmap-ifsp/
 │       ├── script.js          # Menu, carrossel, acessibilidade, formulário público
 │       ├── authentication.js  # Autenticação do administrador
 │       ├── dashboard.js       # Leitura/filtro/exclusão de respostas no painel
-│       └── mapa.js            # Busca, navegação e clique para cadastro de pontos no mapa
+│       ├── mapa.js            # Busca, navegação e clique para cadastro de pontos no mapa
+│       ├── admin.js           # Edição de pontos do mapa (modo administrador)
+│       ├── admin-planta.js    # Modal de envio de nova imagem do mapa (validação, pré-visualização, restaurar)
+│       └── plantas-storage.js # Camada de armazenamento (IndexedDB) das imagens de mapa enviadas
 ├── index.html                 # Página institucional / pública
 ├── login.html                 # Login exclusivo do administrador
 ├── dashboard.html              # Painel administrativo (protegido)
@@ -138,6 +152,9 @@ Como o projeto ainda não possui um back-end, toda a "persistência de dados" da
 |---|---|---|
 | `sessionStorage` | Guarda o estado de sessão do administrador logado (`accessmap_admin_logado`) | Expira ao fechar o navegador |
 | `localStorage` | Guarda as colaborações enviadas pelo formulário público (`accessmap_respostas`) e a preferência de alto contraste (`altoContrasteState`) | Persiste entre sessões, no mesmo navegador/dispositivo |
+| `IndexedDB` | Banco `accessmap`: store `plantas` guarda a imagem (Blob) de cada mapa enviado pelo admin (nome, dimensões, texto alternativo, data e a versão anterior com seus pontos); store `pontos` guarda a lista de pontos de interesse de cada mapa, já com as coordenadas ajustadas | Persiste entre sessões, no mesmo navegador/dispositivo |
+
+> As plantas ficam no IndexedDB (e não no `localStorage`) porque são imagens grandes — a planta original do campus tem ~2,5 MB e o `localStorage` tem limite de ~5 MB para todos os dados juntos.
 
 Essa abordagem tem uma limitação intencional e conhecida: os dados ficam restritos ao navegador/dispositivo em que foram inseridos, não sendo compartilhados entre diferentes usuários ou máquinas. Isso é aceitável para fins de demonstração e avaliação acadêmica da v1, mas será substituído por um back-end real (API + banco de dados) nas próximas versões — ver [Migração para Banco de Dados Real](#migração-para-banco-de-dados-real).
 
@@ -301,8 +318,9 @@ Quando o projeto avançar para uma versão com back-end, a proposta é que a tra
 1. Substituir as funções `lerRespostasForm()` / `salvarNovaResposta()` (em `script.js`) e `lerRespostas()` / `salvarRespostas()` (em `dashboard.js`) por chamadas `fetch` a uma API REST (`GET/POST/DELETE /colaboracoes`).
 2. Substituir a autenticação fixa em `authentication.js` por uma rota de login real (`POST /auth/login`), retornando um token de sessão (JWT ou similar) em vez de uma flag no `sessionStorage`.
 3. Substituir a lógica de clique no mapa, hoje gravada diretamente em `localStorage`, por uma chamada `POST /pontos`, persistindo latitude, longitude e categoria no banco de dados real.
-4. Popular a tabela `categoria_acessibilidade` com as categorias já usadas na v1 (física, auditiva) e abrir espaço para novas categorias (visual, cognitiva, etc.).
-5. Migrar os registros já existentes no `localStorage` (se necessário, via rotina de importação) para as novas tabelas `ponto_acessibilidade` e `colaboracao`.
+4. Substituir `PlantasStorage.publicar/voltarAnterior/restaurarOriginal/obter` (e `salvarPontos/obterPontos` para os pontos, via `GET/PUT /pontos/:ala`) (em `plantas-storage.js`) por chamadas a uma API de upload (`PUT/GET/DELETE /plantas/:ala`), guardando a imagem em disco ou em um serviço de armazenamento de arquivos e apenas o caminho/URL no banco.
+5. Popular a tabela `categoria_acessibilidade` com as categorias já usadas na v1 (física, auditiva) e abrir espaço para novas categorias (visual, cognitiva, etc.).
+6. Migrar os registros já existentes no `localStorage` (se necessário, via rotina de importação) para as novas tabelas `ponto_acessibilidade` e `colaboracao`.
 
 ## Fluxos do Sistema
 
@@ -319,7 +337,8 @@ Quando o projeto avançar para uma versão com back-end, a proposta é que a tra
 2. Após autenticação, é redirecionado para `dashboard.html`.
 3. O painel carrega automaticamente todas as colaborações já registradas, permitindo filtrar, ordenar e excluir relatos.
 4. A partir do dashboard, o administrador acessa `admin.html` para editar o mapa, podendo clicar em um ponto do mapa para cadastrar um novo local, editar um local existente ou removê-lo, retornando ao dashboard ao final.
-5. Tentativas de acessar `dashboard.html` ou `admin.html` diretamente, sem login prévio, são redirecionadas de volta para `login.html`.
+5. Quando o campus mudar (ex.: novo prédio), o administrador clica em **Atualizar imagem do mapa** em `admin.html`, escolhe qual mapa atualizar, seleciona o arquivo, confere a pré-visualização e confirma. A nova imagem substitui a anterior no mapa público; os pontos já cadastrados são mantidos, e o novo local pode ser adicionado clicando sobre o mapa atualizado.
+6. Tentativas de acessar `dashboard.html` ou `admin.html` diretamente, sem login prévio, são redirecionadas de volta para `login.html`.
 
 ## Acesso Administrativo (Ambiente de Avaliação)
 
@@ -343,7 +362,7 @@ Por não depender de back-end ou banco de dados, o projeto pode ser executado in
    git clone https://github.com/m4halic3/accessmap-ifsp.git
    cd accessmap-ifsp
    ```
-2. Abra o arquivo `index.html` diretamente no navegador, ou sirva a pasta com um servidor local simples, por exemplo:
+2. Sirva a pasta com um servidor local simples (recomendado — o envio de imagens do mapa usa o IndexedDB, que se comporta melhor em `http://localhost` do que abrindo os arquivos direto pelo `file://`), por exemplo:
    ```bash
    npx serve .
    ```

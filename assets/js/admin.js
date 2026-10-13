@@ -15,6 +15,12 @@ let coordsClicadas = null;
 let elementoComFocoAntesDoModal = null;
 let marcadorTemporario = null;
 
+// Modo "Reposicionar": o admin escolhe um ponto na lista e clica no mapa
+// para dizer onde ele fica agora (útil quando a imagem do mapa muda).
+// null = desligado; senão { lugar, ala, original: {x, y} }
+let modoReposicionar = null;
+let marcadorPosicaoAntiga = null;
+
 function iniciarAdmin() {
     if (!modoAdmin) return;
 
@@ -29,7 +35,25 @@ function iniciarAdmin() {
     primeiraInicializacao = false;
     aplicarFiltrosCombinados();
 
+    // Trocar de mapa (aba) no meio do reposicionamento cancela o modo,
+    // porque o ponto escolhido pertence ao mapa que estava aberto.
+    const filtrarAlaOriginal = filtrarAla;
+    window.filtrarAla = function () {
+        cancelarReposicionar();
+        return filtrarAlaOriginal.apply(this, arguments);
+    };
+    const resetarMapaOriginal = resetarMapaCompleto;
+    window.resetarMapaCompleto = function () {
+        cancelarReposicionar();
+        return resetarMapaOriginal.apply(this, arguments);
+    };
+
     mapa.on("click", (e) => {
+        if (modoReposicionar) {
+            aoClicarMapaReposicionando(e);
+            return;
+        }
+
         const coords = {
             x: Math.round(e.latlng.lng),
             y: Math.round(e.latlng.lat)
@@ -63,25 +87,90 @@ function popularSelectBlocos() {
 }
 
 // -----------------------------------------------------------------------
-// Lista lateral do admin: por padrão (sem busca) mostra só os pontos
-// essenciais — os mesmos "principais" que o mapa público usa como estado
-// inicial (subponto: false: blocos, estacionamentos, quadra, etc.) — pra
-// não poluir a barra lateral com centenas de salas internas de uma vez.
+// Lista lateral do admin: mostra TODOS os pontos de interesse cadastrados,
+// agrupados pelo mapa a que pertencem (Mapa Geral, Subsolo Edificações,
+// Subsolo Mecânica), sem restrição de ala/andar/subponto — no admin faz
+// sentido encontrar (e poder editar/reposicionar) qualquer local do
+// sistema, mesmo um que pertença a uma planta diferente da aberta agora.
 //
-// Quando há um termo de busca, a lista passa a procurar em TODO o array
-// `lugares`, sem nenhuma restrição de ala/andar/subponto — no admin faz
-// sentido encontrar (e poder editar) qualquer local do sistema, mesmo um
-// que pertença a uma planta diferente da que está aberta no momento.
+// Como são muitos pontos, há um campo próprio para filtrar a lista
+// (#busca-lista-admin) e um contador "Mostrando X de Y". A busca do topo
+// da barra lateral continua filtrando a lista também; quando os dois
+// campos têm texto, o ponto precisa combinar com os dois.
 // -----------------------------------------------------------------------
+const GRUPOS_LISTA_ADMIN = [
+    { ala: "todos", titulo: "Mapa Geral" },
+    { ala: "edificacoes", titulo: "Subsolo Edificações" },
+    { ala: "mecanica", titulo: "Subsolo Mecânica" },
+    { ala: null, titulo: "Outros" }
+];
+
+const ROTULOS_TIPO_LISTA_ADMIN = {
+    fisica: "Acessibilidade física",
+    auditiva: "Acessibilidade auditiva",
+    alerta: "Alerta",
+    geral: "Ponto de interesse"
+};
+
+function termoNormalizado(idCampo) {
+    const campo = document.getElementById(idCampo);
+    return campo ? normalizarTexto(campo.value) : "";
+}
+
 function obterLugaresParaListaAdmin() {
-    const searchInput = document.getElementById("search-input");
-    const termo = searchInput ? normalizarTexto(searchInput.value) : "";
+    const termos = [termoNormalizado("busca-lista-admin"), termoNormalizado("search-input")]
+        .filter(Boolean);
 
-    if (termo) {
-        return lugares.filter(l => normalizarTexto(l.nome).includes(termo));
-    }
+    if (termos.length === 0) return [...lugares];
 
-    return lugares.filter(l => l.subponto === false);
+    return lugares.filter((l) => {
+        const nome = normalizarTexto(l.nome);
+        return termos.every((t) => nome.includes(t));
+    });
+}
+
+function criarItemListaAdmin(lugar) {
+    const indice = lugares.indexOf(lugar);
+
+    const item = document.createElement("div");
+    item.className = "item-lugar-admin";
+
+    const info = document.createElement("div");
+    info.className = "item-lugar-admin-info";
+    const nome = document.createElement("p");
+    nome.textContent = lugar.nome;
+    nome.title = lugar.nome;
+    const tipo = document.createElement("span");
+    tipo.textContent = ROTULOS_TIPO_LISTA_ADMIN[lugar.tipo] || "Ponto de interesse";
+    info.appendChild(nome);
+    info.appendChild(tipo);
+    info.onclick = () => focarNoLugar(lugar);
+
+    const btnReposicionar = document.createElement("button");
+    btnReposicionar.type = "button";
+    btnReposicionar.className = "btn-editar-local btn-reposicionar-local";
+    btnReposicionar.setAttribute("aria-label", `Reposicionar ${lugar.nome} no mapa`);
+    btnReposicionar.title = "Reposicionar no mapa";
+    btnReposicionar.innerHTML = '<i class="fas fa-crosshairs" aria-hidden="true"></i>';
+    btnReposicionar.onclick = (ev) => {
+        ev.stopPropagation();
+        iniciarReposicionar(lugar);
+    };
+
+    const btnEditar = document.createElement("button");
+    btnEditar.type = "button";
+    btnEditar.className = "btn-editar-local";
+    btnEditar.setAttribute("aria-label", `Editar ${lugar.nome}`);
+    btnEditar.innerHTML = '<i class="fas fa-pencil-alt" aria-hidden="true"></i>';
+    btnEditar.onclick = (ev) => {
+        ev.stopPropagation();
+        abrirFormulario(lugar, indice);
+    };
+
+    item.appendChild(info);
+    item.appendChild(btnReposicionar);
+    item.appendChild(btnEditar);
+    return item;
 }
 
 function renderizarListaAdmin() {
@@ -91,30 +180,36 @@ function renderizarListaAdmin() {
 
     const listaParaExibir = obterLugaresParaListaAdmin();
 
-    listaParaExibir.forEach((lugar) => {
-        const indice = lugares.indexOf(lugar);
+    const contador = document.getElementById("contador-lista-admin");
+    if (contador) {
+        contador.textContent = listaParaExibir.length === lugares.length
+            ? `${lugares.length} pontos de interesse`
+            : `Mostrando ${listaParaExibir.length} de ${lugares.length} pontos`;
+    }
 
-        const item = document.createElement("div");
-        item.className = "item-lugar-admin";
+    if (listaParaExibir.length === 0) {
+        const vazio = document.createElement("p");
+        vazio.className = "lista-admin-vazia";
+        vazio.textContent = "Nenhum ponto encontrado. Tente outro nome.";
+        container.appendChild(vazio);
+        return;
+    }
 
-        const info = document.createElement("div");
-        info.className = "item-lugar-admin-info";
-        info.innerHTML = `<p>${lugar.nome}</p><span>Ponto de Interesse</span>`;
-        info.onclick = () => focarNoLugar(lugar);
+    GRUPOS_LISTA_ADMIN.forEach((grupo) => {
+        const doGrupo = listaParaExibir.filter((l) => {
+            const ala = PlantasStorage.alaDoLugar(l);
+            return grupo.ala === null
+                ? !GRUPOS_LISTA_ADMIN.some((g) => g.ala !== null && g.ala === ala)
+                : ala === grupo.ala;
+        });
+        if (doGrupo.length === 0) return;
 
-        const btnEditar = document.createElement("button");
-        btnEditar.type = "button";
-        btnEditar.className = "btn-editar-local";
-        btnEditar.setAttribute("aria-label", `Editar ${lugar.nome}`);
-        btnEditar.innerHTML = '<i class="fas fa-pencil-alt" aria-hidden="true"></i>';
-        btnEditar.onclick = (ev) => {
-            ev.stopPropagation();
-            abrirFormulario(lugar, indice);
-        };
+        const titulo = document.createElement("h3");
+        titulo.className = "grupo-lista-admin";
+        titulo.textContent = `${grupo.titulo} (${doGrupo.length})`;
+        container.appendChild(titulo);
 
-        item.appendChild(info);
-        item.appendChild(btnEditar);
-        container.appendChild(item);
+        doGrupo.forEach((lugar) => container.appendChild(criarItemListaAdmin(lugar)));
     });
 }
 
@@ -134,6 +229,7 @@ function atualizarLabelBloco(travado, nomeBlocoTravado) {
 }
 
 function abrirFormulario(lugar = null, indice = null, coordsForcadas = null) {
+    cancelarReposicionar();
     indiceEmEdicao = indice;
     coordsClicadas = lugar ? { x: lugar.x, y: lugar.y } : coordsForcadas;
 
@@ -289,11 +385,16 @@ function confirmarSalvarLocal() {
     const alerta = document.getElementById("form-alerta").checked;
     const tipo = alerta ? "alerta" : (acessivel ? "fisica" : "geral");
 
+    // Ao editar, o ponto mantém o andar em que já estava (mesmo que a busca
+    // o tenha trazido de outro mapa); só pontos novos usam o mapa aberto.
+    const lugarOriginal = indiceEmEdicao !== null ? lugares[indiceEmEdicao] : null;
+    const alaAntes = lugarOriginal ? PlantasStorage.alaDoLugar(lugarOriginal) : null;
+
     const dados = {
         nome,
         tipo,
         categoria: blocoPai || "geral",
-        andar: alaAtual === "todos" ? "terreo" : "subsolo",
+        andar: lugarOriginal ? lugarOriginal.andar : (alaAtual === "todos" ? "terreo" : "subsolo"),
         y: coordsClicadas.y,
         x: coordsClicadas.x,
         subponto: !!blocoPai
@@ -306,9 +407,14 @@ function confirmarSalvarLocal() {
         lugares.push(dados);
     }
 
+    const alaDepois = PlantasStorage.alaDoLugar(
+        indiceEmEdicao !== null ? lugares[indiceEmEdicao] : dados
+    );
+
     fecharFormulario();
     renderizarListaAdmin();
     aplicarFiltrosCombinados();
+    persistirPontos([alaAntes, alaDepois]);
 }
 
 // ---------- Excluir (com confirmação antes) ----------
@@ -324,13 +430,149 @@ function excluirLocal() {
 }
 
 function confirmarExcluirLocal() {
+    const alaDoExcluido = PlantasStorage.alaDoLugar(lugares[indiceEmEdicao]);
     lugares.splice(indiceEmEdicao, 1);
     fecharFormulario();
     renderizarListaAdmin();
     aplicarFiltrosCombinados();
+    persistirPontos([alaDoExcluido]);
+}
+
+// ---------- Persistência dos pontos (IndexedDB) ----------
+// Mensagem fora dos modais (a região aria-live fica na barra lateral)
+function avisarAdmin(texto) {
+    const el = document.getElementById("planta-status");
+    if (el) el.textContent = texto;
+}
+
+// Salva a lista de pontos de cada mapa citado, para o mapa público enxergar
+// as mudanças e para o "Voltar ao mapa anterior" poder restaurá-las.
+async function persistirPontos(alas) {
+    const unicas = [...new Set(alas.filter(Boolean))];
+    try {
+        for (const ala of unicas) {
+            await PlantasStorage.salvarPontos(ala, lugares);
+        }
+    } catch (erro) {
+        console.error("AccessMap: falha ao salvar os pontos de interesse.", erro);
+        avisarAdmin("A alteração aparece na tela, mas não foi possível salvá-la neste navegador. Ela se perde ao recarregar a página.");
+        return false;
+    }
+    return true;
+}
+
+// ---------- Reposicionar um ponto clicando no mapa ----------
+function mostrarBannerReposicionar(texto) {
+    const banner = document.getElementById("banner-reposicionar");
+    document.getElementById("banner-reposicionar-texto").textContent = texto;
+    banner.hidden = false;
+}
+
+function iniciarReposicionar(lugar) {
+    cancelarReposicionar();
+    if (!document.getElementById("overlay-form").classList.contains("oculto")) {
+        fecharFormulario();
+    }
+
+    // Vai para o mapa em que esse ponto está (o clique só faz sentido nele)
+    const ala = PlantasStorage.alaDoLugar(lugar) || alaAtual;
+    if (ala !== alaAtual) {
+        const botaoAla = document.querySelector(`#seletor-alas .btn-type[onclick*="'${ala}'"]`);
+        if (botaoAla) filtrarAla(ala, botaoAla);
+    }
+
+    modoReposicionar = { lugar, ala, original: { x: lugar.x, y: lugar.y } };
+
+    marcadorPosicaoAntiga = L.circleMarker([lugar.y, lugar.x], {
+        radius: 11,
+        color: "#555555",
+        weight: 2,
+        dashArray: "4 4",
+        fillColor: "#999999",
+        fillOpacity: 0.25,
+        interactive: false
+    }).addTo(mapa);
+    marcadorPosicaoAntiga.bindTooltip("Posição antiga", { permanent: true, direction: "top", offset: [0, -8] });
+
+    mapa.panTo([lugar.y, lugar.x]);
+    document.getElementById("map").classList.add("modo-reposicionar");
+    mostrarBannerReposicionar(
+        `Reposicionando "${lugar.nome}": clique no mapa onde este local fica na imagem atual. ` +
+        "O círculo tracejado mostra a posição antiga."
+    );
+    document.addEventListener("keydown", aoPressionarTeclaReposicionar);
+}
+
+function encerrarModoReposicionar() {
+    modoReposicionar = null;
+    coordsClicadas = null;
+    limparMarcadorTemporario();
+    if (marcadorPosicaoAntiga) {
+        mapa.removeLayer(marcadorPosicaoAntiga);
+        marcadorPosicaoAntiga = null;
+    }
+    document.getElementById("map").classList.remove("modo-reposicionar");
+    document.getElementById("banner-reposicionar").hidden = true;
+    document.removeEventListener("keydown", aoPressionarTeclaReposicionar);
+}
+
+function cancelarReposicionar() {
+    if (modoReposicionar) encerrarModoReposicionar();
+}
+
+function aoPressionarTeclaReposicionar(e) {
+    if (e.key !== "Escape") return;
+    // Se a confirmação está aberta, o Escape fecha só ela
+    const confirmacaoAberta = !document.getElementById("overlay-confirmacao").classList.contains("oculto");
+    if (!confirmacaoAberta) cancelarReposicionar();
+}
+
+function aoClicarMapaReposicionando(e) {
+    const planta = plantas[alaAtual];
+    const coords = {
+        x: Math.round(e.latlng.lng),
+        y: Math.round(e.latlng.lat)
+    };
+
+    if (coords.x < 0 || coords.y < 0 || coords.x > planta.largura || coords.y > planta.altura) {
+        mostrarBannerReposicionar(
+            `Esse clique ficou fora da imagem do mapa. Clique dentro da imagem para posicionar "${modoReposicionar.lugar.nome}".`
+        );
+        return;
+    }
+
+    coordsClicadas = coords;
+    mostrarMarcadorTemporario();
+
+    const { lugar, original } = modoReposicionar;
+    abrirConfirmacao(
+        "Reposicionar local",
+        `Mover "${lugar.nome}" para a posição clicada (X: ${coords.x}px, Y: ${coords.y}px)? ` +
+        `A posição antiga (X: ${original.x}px, Y: ${original.y}px) será substituída.`,
+        () => confirmarReposicionar(coords)
+    );
+}
+
+async function confirmarReposicionar(coords) {
+    if (!modoReposicionar) return;
+    const { lugar, ala } = modoReposicionar;
+
+    lugar.x = coords.x;
+    lugar.y = coords.y;
+
+    encerrarModoReposicionar();
+    renderizarListaAdmin();
+    aplicarFiltrosCombinados();
+    focarNoLugar(lugar);
+
+    const salvou = await persistirPontos([ala]);
+    if (salvou) {
+        avisarAdmin(`"${lugar.nome}" foi movido para X: ${coords.x}px, Y: ${coords.y}px.`);
+    }
 }
 
 function ligarEventosAdmin() {
+    document.getElementById("btn-cancelar-reposicionar").onclick = cancelarReposicionar;
     document.getElementById("btn-novo-local").onclick = () => abrirFormulario();
     document.getElementById("btn-fechar-form").onclick = fecharFormulario;
     document.getElementById("btn-salvar-local").onclick = salvarLocal;
@@ -349,9 +591,16 @@ function ligarEventosAdmin() {
     if (searchInput) {
         searchInput.addEventListener("input", renderizarListaAdmin);
     }
+
+    // Campo próprio para filtrar só a lista de pontos (não mexe no mapa)
+    const buscaLista = document.getElementById("busca-lista-admin");
+    if (buscaLista) {
+        buscaLista.addEventListener("input", renderizarListaAdmin);
+    }
 }
 
-window.addEventListener("load", iniciarAdmin);
+// O mapa agora é criado de forma assíncrona (mapa.js); espera ele ficar pronto.
+mapaPronto.then(iniciarAdmin);
 
 /* =========================================================
    ACESSIBILIDADE: FONTE E CONTRASTE

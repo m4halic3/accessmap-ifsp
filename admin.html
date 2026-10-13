@@ -69,10 +69,24 @@
             </button>
             <p id="planta-status" class="planta-status" role="status" aria-live="polite"></p>
 
+            <div class="busca-lista-admin">
+                <label for="busca-lista-admin" class="sr-only">Filtrar a lista de pontos de interesse</label>
+                <i class="fas fa-filter" aria-hidden="true"></i>
+                <input type="search" id="busca-lista-admin" placeholder="Filtrar a lista de pontos..." autocomplete="off">
+            </div>
+            <p id="contador-lista-admin" class="contador-lista-admin" role="status" aria-live="polite"></p>
+
             <div id="lista-lugares-admin" role="region" aria-label="Lista de locais cadastrados"></div>
         </div>
 
         <div id="map" aria-label="Mapa interativo do campus (modo admin)"></div>
+
+        <!-- Aviso do modo "Reposicionar" (clicar no mapa para mover um ponto) -->
+        <div id="banner-reposicionar" class="banner-reposicionar" role="status" aria-live="polite" hidden>
+            <i class="fas fa-crosshairs" aria-hidden="true"></i>
+            <p id="banner-reposicionar-texto"></p>
+            <button type="button" id="btn-cancelar-reposicionar" class="btn-banner-cancelar">Cancelar</button>
+        </div>
 
         <!-- Painel "Inserir / Atualizar Local" -->
         <div id="overlay-form" class="overlay-form oculto">

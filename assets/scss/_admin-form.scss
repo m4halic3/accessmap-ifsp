@@ -1,5 +1,6 @@
 @use 'sass:color';
 @use 'variables' as *;
+@use 'admin-planta';
 
 $card-radius: 22px;
 
@@ -73,7 +74,8 @@ $card-radius: 22px;
     gap: 10px;
     overflow-y: auto;
     padding-right: 4px;
-    max-height: 280px;
+    max-height: 50vh; // a lista mostra todos os pontos, então precisa de mais altura
+    min-height: 200px;
 
     &::-webkit-scrollbar {
         width: 6px;
@@ -556,5 +558,79 @@ $card-radius: 22px;
     .atributos-row {
         flex-direction: column;
         gap: 10px;
+    }
+}
+
+// Filtro e contador da lista de pontos
+.busca-lista-admin {
+    position: relative;
+    margin-bottom: 8px;
+
+    i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: $color-dark;
+        opacity: 0.6;
+        pointer-events: none;
+        font-size: 0.8rem;
+    }
+
+    input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px 14px 10px 36px;
+        border: 2px solid $color-grey;
+        border-radius: 10px;
+        background: $color-bg-light;
+        font-family: $font-secondary;
+        font-size: 0.85rem;
+        color: $color-dark;
+
+        &:focus {
+            outline: none;
+            border-color: $color-purple;
+            background: $color-white;
+        }
+    }
+}
+
+.contador-lista-admin {
+    margin: 0 0 8px 2px;
+    font-family: $font-secondary;
+    font-size: 0.75rem;
+    color: color.adjust($color-dark, $lightness: 40%);
+}
+
+.grupo-lista-admin {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin: 4px 0 0;
+    padding: 6px 2px;
+    background: $color-white;
+    font-family: $font-primary;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: $color-purple;
+}
+
+.lista-admin-vazia {
+    margin: 8px 2px;
+    font-family: $font-secondary;
+    font-size: 0.85rem;
+    color: color.adjust($color-dark, $lightness: 40%);
+}
+
+// A lista agora mostra todos os pontos: se o conteúdo da barra lateral passar
+// da altura da tela, ela rola em vez de cortar o que ficou para baixo.
+.container-mapa .sidebar {
+    overflow-y: auto;
+
+    #lista-lugares-admin {
+        flex-shrink: 0;
     }
 }

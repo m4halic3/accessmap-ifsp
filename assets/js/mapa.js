@@ -184,6 +184,12 @@ const lugares = [
     { nome: "Vagas Exclusivas PCD - Estacionamento", tipo: "fisica", categoria: "vaga_pcd", andar: "terreo", y: 470, x: 700, subponto: false },
 ];
 
+// Resolve quando o mapa (Leaflet) já foi criado e a planta inicial carregada.
+// O admin.js espera por isso antes de ligar os eventos, porque agora o mapa
+// só é criado depois de ler do navegador as imagens enviadas pelo admin.
+let resolverMapaPronto;
+const mapaPronto = new Promise((resolve) => { resolverMapaPronto = resolve; });
+
 let mapa;
 let marcadores = [];
 let camadaImagem = null;
@@ -302,8 +308,9 @@ function atualizarPlantaDeFundo() {
     if (alaAtual === "edificacoes") textAltPlanta = "Planta baixa detalhada do Subsolo do Bloco C (Edificações).";
     if (alaAtual === "mecanica") textAltPlanta = "Planta baixa detalhada do Subsolo do Bloco B (Mecânica).";
 
+    // Se o admin enviou uma imagem nova e descreveu ela, usa a descrição dele
     camadaImagem = L.imageOverlay(dadosPlanta.url, limites, {
-        alt: textAltPlanta
+        alt: dadosPlanta.alt || textAltPlanta
     }).addTo(mapa);
 
     mapa.fitBounds(limites);
@@ -690,4 +697,16 @@ function resetarMapaCompleto() {
     atualizarListaLateral(blocosPrincipais, "");
 }
 
-window.onload = initMap;
+// Antes de criar o mapa, troca as plantas originais pelas que o admin enviou
+// (e os pontos pelos que ele reposicionou), se houver. Se der qualquer problema, o mapa abre normalmente com as originais.
+async function iniciarMapa() {
+    if (window.PlantasStorage) {
+        await window.PlantasStorage.aplicarEm(plantas);
+        // Pontos de interesse com as coordenadas ajustadas pelo admin (se houver)
+        await window.PlantasStorage.aplicarPontosEm(lugares, plantas);
+    }
+    initMap();
+    resolverMapaPronto();
+}
+
+window.onload = iniciarMapa;

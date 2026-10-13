@@ -207,3 +207,82 @@ $planta-erro: #A32D2D;
         }
     }
 }
+
+// Aviso do modo "Reposicionar" (clique no mapa para mover um ponto)
+.banner-reposicionar {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 900; // acima do Leaflet (controles ~1000 ficam nos cantos), abaixo dos modais (1000)
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: max-content;
+    max-width: calc(100% - 48px);
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: $color-dark;
+    color: $color-white;
+    box-shadow: 0 10px 30px rgba($color-dark, 0.35);
+    font-family: $font-secondary;
+    font-size: 0.85rem;
+    line-height: 1.4;
+
+    &[hidden] {
+        display: none;
+    }
+
+    i {
+        flex-shrink: 0;
+        color: color.adjust($color-orange, $lightness: 20%);
+    }
+
+    p {
+        margin: 0;
+    }
+
+    .btn-banner-cancelar {
+        flex-shrink: 0;
+        padding: 8px 14px;
+        border: 2px solid $color-white;
+        border-radius: 8px;
+        background: transparent;
+        color: $color-white;
+        font-family: $font-primary;
+        font-weight: 700;
+        font-size: 0.75rem;
+        cursor: pointer;
+
+        &:hover {
+            background: rgba($color-white, 0.15);
+        }
+
+        &:focus-visible {
+            outline: 3px solid $color-white;
+            outline-offset: 2px;
+        }
+    }
+}
+
+#map.modo-reposicionar,
+#map.modo-reposicionar.leaflet-grab {
+    cursor: crosshair !important;
+}
+
+// Botão "Reposicionar" ao lado do lápis de editar, na lista de pontos
+.btn-editar-local.btn-reposicionar-local {
+    margin-left: auto;
+
+    + .btn-editar-local {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .banner-reposicionar {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: left;
+    }
+}

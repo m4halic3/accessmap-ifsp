@@ -240,7 +240,8 @@
   gap: 10px;
   overflow-y: auto;
   padding-right: 4px;
-  max-height: 280px;
+  max-height: 50vh;
+  min-height: 200px;
 }
 #lista-lugares-admin::-webkit-scrollbar {
   width: 6px;
@@ -685,3 +686,140 @@
 }
 
 /*# sourceMappingURL=admin.css.map */
+
+.banner-reposicionar {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  max-width: calc(100% - 48px);
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #000;
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.banner-reposicionar[hidden] {
+  display: none;
+}
+.banner-reposicionar i {
+  flex-shrink: 0;
+  color: #f5864a;
+}
+.banner-reposicionar p {
+  margin: 0;
+}
+.banner-reposicionar .btn-banner-cancelar {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border: 2px solid #fff;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.banner-reposicionar .btn-banner-cancelar:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+.banner-reposicionar .btn-banner-cancelar:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+#map.modo-reposicionar,
+#map.modo-reposicionar.leaflet-grab {
+  cursor: crosshair !important;
+}
+
+.btn-editar-local.btn-reposicionar-local {
+  margin-left: auto;
+}
+.btn-editar-local.btn-reposicionar-local + .btn-editar-local {
+  margin-left: 0;
+}
+
+@media (max-width: 480px) {
+  .banner-reposicionar {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+}
+
+.busca-lista-admin {
+  position: relative;
+  margin-bottom: 8px;
+}
+.busca-lista-admin i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #000;
+  opacity: 0.6;
+  pointer-events: none;
+  font-size: 0.8rem;
+}
+.busca-lista-admin input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px 10px 36px;
+  border: 2px solid #cbcbcb;
+  border-radius: 10px;
+  background: #F4F4F4;
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.85rem;
+  color: #000;
+}
+.busca-lista-admin input:focus {
+  outline: none;
+  border-color: #44025c;
+  background: #fff;
+}
+
+.contador-lista-admin {
+  margin: 0 0 8px 2px;
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.grupo-lista-admin {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 4px 0 0;
+  padding: 6px 2px;
+  background: #fff;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #44025c;
+}
+
+.lista-admin-vazia {
+  margin: 8px 2px;
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.container-mapa .sidebar {
+  overflow-y: auto;
+}
+.container-mapa .sidebar #lista-lugares-admin {
+  flex-shrink: 0;
+}

@@ -85,6 +85,7 @@
     // Abrir / fechar
     // ---------------------------------------------------------------
     function abrirModal() {
+        if (typeof cancelarReposicionar === "function") cancelarReposicionar();
         focoAnterior = document.activeElement;
 
         el.alvo.value = (typeof alaAtual !== "undefined" && NOMES_PLANTAS[alaAtual]) ? alaAtual : "todos";
@@ -149,6 +150,12 @@
         el.anteriorArea.hidden = true;
     }
 
+    function textoPontos(anterior) {
+        return Array.isArray(anterior.pontos)
+            ? " Os pontos de interesse também voltam como estavam."
+            : "";
+    }
+
     // Mostra (ou esconde) o bloco "Mapa anterior guardado" com miniatura
     async function atualizarMapaAnterior(ala, minhaSequencia) {
         limparPreviewAnterior();
@@ -168,12 +175,12 @@
         const anterior = registro.anterior;
         if (anterior.original) {
             el.anteriorImg.src = planta.urlOriginal;
-            el.anteriorInfo.textContent = "Imagem original do projeto.";
+            el.anteriorInfo.textContent = "Imagem original do projeto." + textoPontos(anterior);
         } else if (anterior.blob) {
             urlPreviewAnterior = URL.createObjectURL(anterior.blob);
             el.anteriorImg.src = urlPreviewAnterior;
             const data = new Date(anterior.atualizadoEm).toLocaleString("pt-BR");
-            el.anteriorInfo.textContent = `${anterior.nome} — enviada em ${data}.`;
+            el.anteriorInfo.textContent = `${anterior.nome} — enviada em ${data}.` + textoPontos(anterior);
         } else {
             return;
         }
@@ -323,7 +330,8 @@
             "Publicar novo mapa",
             `Tem certeza que deseja substituir a imagem de "${NOMES_PLANTAS[ala]}" por "${arquivo.name}"? ` +
             "A nova imagem passa a aparecer no mapa público deste navegador. " +
-            "Se for preciso, você poderá voltar ao mapa anterior depois.",
+            "Os pontos de interesse continuam nas mesmas coordenadas (use o botão de reposicionar na lista para ajustá-los na nova imagem). " +
+            "Se for preciso, você poderá voltar ao mapa anterior, com os pontos como estavam.",
             confirmarPublicar
         );
     }
@@ -333,6 +341,8 @@
         const alt = el.alt.value.trim();
 
         try {
+            // Guarda, junto com a imagem anterior, os pontos de interesse desse mapa
+            const pontosAtuais = PlantasStorage.pontosDaAla(lugares, ala);
             await PlantasStorage.publicar({
                 ala,
                 blob: arquivo,
@@ -343,7 +353,7 @@
                 altura: infoArquivo.altura,
                 alt,
                 atualizadoEm: Date.now()
-            });
+            }, pontosAtuais);
             await PlantasStorage.aplicarAla(plantas, ala);
         } catch (erro) {
             console.error("AccessMap: falha ao salvar a imagem do mapa.", erro);
@@ -361,7 +371,7 @@
         fecharModal();
         mostrarStatus(
             estaNaTela
-                ? `Mapa atualizado: "${nomeMapa}" já está com a nova imagem.`
+                ? `Mapa atualizado: "${nomeMapa}" já está com a nova imagem. Se precisar, ajuste os pontos de interesse com o botão de reposicionar na lista.`
                 : `Mapa atualizado: "${nomeMapa}" foi salvo. Abra essa aba do mapa para ver a nova imagem.`
         );
     }
@@ -370,7 +380,7 @@
         const ala = el.alvo.value;
         abrirConfirmacao(
             "Restaurar mapa original",
-            `Tem certeza que deseja voltar "${NOMES_PLANTAS[ala]}" para a imagem original do projeto? A imagem enviada e o histórico dela serão removidos.`,
+            `Tem certeza que deseja voltar "${NOMES_PLANTAS[ala]}" para a imagem original do projeto? A imagem enviada, o histórico dela e os ajustes feitos nos pontos de interesse desse mapa serão removidos.`,
             confirmarRestaurar
         );
     }
@@ -379,25 +389,26 @@
         const ala = el.alvo.value;
 
         try {
-            await PlantasStorage.remover(ala);
+            await PlantasStorage.restaurarOriginal(ala);
             await PlantasStorage.aplicarAla(plantas, ala);
+            await PlantasStorage.aplicarPontosAla(lugares, ala);
         } catch (erro) {
             console.error("AccessMap: falha ao restaurar a imagem original.", erro);
             mostrarErro("Não foi possível restaurar a imagem original. Tente novamente.");
             return;
         }
 
-        if (ala === alaAtual) atualizarPlantaDeFundo();
+        recarregarTelaDoAdmin(ala);
 
         fecharModal();
-        mostrarStatus(`"${NOMES_PLANTAS[ala]}" voltou para a imagem original.`);
+        mostrarStatus(`"${NOMES_PLANTAS[ala]}" voltou para a imagem original, com os pontos de interesse originais.`);
     }
 
     function pedirConfirmacaoVoltar() {
         const ala = el.alvo.value;
         abrirConfirmacao(
             "Voltar ao mapa anterior",
-            `Tem certeza que deseja voltar "${NOMES_PLANTAS[ala]}" para o mapa anterior? A imagem que está em uso agora será descartada.`,
+            `Tem certeza que deseja voltar "${NOMES_PLANTAS[ala]}" para o mapa anterior? A imagem que está em uso agora será descartada e os pontos de interesse deste mapa voltam como estavam antes da última atualização (ajustes feitos depois dela serão perdidos).`,
             confirmarVoltar
         );
     }
@@ -408,16 +419,24 @@
         try {
             await PlantasStorage.voltarAnterior(ala);
             await PlantasStorage.aplicarAla(plantas, ala);
+            await PlantasStorage.aplicarPontosAla(lugares, ala);
         } catch (erro) {
             console.error("AccessMap: falha ao voltar ao mapa anterior.", erro);
             mostrarErro("Não foi possível voltar ao mapa anterior. Tente novamente.");
             return;
         }
 
-        if (ala === alaAtual) atualizarPlantaDeFundo();
+        recarregarTelaDoAdmin(ala);
 
         fecharModal();
-        mostrarStatus(`"${NOMES_PLANTAS[ala]}" voltou para o mapa anterior.`);
+        mostrarStatus(`"${NOMES_PLANTAS[ala]}" voltou para o mapa anterior, com os pontos de interesse como estavam.`);
+    }
+
+    // Depois de trocar imagem/pontos de um mapa: redesenha o que está na tela
+    function recarregarTelaDoAdmin(ala) {
+        if (ala === alaAtual) atualizarPlantaDeFundo();
+        renderizarListaAdmin();
+        aplicarFiltrosCombinados();
     }
 
     // Mensagem fora do modal (leitores de tela anunciam por causa do aria-live)
