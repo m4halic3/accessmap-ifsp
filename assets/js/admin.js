@@ -119,9 +119,9 @@ function renderizarListaAdmin() {
 
         const info = document.createElement("button");
         info.type = "button";
-        info.className = "item-lugar-admin-info";
+        info.className = "item-lugar-admin-info com-selo";
         info.setAttribute("aria-label", `Ver ${lugar.nome} no mapa`);
-        info.innerHTML = `<p>${escaparHtml(lugar.nome)}</p><span>${descricaoDoTipo(lugar)}</span>`;
+        info.innerHTML = `${seloDoLugar(lugar)}<span class="item-lugar-texto"><p>${escaparHtml(lugar.nome)}</p><span>${descricaoDoTipo(lugar)}</span></span>`;
         info.addEventListener("click", () => irParaLugar(lugar));
 
         const btnEditar = document.createElement("button");

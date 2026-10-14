@@ -1,19 +1,39 @@
+// largura/altura = área de coordenadas da planta (os pontos de `lugares`
+// usam essas coordenadas — não altere, senão os pontos saem do lugar).
+// url = imagem base (2 px por coordenada); hd = pasta com os pedaços em
+// alta resolução, gerados por scripts/gerar-plantas-hd.sh.
+// proporcaoArte = proporção do desenho original (1920x1080), que é esticado
+// para caber na área de coordenadas; uma imagem nova deve ter a mesma.
 const plantas = {
     todos: {
         largura: 1500,
         altura: 1056,
-        url: 'assets/images/planta-campus.png' 
+        url: 'assets/images/plantas/todos/base.webp',
+        hd: 'assets/images/plantas/todos/hd',
+        proporcaoArte: 16 / 9
     },
     edificacoes: {
-        largura: 1200, 
+        largura: 1200,
         altura: 800,
-        url: 'assets/images/planta-edificacoes.png' 
+        url: 'assets/images/plantas/edificacoes/base.webp',
+        hd: 'assets/images/plantas/edificacoes/hd',
+        proporcaoArte: 16 / 9
     },
     mecanica: {
-        largura: 1200, 
+        largura: 1200,
         altura: 800,
-        url: 'assets/images/planta-mecanica.png' 
+        url: 'assets/images/plantas/mecanica/base.webp',
+        hd: 'assets/images/plantas/mecanica/hd',
+        proporcaoArte: 16 / 9
     }
+};
+
+// Precisa bater com as variáveis de scripts/gerar-plantas-hd.sh
+const PLANTA_HD = {
+    colunas: 6,
+    linhas: 4,
+    escalaBase: 2,     // px por coordenada da imagem base
+    sobreposicao: 1    // coordenadas que cada pedaço avança sobre o vizinho
 };
 
 const lugares = [
@@ -245,11 +265,11 @@ carregarLugaresSalvos();
 let mapa;
 let marcadores = [];
 let camadaImagem = null;
+let pedacosHD = [];      // [{ limites, camada, url }] da planta aberta
 let filtroAtual = null;
 let alaAtual = "todos";
 let primeiraInicializacao = true;
 
-const LEAFLET_SHADOW = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png";
 
 const NOMES_ALAS = {
     todos: "Mapa Geral",
@@ -271,53 +291,6 @@ function getAndarDaAla() {
     return (alaAtual === "todos") ? "terreo" : "subsolo";
 }
 
-function getIcon(categoria, tipo, nomeLugar) {
-    if (tipo === "alerta") {
-        return L.icon({
-            iconUrl: "assets/images/icone-alerta.png",
-            shadowUrl: LEAFLET_SHADOW,
-            iconSize: [25, 25],
-            iconAnchor: [12, 25],
-            popupAnchor: [0, -22],
-            alt: `Alerta em: ${nomeLugar}`
-        });
-    }
-
-    let cor = "black"; // Cor padrão para salas internas
-    let descricaoAlt = `Ponto de interesse: ${nomeLugar}`;
-    const nomeLower = nomeLugar.toLowerCase();
-
-    if (tipo === "fisica" && categoria === "banheiro_acessivel") {
-        cor = "green"; // PCD
-        descricaoAlt = `Banheiro acessível PCD em: ${nomeLugar}`;
-    } else if (nomeLower.includes("banheiro") && categoria !== "banheiro_acessivel") {
-        cor = "yellow"; // Banheiro normal
-        descricaoAlt = `Banheiro em: ${nomeLugar}`;
-    } else if (tipo === "auditiva") {
-        cor = "red";
-        descricaoAlt = `Acessibilidade auditiva em: ${nomeLugar}`;
-    } else {
-        // Blocos, áreas externas e salas
-        if (categoria === "administrativo") cor = "violet";
-        else if (["estacionamento", "entrada", "quadra", "refeitorio", "rampa", "escada"].includes(categoria)) cor = "orange";
-        else if (categoria === "mecanica") cor = "red";
-        else if (categoria === "edificacoes") cor = "blue";
-        else if (categoria === "informatica") cor = "black";
-        else if (categoria === "secretaria") cor = "violet";
-        else if (categoria === "servidores") cor = "blue";
-        else if (categoria === "geral") cor = "violet";
-        else if (categoria === "biblioteca") cor = "grey";
-    }
-
-    return L.icon({
-        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${cor}.png`,
-        shadowUrl: LEAFLET_SHADOW,
-        iconSize: [18, 30],
-        iconAnchor: [9, 30],
-        popupAnchor: [1, -26],
-        alt: descricaoAlt
-    });
-}
 
 // Escapa texto antes de inserir via innerHTML (nomes podem ser digitados pelo admin)
 function escaparHtml(texto) {
@@ -349,8 +322,17 @@ function initMap() {
     mapa = L.map("map", {
         crs: L.CRS.Simple,
         minZoom: -1,
-        maxZoom: 3
+        maxZoom: 3,
+        zoomSnap: 0.5,   // zoom em meios passos: transição mais suave
+        zoomDelta: 0.5,
+        wheelPxPerZoomLevel: 90
     });
+
+    // Camadas próprias para a planta: a base fica embaixo e os pedaços HD
+    // por cima dela, ambos abaixo dos marcadores e do marcador temporário
+    mapa.createPane("planta").style.zIndex = 250;
+    mapa.createPane("plantaHD").style.zIndex = 260;
+    mapa.on("zoomend moveend", atualizarCamadaHD);
 
     primeiraInicializacao = true;
     atualizarPlantaDeFundo();
@@ -385,12 +367,80 @@ function atualizarPlantaDeFundo() {
     if (dadosPlanta.alt) textAltPlanta = dadosPlanta.alt;
 
     camadaImagem = L.imageOverlay(dadosPlanta.url, limites, {
-        alt: textAltPlanta
+        alt: textAltPlanta,
+        pane: "planta"
     }).addTo(mapa);
 
+    prepararPedacosHD(dadosPlanta);
     mapa.fitBounds(limites);
+    atualizarCamadaHD();
     atualizarTituloResultados();
     aplicarFiltrosCombinados();
+}
+
+/* ---------------------------------------------------------
+   ALTA RESOLUÇÃO SOB DEMANDA
+   A imagem base é leve e sempre carregada. Quando o zoom pede mais
+   detalhe do que ela tem, entram por cima os pedaços HD — só os que
+   estão na área visível (com uma margem), para a página continuar leve.
+   --------------------------------------------------------- */
+function prepararPedacosHD(planta) {
+    pedacosHD.forEach(p => { if (p.camada) mapa.removeLayer(p.camada); });
+    pedacosHD = [];
+
+    // Imagem enviada pelo admin não tem pedaços HD: usa só ela
+    if (!planta.hd || planta.personalizada) return;
+
+    const { colunas, linhas, sobreposicao } = PLANTA_HD;
+    const cw = planta.largura / colunas;
+    const ch = planta.altura / linhas;
+
+    for (let l = 0; l < linhas; l++) {
+        for (let c = 0; c < colunas; c++) {
+            // Mesmo cálculo do script (linha 0 = faixa de cima da imagem)
+            const x0 = Math.max(0, c * cw - sobreposicao);
+            const x1 = Math.min(planta.largura, (c + 1) * cw + sobreposicao);
+            const yTopo = Math.max(0, l * ch - sobreposicao);
+            const yBase = Math.min(planta.altura, (l + 1) * ch + sobreposicao);
+
+            pedacosHD.push({
+                url: `${planta.hd}/${l}-${c}.webp`,
+                // No mapa, a coordenada Y cresce para cima
+                limites: L.latLngBounds([planta.altura - yBase, x0], [planta.altura - yTopo, x1]),
+                camada: null
+            });
+        }
+    }
+}
+
+function precisaDeHD() {
+    // px de tela por coordenada, considerando telas de alta densidade (retina)
+    const pixelsPorCoordenada = Math.pow(2, mapa.getZoom()) * (window.devicePixelRatio || 1);
+    return pixelsPorCoordenada > PLANTA_HD.escalaBase;
+}
+
+function atualizarCamadaHD() {
+    if (!mapa || pedacosHD.length === 0) return;
+
+    if (!precisaDeHD()) {
+        pedacosHD.forEach(p => {
+            if (p.camada && mapa.hasLayer(p.camada)) mapa.removeLayer(p.camada);
+        });
+        return;
+    }
+
+    const areaVisivel = mapa.getBounds().pad(0.25);
+    pedacosHD.forEach(p => {
+        if (!areaVisivel.intersects(p.limites)) return;
+        if (!p.camada) {
+            p.camada = L.imageOverlay(p.url, p.limites, {
+                pane: "plantaHD",
+                alt: "",          // decorativo: a descrição está na imagem base
+                interactive: false
+            });
+        }
+        if (!mapa.hasLayer(p.camada)) p.camada.addTo(mapa);
+    });
 }
 
 function atualizarTituloResultados() {
@@ -485,23 +535,33 @@ function mostrarLugares(lista) {
     lista.forEach(lugar => adicionarMarcador(lugar));
 }
 
+// Texto curto "o que é · onde fica" (ícones e cores: icones-lugares.js)
 function descricaoDoTipo(lugar) {
     if (lugar.tipo === "alerta") return "<span class='tag-alerta'>⚠️ Barreira física (necessita de melhorias)</span>";
-    if (lugar.tipo === "fisica") return "Acessibilidade física";
-    if (lugar.tipo === "auditiva") return "Acessibilidade auditiva";
-    if (lugar.subponto) return `Dependência interna (${lugar.andar === "subsolo" ? "Subsolo" : "Térreo"})`;
-    return "Ponto de interesse";
+
+    const estilo = estiloDoLugar(lugar);
+    const andar = lugar.andar === "subsolo" ? " (subsolo)" : "";
+    if (TIPOS_DESTAQUE[lugar.tipo]) {
+        return `${TIPOS_DESTAQUE[lugar.tipo].rotulo} · ${escaparHtml(estilo.oQue)}${andar}`;
+    }
+    return `${escaparHtml(estilo.oQue)} · ${escaparHtml(estilo.area)}${andar}`;
 }
 
 function adicionarMarcador(lugar) {
+    const estilo = estiloDoLugar(lugar);
     const marcador = L.marker([lugar.y, lugar.x], {
-        icon: getIcon(lugar.categoria, lugar.tipo, lugar.nome),
+        icon: criarIconeLugar(lugar),
         title: lugar.nome,
         keyboard: true
     }).addTo(mapa);
 
+    // Nome acessível do marcador (o pino é um <div>, sem alt)
+    const el = marcador.getElement();
+    if (el) el.setAttribute("aria-label", `${lugar.nome}. ${estilo.descricao}`);
+
     marcador.bindPopup(`
         <div class="popup-lugar">
+            ${seloDoLugar(lugar, "selo-lugar--popup")}
             <strong>${escaparHtml(lugar.nome)}</strong>
             <span>${descricaoDoTipo(lugar)}</span>
         </div>
@@ -523,17 +583,6 @@ function filtrar(tipo) {
     aplicarFiltrosCombinados();
 }
 
-function corDaBorda(lugar) {
-    const categoriaAlvo = lugar.bloco_pai || lugar.categoria;
-    if (categoriaAlvo === "informatica" || lugar.nome.includes("Bloco A")) return "#790000";
-    if (categoriaAlvo === "mecanica" || lugar.nome.includes("Bloco B")) return "#002f5e";
-    if (categoriaAlvo === "edificacoes" || lugar.nome.includes("Bloco C")) return "#005b26";
-    if (categoriaAlvo === "administrativo" || lugar.nome.includes("Bloco D")) return "#4e0071";
-    if (lugar.tipo === "alerta") return "#e67e22";
-    if (categoriaAlvo === "estacionamento") return "#f39c12";
-    if (lugar.categoria === "rampa" || lugar.categoria === "escada") return "#047c50";
-    return "#ccc";
-}
 
 /**
  * Monta a lista lateral do mapa público.
@@ -574,11 +623,14 @@ function atualizarListaLateral(lista, { mostrarTodos = false } = {}) {
     listaParaExibir.forEach(lugar => {
         const item = document.createElement("button");
         item.type = "button";
-        item.className = "item-lugar";
-        item.style.setProperty("--cor-borda", corDaBorda(lugar));
+        item.className = "item-lugar com-selo";
+        item.style.setProperty("--cor-borda", estiloDoLugar(lugar).cor);
         item.innerHTML = `
-            <p><strong>${escaparHtml(lugar.nome)}</strong></p>
-            <span>${descricaoDoTipo(lugar)}</span>
+            ${seloDoLugar(lugar)}
+            <span class="item-lugar-texto">
+                <p><strong>${escaparHtml(lugar.nome)}</strong></p>
+                <span>${descricaoDoTipo(lugar)}</span>
+            </span>
         `;
         item.addEventListener("click", () => focarNoLugar(lugar));
         container.appendChild(item);

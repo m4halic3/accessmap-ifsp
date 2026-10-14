@@ -25,11 +25,15 @@
 
     const LIMITE_PROPORCAO = 0.02;   // tolerância de 2% na proporção
     const LADO_MINIMO_PX = 300;
+    // Para ficar nítida no zoom, a imagem deve ter pelo menos 2 px (ideal: 4 px)
+    // por coordenada do mapa — ex.: Mapa Geral (1500 de largura) => 3000 px
+    const PX_POR_COORDENADA_MINIMO = 2;
+    const PX_POR_COORDENADA_IDEAL = 4;
 
     let arquivo = null;          // File escolhido
     let infoArquivo = null;      // { largura, altura }
     let urlPreview = null;       // object URL da pré-visualização
-    let razaoAtual = null;       // proporção (largura/altura) da imagem em uso
+    let razaoAtual = null;       // proporção (largura/altura) do desenho em uso
     let focoAnterior = null;
     let sequenciaAtual = 0;      // evita "corrida" entre leituras assíncronas
     let urlPreviewAnterior = null; // object URL da miniatura do mapa anterior
@@ -196,17 +200,12 @@
         const minhaSequencia = ++sequenciaAtual;
         atualizarMapaAnterior(ala, minhaSequencia);
 
-        // Descobre a proporção da imagem atual para avisar se a nova for diferente
-        razaoAtual = null;
-        try {
-            const dims = await medirImagem(planta.url);
-            if (minhaSequencia === sequenciaAtual) {
-                razaoAtual = dims.largura / dims.altura;
-                if (arquivo && infoArquivo) avaliarProporcao();
-            }
-        } catch (_) {
-            // Sem a proporção atual simplesmente não mostramos o aviso
-        }
+        // Proporção do desenho em uso (o enviado pelo admin ou o original),
+        // para avisar se a nova imagem for diferente
+        razaoAtual = (planta.personalizada && planta.meta && planta.meta.largura && planta.meta.altura)
+            ? planta.meta.largura / planta.meta.altura
+            : (planta.proporcaoArte || null);
+        if (arquivo && infoArquivo) avaliarProporcao();
     }
 
     // ---------------------------------------------------------------
@@ -291,23 +290,30 @@
     }
 
     function avaliarProporcao() {
-        if (!infoArquivo || !razaoAtual) {
-            el.aviso.hidden = true;
-            return;
-        }
-        const razaoNova = infoArquivo.largura / infoArquivo.altura;
-        const diferenca = Math.abs(razaoNova / razaoAtual - 1);
+        const avisos = [];
 
-        if (diferenca > LIMITE_PROPORCAO) {
-            el.aviso.textContent =
-                "Atenção: a proporção desta imagem é diferente da imagem atual. Ela será esticada para caber " +
-                "na área do mapa e os pontos já cadastrados podem ficar fora do lugar certo. " +
-                "Prefira uma imagem com a mesma proporção e o mesmo enquadramento da anterior.";
-            el.aviso.hidden = false;
-        } else {
-            el.aviso.hidden = true;
-            el.aviso.textContent = "";
+        if (infoArquivo && razaoAtual) {
+            const razaoNova = infoArquivo.largura / infoArquivo.altura;
+            if (Math.abs(razaoNova / razaoAtual - 1) > LIMITE_PROPORCAO) {
+                avisos.push(
+                    "A proporção desta imagem é diferente da imagem atual. Ela será esticada para caber " +
+                    "na área do mapa e os pontos já cadastrados podem ficar fora do lugar certo. " +
+                    "Prefira uma imagem com a mesma proporção e o mesmo enquadramento da anterior."
+                );
+            }
         }
+
+        const planta = plantas[el.alvo.value];
+        if (infoArquivo && planta && infoArquivo.largura < planta.largura * PX_POR_COORDENADA_MINIMO) {
+            avisos.push(
+                `A resolução é baixa para o zoom do mapa e a imagem vai ficar borrada ao aproximar. ` +
+                `Recomendado: pelo menos ${planta.largura * PX_POR_COORDENADA_MINIMO} px de largura ` +
+                `(ideal: ${planta.largura * PX_POR_COORDENADA_IDEAL} px).`
+            );
+        }
+
+        el.aviso.textContent = avisos.length ? "Atenção: " + avisos.join(" ") : "";
+        el.aviso.hidden = avisos.length === 0;
     }
 
     // ---------------------------------------------------------------

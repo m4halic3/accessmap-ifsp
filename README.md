@@ -117,7 +117,9 @@ accessmap-ifsp/
 │   │   ├── style.css          # CSS compilado de scss/style.scss (todas as páginas)
 │   │   └── admin.css          # CSS compilado de scss/admin.scss (só admin.html)
 │   ├── scss/                  # Código-fonte dos estilos (partials _*.scss)
-│   ├── images/                # Logos, ícones, fotos da equipe, slides, plantas
+│   ├── images/                # Logos, ícones, fotos da equipe, slides
+│   │   ├── planta-*.png       # Desenhos originais das plantas (fonte, 1920x1080)
+│   │   └── plantas/<ala>/     # Plantas usadas no mapa: base.webp + hd/ (alta resolução)
 │   └── js/
 │       ├── acessibilidade.js  # A+/A-, alto contraste e VLibras (todas as páginas)
 │       ├── script.js          # Menu, carrossel e formulário público (index.html)
@@ -127,6 +129,8 @@ accessmap-ifsp/
 │       ├── admin.js           # Inserir/editar/excluir locais (admin.html)
 │       ├── plantas-storage.js # Imagens de planta no IndexedDB
 │       └── admin-planta.js    # Modal "Atualizar imagem do mapa" (admin.html)
+├── scripts/
+│   └── gerar-plantas-hd.sh    # Gera base.webp e os pedaços HD de uma planta
 ├── index.html                 # Página institucional / pública
 ├── login.html                 # Login exclusivo do administrador
 ├── dashboard.html              # Painel administrativo (protegido)
@@ -366,6 +370,27 @@ Os arquivos em `assets/css/` são gerados — edite os `.scss` em `assets/scss/`
 npx sass assets/scss/style.scss assets/css/style.css --style=compressed
 npx sass assets/scss/admin.scss assets/css/admin.css --style=compressed
 ```
+
+### Imagens das plantas em alta resolução
+
+Para o mapa continuar nítido no zoom sem deixar a página pesada, cada planta é servida em duas camadas:
+
+- `assets/images/plantas/<ala>/base.webp` — imagem leve, sempre carregada;
+- `assets/images/plantas/<ala>/hd/L-C.webp` — a planta em alta resolução cortada em 6x4 pedaços, que o `mapa.js` só baixa quando o zoom pede mais detalhe, e apenas os que estão na tela.
+
+As versões em alta resolução foram obtidas ampliando os desenhos originais (`planta-*.png`) 4x com o [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) (modelo `realesrgan-x4plus`). Para refazer uma planta (ex.: depois de redesenhá-la):
+
+```bash
+# 1. Ampliar 4x com IA (binário realesrgan-ncnn-vulkan, da página de releases do projeto)
+realesrgan-ncnn-vulkan -i assets/images/planta-campus.png -o campus-x4.png -n realesrgan-x4plus -t 64
+
+# 2. Gerar base + pedaços HD (a área de coordenadas é a de plantas[ala] no mapa.js)
+scripts/gerar-plantas-hd.sh todos campus-x4.png 1500 1056
+scripts/gerar-plantas-hd.sh edificacoes edificacoes-x4.png 1200 800
+scripts/gerar-plantas-hd.sh mecanica mecanica-x4.png 1200 800
+```
+
+> Imagens enviadas pelo admin em "Atualizar imagem do mapa" são exibidas inteiras (sem os pedaços HD); para ficarem nítidas no zoom, envie-as em alta resolução — o próprio formulário avisa quando a resolução é baixa.
 
 ### Testando os locais do mapa
 
