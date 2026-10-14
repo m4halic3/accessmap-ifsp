@@ -191,3 +191,174 @@
         font-size: 15px;
     }
 }
+
+// =========================================================================
+// NOMES DOS LOCAIS NO MAPA (texto) — aparecem conforme o zoom
+// =========================================================================
+
+// Contêiner de tamanho zero no ponto exato; o texto fica centralizado nele
+.leaflet-marker-icon.rotulo-wrap {
+    background: none;
+    border: none;
+    overflow: visible;
+}
+
+// Entrada/saída suave dos itens (nomes e pinos) ao mudar o zoom
+.leaflet-marker-icon.rotulo-wrap,
+.leaflet-marker-icon.marcador-lugar {
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+
+    &.item-mapa-oculto {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+}
+
+.rotulo-lugar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    cursor: pointer;
+    font-family: $font-secondary;
+    font-weight: 700;
+    font-size: 0.72rem;
+    line-height: 1.1;
+    color: #1a1a1a;
+    // contorno branco: o texto fica legível sobre qualquer parte da planta
+    text-shadow:
+        0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #fff,
+        1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+    transition: opacity 0.2s ease;
+
+    // ícone pequeno na cor da área
+    i {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--cor-lugar, #455a64);
+        color: var(--cor-icone, #fff);
+        font-size: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-shadow: none;
+        box-shadow: 0 0 0 1.5px #fff;
+    }
+
+    &:hover .rotulo-texto {
+        text-decoration: underline;
+    }
+
+    // Prédios: maiores, em "etiqueta" com a cor do bloco
+    &.rotulo-lugar--predio {
+        font-family: $font-primary;
+        font-weight: 800;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 4px 10px 4px 4px;
+        border-radius: 999px;
+        background: rgba(#fff, 0.92);
+        border: 2px solid var(--cor-lugar);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        text-shadow: none;
+
+        i {
+            width: 22px;
+            height: 22px;
+            font-size: 11px;
+        }
+    }
+
+    // Áreas principais (estacionamento, quadra, refeitório...)
+    &.rotulo-lugar--area {
+        font-size: 0.78rem;
+    }
+}
+
+// Busca ativa: resultados destacados, demais nomes apagados
+.mapa-com-busca .rotulo-wrap:not(.item-mapa-destaque) .rotulo-lugar {
+    opacity: 0.35;
+}
+
+.rotulo-wrap.item-mapa-destaque .rotulo-lugar {
+    padding: 3px 9px 3px 3px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 0 0 2px $color-purple, 0 3px 10px rgba(0, 0, 0, 0.3);
+    text-shadow: none;
+}
+
+.marcador-lugar.item-mapa-destaque .pino-lugar {
+    transform: rotate(-45deg) scale(1.2);
+    outline: 3px solid $color-purple;
+    outline-offset: 2px;
+}
+
+// Explicação no topo da legenda
+.legenda-mapa .legenda-explicacao {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin: 4px 0 6px;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: #222;
+
+    .pino-legenda {
+        flex-shrink: 0;
+        width: 22px;
+        height: 22px;
+        margin-top: 2px;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        background: #0057b8;
+        border: 2px solid #fff;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        i {
+            transform: rotate(45deg);
+            color: #fff;
+            font-size: 10px;
+        }
+    }
+}
+
+// Zoom afastado: etiqueta do prédio em duas linhas ("BLOCO" pequeno + letra
+// grande), bem mais estreita, para os quatro prédios caberem lado a lado
+.mapa-afastado .rotulo-lugar.rotulo-lugar--predio {
+    padding: 2px 8px 2px 2px;
+    gap: 4px;
+
+    i {
+        width: 18px;
+        height: 18px;
+        font-size: 9px;
+    }
+
+    .rotulo-texto {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1;
+    }
+
+    .rotulo-predio-palavra {
+        font-size: 0.5rem;
+        letter-spacing: 0.5px;
+    }
+
+    .rotulo-predio-letra {
+        font-size: 0.95rem;
+    }
+}

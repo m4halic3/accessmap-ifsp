@@ -47,6 +47,8 @@ function mudarFonte(direcao) {
     nivelFonte = novoNivel;
     salvarPreferencia(CHAVE_FONTE, String(nivelFonte));
     aplicarFonte();
+    // Avisa quem depende do tamanho do texto (ex.: nomes no mapa)
+    document.dispatchEvent(new CustomEvent("accessmap:fonte"));
 }
 
 function aplicarContraste(ativo) {
