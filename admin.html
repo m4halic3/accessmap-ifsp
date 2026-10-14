@@ -85,6 +85,11 @@
             <p class="dica-admin">Dica: clique em qualquer ponto do mapa para cadastrar um local ali.</p>
             <p id="admin-status" class="planta-status" role="status" aria-live="polite"></p>
 
+            <details class="legenda-mapa">
+                <summary>Legenda dos ícones</summary>
+                <div id="legenda-conteudo"></div>
+            </details>
+
             <div id="lista-lugares-admin" role="region" aria-label="Lista de locais cadastrados"></div>
 
             <button type="button" id="btn-restaurar-locais" class="btn-texto" hidden>
@@ -165,7 +170,7 @@
 
                     <label for="planta-arquivo">Nova imagem do mapa</label>
                     <input type="file" id="planta-arquivo" class="planta-arquivo" accept="image/png,image/jpeg,image/webp" aria-describedby="planta-dica">
-                    <p id="planta-dica" class="dica-coords">PNG, JPG ou WEBP, até 10 MB. Use a mesma proporção e o mesmo enquadramento do mapa atual, para que os pontos já cadastrados continuem no lugar certo.</p>
+                    <p id="planta-dica" class="dica-coords">PNG, JPG ou WEBP, até 25 MB. Use a mesma proporção e o mesmo enquadramento do mapa atual, para que os pontos já cadastrados continuem no lugar certo. Para ficar nítida no zoom, envie em alta resolução (ideal: 6000 px de largura no Mapa Geral e 4800 px nos subsolos).</p>
 
                     <div id="planta-preview-area" class="planta-preview" hidden>
                         <img id="planta-preview" alt="Pré-visualização da nova imagem do mapa">
@@ -222,6 +227,7 @@
     <script src="assets/js/acessibilidade.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="assets/js/plantas-storage.js"></script>
+    <script src="assets/js/icones-lugares.js"></script>
     <script src="assets/js/mapa.js"></script>
     <script src="assets/js/admin.js"></script>
     <script src="assets/js/admin-planta.js"></script>

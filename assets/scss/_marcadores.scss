@@ -1,0 +1,193 @@
+@use 'variables' as *;
+
+// =========================================================================
+// MARCADORES DOS LOCAIS (pino com ícone) + SELO DA LISTA + LEGENDA
+// A cor vem de --cor-lugar (definida em assets/js/icones-lugares.js)
+// =========================================================================
+
+// Contêiner do L.divIcon: sem o fundo/borda padrão do Leaflet
+.leaflet-marker-icon.marcador-lugar {
+    background: none;
+    border: none;
+
+    &:focus-visible {
+        outline: none;
+
+        .pino-lugar {
+            outline: 3px solid $color-dark;
+            outline-offset: 3px;
+        }
+    }
+
+    &:hover .pino-lugar {
+        transform: rotate(-45deg) scale(1.12);
+    }
+}
+
+// Pino: quadrado com 3 cantos arredondados, girado 45° (ponta para baixo)
+.pino-lugar {
+    position: absolute;
+    left: 3px;
+    top: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    transform-origin: center;
+    background: var(--cor-lugar, #455a64);
+    border: 2px solid #ffffff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease;
+
+    i {
+        transform: rotate(45deg); // desfaz a rotação para o ícone ficar em pé
+        color: var(--cor-icone, #ffffff);
+        font-size: 13px;
+        line-height: 1;
+    }
+
+    // Alertas pulsam de leve para chamar atenção (desliga com "reduzir movimento")
+    &--alerta {
+        border-color: #1a1a1a;
+        animation: pulso-alerta 2s ease-in-out infinite;
+    }
+}
+
+@keyframes pulso-alerta {
+    0%, 100% { box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35), 0 0 0 0 rgba(249, 168, 37, 0.7); }
+    50%      { box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35), 0 0 0 9px rgba(249, 168, 37, 0); }
+}
+
+// Selo redondo com o ícone (lista lateral, admin e popup)
+.selo-lugar {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--cor-lugar, #455a64);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+
+    i {
+        color: var(--cor-icone, #ffffff) !important;
+    }
+
+    &.selo-lugar--popup {
+        width: 34px;
+        height: 34px;
+        font-size: 15px;
+        margin-bottom: 6px;
+    }
+}
+
+// Item da lista com selo à esquerda
+.item-lugar.com-selo,
+.item-lugar-admin-info.com-selo {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+
+    .item-lugar-texto {
+        min-width: 0;
+        flex: 1;
+    }
+}
+
+// Legenda do mapa (<details>)
+.legenda-mapa {
+    margin: 0 0 18px;
+    border: 1.5px solid #e5e5e5;
+    border-radius: 10px;
+    background: #fafafa;
+    font-family: $font-secondary;
+
+    summary {
+        cursor: pointer;
+        padding: 10px 14px;
+        font-family: $font-primary;
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #000000;
+        list-style-position: inside;
+
+        &:focus-visible {
+            outline: 3px solid $color-purple;
+            outline-offset: 2px;
+            border-radius: 8px;
+        }
+    }
+
+    #legenda-conteudo {
+        padding: 0 14px 12px;
+    }
+
+    .legenda-subtitulo {
+        margin: 8px 0 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .legenda-lista {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 6px;
+        font-size: 0.78rem;
+        color: #222;
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        &.legenda-lista--icones {
+            grid-template-columns: 1fr 1fr;
+
+            i {
+                width: 18px;
+                text-align: center;
+                color: $color-purple;
+            }
+        }
+    }
+
+    .legenda-cor {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--cor-lugar);
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+        flex-shrink: 0;
+    }
+}
+
+// As regras de "span" da lista/popup usam id (mais específicas): reforça o selo
+.container-mapa .sidebar #lista-lugares .item-lugar .selo-lugar,
+#lista-lugares-admin .item-lugar-admin-info .selo-lugar,
+.container-mapa #map .popup-lugar .selo-lugar {
+    display: inline-flex;
+    font-size: 13px;
+    color: var(--cor-icone, #ffffff);
+}
+
+.container-mapa #map .popup-lugar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .selo-lugar.selo-lugar--popup {
+        font-size: 15px;
+    }
+}

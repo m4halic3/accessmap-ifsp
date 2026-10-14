@@ -27,7 +27,7 @@
     const STORE = "plantas";
 
     const TIPOS_ACEITOS = ["image/png", "image/jpeg", "image/webp"];
-    const TAMANHO_MAXIMO = 10 * 1024 * 1024; // 10 MB
+    const TAMANHO_MAXIMO = 25 * 1024 * 1024; // 25 MB (imagens em alta resolução)
 
     let promessaBanco = null;
 
