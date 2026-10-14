@@ -21,9 +21,16 @@
         padding: 25px;
         overflow-y: auto;
 
+        // Os itens nunca encolhem: se não couber, a barra lateral rola.
+        // (Sem isso, com a fonte aumentada, botões de duas linhas ficavam
+        // espremidos em 44 px e o texto vazava.)
+        > * {
+            flex-shrink: 0;
+        }
+
         h2 {
             font-family: $font-primary;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: #000000; // Todo texto em preto puro
             margin-bottom: 4px;
         }
@@ -209,6 +216,8 @@
             align-items: center;
             margin-bottom: 15px;
 
+            gap: 10px;
+
             h3 {
                 font-size: 0.85rem;
                 text-transform: uppercase;
@@ -218,6 +227,8 @@
             }
 
             .btn-reset {
+                white-space: nowrap;
+                flex-shrink: 0;
                 background: $color-pink;
                 color: white; // Letra branca para dar contraste com o fundo rosa!
                 border: none;
@@ -302,7 +313,8 @@
 
         // Lista Dinâmica de Lugares
         #lista-lugares {
-            flex: 1;
+            flex: 1 1 auto; // só a lista pode encolher/crescer (tem rolagem própria)
+            min-height: 220px; // com a legenda aberta, a barra lateral rola em vez de espremer a lista
             overflow-y: auto;
             padding-right: 5px;
 
@@ -420,28 +432,124 @@
     }
 }
 
-// --- RESPONSIVIDADE CORRIGIDA ---
+// Alça do painel deslizante: só existe em telas pequenas
+.sidebar-alca {
+    display: none;
+}
+
+// =========================================================================
+// RESPONSIVIDADE (celular e tablet): mapa em tela cheia e a barra lateral
+// vira um painel deslizante na parte de baixo (controlado por
+// assets/js/sidebar-mapa.js). --altura-recolhida é medida pelo JS para
+// mostrar a busca e a escolha da planta com o painel recolhido.
+// =========================================================================
 @media (max-width: 992px) {
     .container-mapa {
-        flex-direction: column !important;
-        height: auto !important;
-    }
+        position: relative;
+        display: block;
+        height: calc(100vh - 60px);
+        height: calc(100dvh - 60px); // desconta a barra do navegador no celular
+        overflow: hidden;
 
-    .sidebar {
-        width: 100% !important;
-        height: auto !important;
-        padding: 20px !important;
+        #map {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; // isola as camadas do Leaflet (controles usam z-index 1000)
+        }
 
-        #lista-lugares {
-            max-height: 40vh; // Define que a lista ocupará no máximo 40% da altura da tela
-            overflow-y: auto; // Garante a barra de rolagem dentro da lista
-            margin-bottom: 20px;
+        .sidebar {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: calc(100% - 56px); // expandido, deixa uma faixa do mapa visível
+            padding: 0 70px 28px 20px;  // à direita: espaço dos botões de acessibilidade
+            border-radius: 18px 18px 0 0;
+            box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.18);
+            z-index: 1000; // acima das camadas do mapa
+            overflow: hidden;
+            transform: translateY(calc(100% - var(--altura-recolhida, 230px)));
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+            &.sidebar-expandida {
+                transform: translateY(0);
+                overflow-y: auto;
+                overscroll-behavior: contain;
+            }
+
+            h2 {
+                font-size: 1.15rem;
+                margin-bottom: 2px;
+            }
+
+            .contador-resultados {
+                margin-bottom: 12px;
+            }
+
+            .search-container {
+                margin-bottom: 14px;
+            }
+
+            .fieldset-reset {
+                margin-bottom: 18px;
+            }
+
+            #lista-lugares {
+                flex: none;
+                min-height: 0;
+                overflow: visible;
+                padding-right: 0;
+            }
+        }
+
+        // Alça no topo do painel (fica presa ao rolar)
+        .sidebar-alca {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            width: calc(100% + 90px);
+            margin: 0 -70px 8px -20px;
+            padding: 10px 0 10px;
+            border: none;
+            border-radius: 18px 18px 0 0;
+            background: $color-white;
+            cursor: pointer;
+            font-family: $font-primary;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: $color-purple;
+
+            .alca-barra {
+                width: 44px;
+                height: 5px;
+                border-radius: 3px;
+                background: #c4c4c4;
+            }
+
+            &:focus-visible {
+                outline: 3px solid $color-purple;
+                outline-offset: -3px;
+            }
         }
     }
+}
 
-    #map {
-        width: 100% !important;
-        height: 400px !important; // Mapa fica logo abaixo com tamanho fixo
-        flex: none !important;
+@media (max-width: 768px) {
+    .container-mapa .sidebar {
+        padding-right: 58px;
+    }
+
+    .container-mapa .sidebar-alca {
+        width: calc(100% + 78px);
+        margin-right: -58px;
     }
 }

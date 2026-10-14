@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#44025c">
     <title>Admin - Locais do Mapa - AccessMap</title>
     <!-- Protege a página: sem login, redireciona para login.html antes de exibir -->
     <script src="assets/js/authentication.js"></script>
@@ -38,14 +39,18 @@
     </nav>
 
     <main class="container-mapa" id="container-mapa-conteudo">
-        <div class="sidebar">
+        <div class="sidebar" id="painel-sidebar-conteudo">
+            <button type="button" id="btn-alca-sidebar" class="sidebar-alca" aria-expanded="false" aria-controls="painel-sidebar-conteudo">
+                <span class="alca-barra" aria-hidden="true"></span>
+                <span class="alca-texto">Ver locais e filtros</span>
+            </button>
             <h1 class="sr-only">Edição dos locais do mapa</h1>
             <h2 id="titulo-resultados">Resultados (Mapa Geral)</h2>
 
             <div class="search-container">
                 <label for="search-input" class="sr-only">Pesquisar local no campus</label>
                 <i class="fas fa-search search-icon" aria-hidden="true"></i>
-                <input type="search" id="search-input" placeholder="Pesquisar local... (Enter para ir)" autocomplete="off" onkeydown="handleBuscaKeydown(event)">
+                <input type="search" id="search-input" placeholder="Buscar local (ex.: biblioteca)" autocomplete="off" enterkeyhint="search" onkeydown="handleBuscaKeydown(event)">
             </div>
 
             <div class="fieldset-reset" role="group" aria-labelledby="titulo-filtro-ala">
@@ -231,5 +236,6 @@
     <script src="assets/js/mapa.js"></script>
     <script src="assets/js/admin.js"></script>
     <script src="assets/js/admin-planta.js"></script>
+    <script src="assets/js/sidebar-mapa.js"></script>
 </body>
 </html>

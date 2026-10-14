@@ -1,0 +1,54 @@
+@use 'variables' as *;
+
+// =========================================================================
+// ADMIN NO CELULAR / TELAS DE TOQUE (carregado por último em admin.scss)
+// Alvos de toque de 44 px e texto de no mínimo 12 px — ver _mobile.scss
+// =========================================================================
+$alvo-toque: 44px;
+
+@media (pointer: coarse), (max-width: 768px) {
+    .nav-admin-link {
+        min-height: $alvo-toque;
+    }
+
+    .btn-novo-local {
+        min-height: $alvo-toque;
+    }
+
+    // Lista de locais do admin
+    .item-lugar-admin-info {
+        min-height: $alvo-toque;
+
+        span {
+            font-size: 0.78rem;
+        }
+    }
+
+    .btn-editar-local {
+        width: $alvo-toque;
+        height: $alvo-toque;
+    }
+
+    .btn-texto {
+        min-height: $alvo-toque;
+    }
+
+    // Formulário de local
+    .btn-fechar-form {
+        min-width: $alvo-toque;
+        min-height: $alvo-toque;
+    }
+
+    .tipo-opcoes label {
+        min-height: $alvo-toque;
+    }
+
+    .btn-salvar,
+    .btn-excluir {
+        min-height: $alvo-toque;
+    }
+
+    .confirm-actions button {
+        min-height: $alvo-toque;
+    }
+}

@@ -67,6 +67,21 @@ div[vw].enabled {
     }
 }
 
+// Grupo com A+ / A- / contraste e o botão que o abre no celular
+.widget-acessibilidade-nativo {
+    .widget-acessibilidade-opcoes {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    // só existe no celular (ver responsividade abaixo)
+    .btn-acessibilidade-menu {
+        display: none;
+        font-size: 1.15rem !important;
+    }
+}
+
 /* ==========================================================================
    3. REGRAS DE RESPONSIVIDADE (Ajustes para Mobile)
    ========================================================================== */
@@ -80,10 +95,29 @@ div[vw].enabled {
     .widget-acessibilidade-nativo {
         top: 56% !important; // Acompanha a subida do VLibras proporcionalmente
         right: 10px !important;
-        
+
         button {
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
+        }
+
+        // Fechado: só o botão "Acessibilidade"; aberto: as opções aparecem abaixo dele
+        .btn-acessibilidade-menu {
+            display: flex;
+        }
+
+        .widget-acessibilidade-opcoes {
+            display: none;
+        }
+
+        &.widget-aberto {
+            .widget-acessibilidade-opcoes {
+                display: flex;
+            }
+
+            .btn-acessibilidade-menu {
+                background-color: $color-purple;
+            }
         }
     }
 }

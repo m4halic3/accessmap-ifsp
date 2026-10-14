@@ -220,6 +220,7 @@ function limparFiltros() {
 }
 
 function iniciarDashboard() {
+
     document.getElementById('filtro-local')?.addEventListener('input', renderizarRespostas);
     document.getElementById('filtro-relato')?.addEventListener('input', renderizarRespostas);
     document.getElementById('filtro-ordenacao')?.addEventListener('change', renderizarRespostas);

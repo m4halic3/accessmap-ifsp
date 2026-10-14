@@ -382,8 +382,7 @@ function atualizarPlantaDeFundo() {
     }).addTo(mapa);
 
     prepararPedacosHD(dadosPlanta);
-    zoomEnquadrado = mapa.getBoundsZoom(limites);
-    mapa.fitBounds(limites);
+    enquadrarPlanta();
     atualizarCamadaHD();
     atualizarTituloResultados();
     aplicarFiltrosCombinados();
@@ -452,6 +451,17 @@ function atualizarCamadaHD() {
         }
         if (!mapa.hasLayer(p.camada)) p.camada.addTo(mapa);
     });
+}
+
+// Mostra a planta inteira na área visível. No celular, desconta o painel
+// inferior recolhido (sidebar-mapa.js), para a planta não ficar embaixo dele.
+function enquadrarPlanta() {
+    const dadosPlanta = plantas[alaAtual];
+    const limites = L.latLngBounds([[0, 0], [dadosPlanta.altura, dadosPlanta.largura]]);
+    const painel = typeof window.alturaPainelInferior === "function" ? window.alturaPainelInferior() : 0;
+    const margem = L.point(0, painel);
+    zoomEnquadrado = mapa.getBoundsZoom(limites, false, margem);
+    mapa.fitBounds(limites, { paddingBottomRight: margem, animate: false });
 }
 
 function atualizarTituloResultados() {
@@ -611,7 +621,14 @@ function conteudoPopup(lugar) {
 }
 
 function abrirPopupDoLugar(lugar) {
-    popupAberto = L.popup({ offset: ePontoDeAcessibilidade(lugar) ? [0, -36] : [0, -10] })
+    // No celular, o popup não pode ficar escondido atrás do painel inferior
+    const painel = typeof window.alturaPainelInferior === "function" ? window.alturaPainelInferior() : 0;
+    popupAberto = L.popup({
+        offset: ePontoDeAcessibilidade(lugar) ? [0, -36] : [0, -10],
+        maxWidth: Math.min(300, window.innerWidth - 60),
+        autoPanPaddingTopLeft: L.point(16, 16),
+        autoPanPaddingBottomRight: L.point(16, painel + 16)
+    })
         .setLatLng([lugar.y, lugar.x])
         .setContent(conteudoPopup(lugar))
         .openOn(mapa);

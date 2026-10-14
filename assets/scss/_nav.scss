@@ -93,6 +93,25 @@ body { padding-top: 60px; }
     .mobile-only { display: block !important; }
     .navbar { padding: 0 5%; }
 
+    // Links da navbar só com o ícone (o texto continua para leitores de tela)
+    .nav-texto {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+    }
+
+    .nav-right .btn-login-destaque {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 1.1rem;
+    }
+
     #menu-bar {
         width: 55px; height: 34px;
         cursor: pointer; z-index: 105;

@@ -70,7 +70,50 @@ if (!Number.isNaN(nivelSalvo) && NIVEIS_FONTE[nivelSalvo]) {
     document.documentElement.style.fontSize = NIVEIS_FONTE[nivelFonte];
 }
 
+// No celular, A+ / A- / contraste ficam agrupados atrás de um único botão
+// "Acessibilidade" (ocupam menos espaço sobre o conteúdo). No computador o
+// botão fica escondido pelo CSS e os três aparecem como sempre.
+function montarMenuAcessibilidade() {
+    const widget = document.querySelector(".widget-acessibilidade-nativo");
+    if (!widget || document.getElementById("btn-acessibilidade-menu")) return;
+
+    const botoes = [...widget.querySelectorAll("button")];
+    const grupo = document.createElement("div");
+    grupo.className = "widget-acessibilidade-opcoes";
+    grupo.id = "widget-acessibilidade-opcoes";
+    botoes.forEach(b => grupo.appendChild(b));
+
+    const menu = document.createElement("button");
+    menu.type = "button";
+    menu.id = "btn-acessibilidade-menu";
+    menu.className = "btn-acessibilidade-menu";
+    menu.setAttribute("aria-expanded", "false");
+    menu.setAttribute("aria-controls", grupo.id);
+    menu.setAttribute("aria-label", "Opções de acessibilidade: tamanho do texto e contraste");
+    menu.innerHTML = '<i class="fas fa-universal-access" aria-hidden="true"></i>';
+
+    const alternar = (abrir) => {
+        widget.classList.toggle("widget-aberto", abrir);
+        menu.setAttribute("aria-expanded", String(abrir));
+    };
+    menu.addEventListener("click", () => alternar(!widget.classList.contains("widget-aberto")));
+    widget.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && widget.classList.contains("widget-aberto")) {
+            alternar(false);
+            menu.focus();
+        }
+    });
+    // Toque fora fecha o menu
+    document.addEventListener("click", (e) => {
+        if (!widget.contains(e.target)) alternar(false);
+    });
+
+    widget.appendChild(menu);
+    widget.appendChild(grupo);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+    montarMenuAcessibilidade();
     aplicarFonte();
     aplicarContraste(lerPreferencia(CHAVE_CONTRASTE) === "true");
 });

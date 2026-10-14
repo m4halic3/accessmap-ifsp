@@ -16,6 +16,7 @@
 @use 'dashboard';
 @use 'marcadores';
 @use 'utilities';
+@use 'mobile'; // por último: ajustes de toque e de telas pequenas
 // Os estilos do admin (admin-form / admin-planta) ficam em admin.scss -> admin.css
 
 
