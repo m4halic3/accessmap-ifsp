@@ -3,101 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa do Campus - AccessMap</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <title>Mapa - AccessMap</title>
     <link rel="icon" type="image/png" href="assets/images/logo-roxa.png">
-
-
-    <style>
-        .sidebar .fieldset-reset .btn-limpar-mapa {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            margin-top: 15px;
-            background-color: #007750; 
-            color: #ffffff;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 8px;
-            font-family: system-ui, -apple-system, sans-serif;
-            font-weight: 700;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar .fieldset-reset .btn-limpar-mapa:hover {
-            background-color: #007556; 
-            box-shadow: 0 4px 12px rgba(74, 85, 104, 0.25);
-            transform: translateY(-1px);
-        }
-
-        .sidebar .fieldset-reset .btn-limpar-mapa:active {
-            transform: scale(0.98);
-        }
-    </style>
 </head>
 <body>
-    <nav class="navbar" aria-label="Navegação Principal">
-        <div class="logo">
-            <a href="./index.html"><img src="assets/images/logo-branca.png" alt="Logotipo do AccessMap mostrando linhas de rotas estilizadas" class="logo-img"></a>
+    <a href="#search-input" class="skip-link">Pular para a busca de locais</a>
+
+    <nav class="navbar" aria-label="Navegação principal">
+        <a href="index.html" class="logo" style="text-decoration:none;">
+            <img src="assets/images/logo-branca.png" alt="" class="logo-img">
             <span class="logo-text">ACCESSMAP</span>
+            <span class="sr-only">— voltar à página inicial</span>
+        </a>
+        <div class="nav-right">
+            <a href="index.html#contato" class="btn-login-destaque">Relatar um problema</a>
         </div>
     </nav>
 
     <main class="container-mapa" id="container-mapa-conteudo">
         <div class="sidebar">
-            <h2>Resultados (geral)</h2>
-            
+            <h1 class="sr-only">Mapa de acessibilidade do campus</h1>
+            <h2 id="titulo-resultados">Resultados (Mapa Geral)</h2>
+            <p id="contador-resultados" class="contador-resultados" aria-live="polite"></p>
+
             <div class="search-container">
                 <label for="search-input" class="sr-only">Pesquisar local no campus</label>
-                <i class="fas fa-search search-icon" aria-hidden="true"></i> 
-                <input type="text" id="search-input" placeholder="Pesquisar local... (Enter para ir)" onkeydown="handleBuscaKeydown(event)">
+                <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                <input type="search" id="search-input" placeholder="Pesquisar local... (Enter para ir)" autocomplete="off" onkeydown="handleBuscaKeydown(event)">
             </div>
 
-            <div class="fieldset-reset" style="margin-bottom: 20px;" role="region" aria-label="Controles de filtragem por pavimentos">
-                <span id="titulo-filtro-ala" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px; color: #000;">Filtrar por Ala</span>
-                <div class="type-buttons" id="seletor-alas" style="display: flex; gap: 8px; margin-bottom: 10px;" role="group" aria-labelledby="titulo-filtro-ala">
-                    <button type="button" class="btn-type active" aria-current="true" onclick="filtrarAla('todos', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Mapa Geral</button>
-                    <button type="button" class="btn-type" aria-current="false" onclick="filtrarAla('edificacoes', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Subsolo Edif.</button>
-                    <button type="button" class="btn-type" aria-current="false" onclick="filtrarAla('mecanica', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Subsolo Mec.</button>
+            <div class="fieldset-reset" role="group" aria-labelledby="titulo-filtro-ala">
+                <span id="titulo-filtro-ala">Mapa exibido</span>
+                <div class="type-buttons" id="seletor-alas">
+                    <button type="button" class="btn-type active" data-ala="todos" aria-pressed="true" onclick="filtrarAla('todos')">Mapa Geral</button>
+                    <button type="button" class="btn-type" data-ala="edificacoes" aria-pressed="false" onclick="filtrarAla('edificacoes')">Subsolo Edif.</button>
+                    <button type="button" class="btn-type" data-ala="mecanica" aria-pressed="false" onclick="filtrarAla('mecanica')">Subsolo Mec.</button>
                 </div>
 
                 <button type="button" class="btn-limpar-mapa" onclick="resetarMapaCompleto()">
-                    <i class="fas fa-eraser" aria-hidden="true"></i> Limpar Mapa e Filtros
+                    <i class="fas fa-eraser" aria-hidden="true"></i> Limpar mapa e filtros
                 </button>
             </div>
 
             <div class="header-filtros">
-                <h3>Filtrar por Acessibilidade</h3>
-                <button class="btn-reset" onclick="mostrarTodos()">Ver Todos</button>
+                <h3 id="titulo-filtro-acess">Filtrar por acessibilidade</h3>
+                <button type="button" id="btn-ver-todos" class="btn-reset" aria-pressed="false" onclick="mostrarTodos()">Ver todos</button>
             </div>
 
-            <div class="filtros" role="group" aria-label="Filtros de categorias de acessibilidade">
-                <div class="filtro" id="filtro-fisica" onclick="filtrar('fisica', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); filtrar('fisica', this);}" role="button" tabindex="0" aria-label="Filtrar por Acessibilidade Física" aria-pressed="false">
-                    <img src="assets/images/simbolo-fisica.png" alt="Símbolo Internacional de Acessibilidade retratando uma pessoa em cadeira de rodas em verde">
-                </div>
-                <div class="filtro" id="filtro-auditiva" onclick="filtrar('auditiva', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); filtrar('auditiva', this);}" role="button" tabindex="0" aria-label="Filtrar por Acessibilidade Auditiva" aria-pressed="false">
-                    <img src="assets/images/simbolo-auditiva.png" alt="Símbolo Internacional de Deficiência Auditiva retratando um ouvido atravessado por uma linha em roxo">
-                </div>
+            <div class="filtros" role="group" aria-labelledby="titulo-filtro-acess">
+                <button type="button" class="filtro" data-filtro="fisica" aria-pressed="false" onclick="filtrar('fisica')" title="Acessibilidade física">
+                    <img src="assets/images/simbolo-fisica.png" alt="Acessibilidade física">
+                </button>
+                <button type="button" class="filtro" data-filtro="auditiva" aria-pressed="false" onclick="filtrar('auditiva')" title="Acessibilidade auditiva">
+                    <img src="assets/images/simbolo-auditiva.png" alt="Acessibilidade auditiva">
+                </button>
             </div>
 
-            <div id="lista-lugares" role="region" aria-live="polite" aria-label="Lista dinâmica de locais encontrados"></div>
+            <div id="lista-lugares" role="region" aria-label="Lista de locais encontrados"></div>
         </div>
 
-        <div id="map" aria-label="Mapa interativo do campus"></div>
+        <div id="map" role="region" aria-label="Mapa interativo do campus"></div>
     </main>
-
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="assets/js/plantas-storage.js"></script>
-    <script src="assets/js/mapa.js"></script>
 
     <div vw class="enabled">
         <div vw-access-button class="active"></div>
@@ -105,20 +77,19 @@
             <div class="vw-plugin-top-wrapper"></div>
         </div>
     </div>
-    
-    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles manuais de acessibilidade visual">
+
+    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles de acessibilidade">
         <button type="button" id="btn-aumentar" onclick="mudarFonte(1)" aria-label="Aumentar tamanho do texto">A+</button>
         <button type="button" id="btn-diminuir" onclick="mudarFonte(-1)" aria-label="Diminuir tamanho do texto">A-</button>
-        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alternar alto contraste da página">
+        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alto contraste" aria-pressed="false">
             <i class="fas fa-adjust" aria-hidden="true"></i>
         </button>
     </div>
 
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <script>
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-    </script>
-
-    <script src="assets/js/script.js"></script>
+    <script src="assets/js/acessibilidade.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="assets/js/plantas-storage.js"></script>
+    <script src="assets/js/mapa.js"></script>
 </body>
 </html>

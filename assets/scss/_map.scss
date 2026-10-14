@@ -46,7 +46,9 @@
         pointer-events: auto;
     }
 
-    button.btn-mapa {
+    .btn-mapa {
+        display: inline-block;
+        text-decoration: none;
         appearance: none;
         border: none;
         cursor: pointer;
@@ -67,6 +69,11 @@
             transform: scale(1.05);
             box-shadow: 0 15px 30px rgba($color-pink, 0.6);
         }
+
+        &:focus-visible {
+            outline: 4px solid $color-white;
+            outline-offset: 4px;
+        }
     }
 
     // AJUSTE ESPECÍFICO PARA CELULARES
@@ -80,7 +87,7 @@
             border-radius: 15px; // Ajusta levemente o radius
         }
 
-        button.btn-mapa {
+        .btn-mapa {
             padding: 15px 30px;
             font-size: 0.85rem;
         }

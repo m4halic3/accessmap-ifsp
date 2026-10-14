@@ -3,42 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Login do Administrador - AccessMap</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
-    <title>Login - AccessMap</title>
+    <link rel="icon" type="image/png" href="assets/images/logo-roxa.png">
 </head>
 <body class="autenticacao">
-    
+
     <div class="auth-container">
         <header class="auth-header">
-            <a href="index.html" aria-label="Voltar para a página inicial Home">
-                <img src="assets/images/logo-roxa.png" alt="Logotipo AccessMap" class="logo-img-auth">
+            <a href="index.html">
+                <img src="assets/images/logo-roxa.png" alt="AccessMap — voltar para a página inicial" class="logo-img-auth">
             </a>
-            <a href="index.html" class="back-link">Voltar</a>
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Voltar</a>
         </header>
 
         <main class="auth-card active" id="card-login">
-            <h2>Log in</h2>
-            
-            <form id="form-login" action="#" method="POST">
+            <h1 class="sr-only">Área do administrador</h1>
+            <h2>Entrar</h2>
+            <p class="switch" style="margin:-18px 0 24px;">Acesso restrito à equipe que administra o mapa.</p>
+
+            <form id="form-login" action="#" method="POST" novalidate>
                 <div class="input-group">
-                    <label for="user-login" class="sr-only">Nome de usuário</label>
-                    <input type="text" id="user-login" placeholder="Nome de usuário" required>
-                </div>
-                
-                <div class="input-group">
-                    <label for="pass-login" class="sr-only">Senha</label>
-                    <input type="password" id="pass-login" placeholder="Senha" required>
-                </div>
-                
-                <div class="options">
-                    <label><input type="checkbox"> Lembre-me</label>
-                    <a href="#">Esqueceu a senha?</a>
+                    <label for="user-login">Usuário</label>
+                    <input type="text" id="user-login" autocomplete="username" autocapitalize="none" spellcheck="false" required aria-describedby="msg-erro">
                 </div>
 
-                <p id="msg-erro" style="color:red; display:none;"></p>
-                
-                <button type="submit" class="btn-auth">Log in</button>
+                <div class="input-group input-senha">
+                    <label for="pass-login">Senha</label>
+                    <input type="password" id="pass-login" autocomplete="current-password" required aria-describedby="msg-erro">
+                    <button type="button" id="btn-ver-senha" class="btn-ver-senha" aria-label="Mostrar senha" aria-pressed="false" aria-controls="pass-login">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <p id="msg-erro" class="msg-feedback msg-erro" role="alert" hidden></p>
+
+                <button type="submit" class="btn-auth">Entrar</button>
             </form>
         </main>
     </div>
@@ -50,19 +54,16 @@
         </div>
     </div>
 
-    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles manuais de acessibilidade">
+    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles de acessibilidade">
         <button type="button" id="btn-aumentar" onclick="mudarFonte(1)" aria-label="Aumentar tamanho do texto">A+</button>
         <button type="button" id="btn-diminuir" onclick="mudarFonte(-1)" aria-label="Diminuir tamanho do texto">A-</button>
-        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alternar alto contraste">
+        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alto contraste" aria-pressed="false">
             <i class="fas fa-adjust" aria-hidden="true"></i>
         </button>
     </div>
 
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <script>
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-    </script>
-    <script src="assets/js/script.js"></script>
+    <script src="assets/js/acessibilidade.js"></script>
     <script src="assets/js/authentication.js"></script>
 </body>
 </html>

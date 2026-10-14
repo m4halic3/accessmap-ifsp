@@ -118,6 +118,12 @@ $transition-fast: 0.3s;
             &:focus-visible { outline: 2px solid $color-white; outline-offset: 4px; }
         }
     }
+
+    @media (max-width: 768px) {
+        padding: 0 5%;
+
+        .nav-right .admin-user { display: none; }
+    }
 }
 
 .pagina-dashboard {

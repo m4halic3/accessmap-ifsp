@@ -19,8 +19,51 @@ function salvarRespostas(lista) {
     localStorage.setItem(CHAVE_RESPOSTAS, JSON.stringify(lista));
 }
 
+// Guarda a última resposta excluída para permitir "Desfazer"
+let ultimaExcluida = null;
+let timerToast = null;
+
 function removerResposta(id) {
-    salvarRespostas(lerRespostas().filter(r => r.id !== id));
+    const lista = lerRespostas();
+    const indice = lista.findIndex(r => r.id === id);
+    if (indice === -1) return null;
+    const [removida] = lista.splice(indice, 1);
+    salvarRespostas(lista);
+    return { resposta: removida, indice };
+}
+
+function desfazerExclusao() {
+    if (!ultimaExcluida) return;
+    const lista = lerRespostas();
+    lista.splice(Math.min(ultimaExcluida.indice, lista.length), 0, ultimaExcluida.resposta);
+    salvarRespostas(lista);
+    ultimaExcluida = null;
+    esconderToast();
+    renderizarRespostas();
+    anunciar('Exclusão desfeita.');
+}
+
+function mostrarToast(texto) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    document.getElementById('toast-texto').textContent = texto;
+    toast.hidden = false;
+    clearTimeout(timerToast);
+    timerToast = setTimeout(esconderToast, 8000);
+}
+
+function esconderToast() {
+    const toast = document.getElementById('toast');
+    if (toast) toast.hidden = true;
+    clearTimeout(timerToast);
+}
+
+// Mensagem só para leitores de tela (região aria-live)
+function anunciar(texto) {
+    const regiao = document.getElementById('anuncio-dashboard');
+    if (!regiao) return;
+    regiao.textContent = '';
+    setTimeout(() => { regiao.textContent = texto; }, 50);
 }
 
 function normalizarTexto(txt) {
@@ -32,11 +75,17 @@ function normalizarTexto(txt) {
 }
 
 function formatarData(isoString) {
-    return new Date(isoString).toLocaleDateString('pt-BR');
+    const data = new Date(isoString);
+    if (Number.isNaN(data.getTime())) return 'Data desconhecida';
+    return data.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 }
 
 function rotuloCategoria(categoria) {
     return categoria === 'fisica' ? 'Física' : 'Auditiva';
+}
+
+function categoriaSegura(categoria) {
+    return categoria === 'fisica' ? 'fisica' : 'auditiva';
 }
 
 function escaparHtml(texto) {
@@ -48,7 +97,7 @@ function escaparHtml(texto) {
 function criarCard(resposta) {
     const article = document.createElement('article');
     article.className = 'resposta-card';
-    article.dataset.categoria = resposta.categoria;
+    article.dataset.categoria = categoriaSegura(resposta.categoria);
     article.dataset.id = resposta.id;
 
     article.innerHTML = `
@@ -57,23 +106,37 @@ function criarCard(resposta) {
                 <i class="fas fa-map-pin" aria-hidden="true"></i>
                 ${escaparHtml(resposta.local)}
             </span>
-            <span class="resposta-tag tag-${resposta.categoria}">${rotuloCategoria(resposta.categoria)}</span>
+            <span class="resposta-tag tag-${categoriaSegura(resposta.categoria)}">${rotuloCategoria(resposta.categoria)}</span>
         </div>
         <p class="resposta-texto">${escaparHtml(resposta.relato)}</p>
         <div class="resposta-card-footer">
             <span class="resposta-data">
                 <i class="fas fa-clock" aria-hidden="true"></i>
-                ${formatarData(resposta.data)}
+                <time datetime="${escaparHtml(String(resposta.data))}">${formatarData(resposta.data)}</time>
             </span>
-            <button type="button" class="btn-excluir-resposta" aria-label="Excluir esta resposta">
+            <button type="button" class="btn-excluir-resposta" aria-label="Excluir a resposta sobre ${escaparHtml(resposta.local)}" title="Excluir">
                 <i class="fas fa-trash" aria-hidden="true"></i>
             </button>
         </div>
     `;
 
     article.querySelector('.btn-excluir-resposta').addEventListener('click', () => {
-        removerResposta(resposta.id);
+        // Mantém o foco num lugar previsível depois que o card some
+        const proximo = article.nextElementSibling?.querySelector('.btn-excluir-resposta')
+            || article.previousElementSibling?.querySelector('.btn-excluir-resposta');
+
+        ultimaExcluida = removerResposta(resposta.id);
         renderizarRespostas();
+
+        if (ultimaExcluida) {
+            mostrarToast(`Resposta sobre "${resposta.local}" excluída.`);
+            anunciar(`Resposta sobre ${resposta.local} excluída. Use o botão Desfazer para recuperar.`);
+        }
+
+        const destino = proximo && document.body.contains(proximo)
+            ? proximo
+            : document.getElementById('toast-desfazer');
+        if (destino) destino.focus();
     });
 
     return article;
@@ -89,7 +152,8 @@ function renderizarRespostas() {
     const termoRelato = normalizarTexto(document.getElementById('filtro-relato')?.value || '');
     const ordenacao = document.getElementById('filtro-ordenacao')?.value || 'recentes';
 
-    let respostas = lerRespostas().filter(r => {
+    const todas = lerRespostas();
+    let respostas = todas.filter(r => {
         const bateLocal = !termoLocal || normalizarTexto(r.local).includes(termoLocal);
         const bateRelato = !termoRelato || normalizarTexto(r.relato).includes(termoRelato);
         const bateCategoria = !categoriaAtual || r.categoria === categoriaAtual;
@@ -107,8 +171,18 @@ function renderizarRespostas() {
     lista.querySelectorAll('.resposta-card').forEach(card => card.remove());
     respostas.forEach(r => lista.insertBefore(criarCard(r), vazio));
 
-    if (vazio) vazio.hidden = respostas.length > 0;
-    if (contador) contador.textContent = `${respostas.length} resposta${respostas.length === 1 ? '' : 's'}`;
+    if (vazio) {
+        vazio.hidden = respostas.length > 0;
+        vazio.textContent = todas.length === 0
+            ? 'Ainda não há respostas. Elas aparecem aqui quando alguém envia o formulário de colaboração da página inicial.'
+            : 'Nenhuma resposta encontrada para os filtros selecionados. Tente limpar os filtros.';
+    }
+    if (contador) {
+        const filtrando = respostas.length !== todas.length;
+        contador.textContent = filtrando
+            ? `${respostas.length} de ${todas.length} respostas`
+            : `${respostas.length} resposta${respostas.length === 1 ? '' : 's'}`;
+    }
 }
 
 function alternarCategoria(botao) {
@@ -155,57 +229,15 @@ function iniciarDashboard() {
         btn.addEventListener('click', () => alternarCategoria(btn));
     });
 
+    document.getElementById('toast-desfazer')?.addEventListener('click', desfazerExclusao);
+    document.getElementById('toast-fechar')?.addEventListener('click', esconderToast);
+
+    // Respostas enviadas em outra aba aparecem sem precisar recarregar
+    window.addEventListener('storage', (e) => {
+        if (e.key === CHAVE_RESPOSTAS) renderizarRespostas();
+    });
+
     renderizarRespostas();
 }
 
 window.addEventListener('DOMContentLoaded', iniciarDashboard);
-
-/* =========================================================
-   ACESSIBILIDADE: FONTE E CONTRASTE
-   ========================================================= */
-let nivelFonte = 0;
-const maxNivel = 3;
-const minNivel = -2;
-
-function mudarFonte(direcao) {
-    const novoNivel = nivelFonte + direcao;
-
-    if (novoNivel > maxNivel || novoNivel < minNivel) return;
-
-    nivelFonte = novoNivel;
-    const htmlElement = document.documentElement;
-
-    switch (nivelFonte) {
-        case 0:
-            htmlElement.style.fontSize = "100%";
-            break;
-        case 1:
-            htmlElement.style.fontSize = "110%";
-            break;
-        case 2:
-            htmlElement.style.fontSize = "120%";
-            break;
-        case 3:
-            htmlElement.style.fontSize = "130%";
-            break;
-        case -1:
-            htmlElement.style.fontSize = "90%";
-            break;
-        case -2:
-            htmlElement.style.fontSize = "80%";
-            break;
-    }
-}
-
-function toggleContraste() {
-    document.body.classList.toggle("alto-contraste");
-
-    const estadoAtivo = document.body.classList.contains("alto-contraste");
-    localStorage.setItem("altoContrasteState", estadoAtivo);
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-    if (localStorage.getItem("altoContrasteState") === "true") {
-        document.body.classList.add("alto-contraste");
-    }
-});

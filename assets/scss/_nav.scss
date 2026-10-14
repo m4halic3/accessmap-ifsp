@@ -88,7 +88,8 @@ body { padding-top: 60px; }
 // RESPONSIVIDADE MOBILE
 // =========================================================================
 @media (max-width: 768px) {
-    .desktop-only, .nav-links-desktop, .nav-right { display: none !important; }
+    // (.nav-right do admin/dashboard continua visível: tem o botão "Sair")
+    .desktop-only, .nav-links-desktop { display: none !important; }
     .mobile-only { display: block !important; }
     .navbar { padding: 0 5%; }
 

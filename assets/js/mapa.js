@@ -33,7 +33,7 @@ const lugares = [
 { nome: "Rampa Externa de acesso a quadra", tipo: "fisica", categoria: "rampa", andar: "terreo", y: 650, x: 300, subponto: false },
 { nome: "Rampa Externa de acesso aos blocos", tipo: "fisica", categoria: "rampa", andar: "terreo", y: 660, x: 500, subponto: false },
 { nome: "Escada Externa de acesso ao Estacionamento Interno B", tipo: "fisica", categoria: "escada", andar: "terreo", y: 800, x: 670, subponto: false },
-{ nome: "Alerta: Porta Pequena (Acesso Externo)", tipo: "alerta", categoria: "física", andar: "terreo", y: 700, x: 330, subponto: false },
+{ nome: "Alerta: Porta Pequena (Acesso Externo)", tipo: "alerta", categoria: "fisica", andar: "terreo", y: 700, x: 330, subponto: false },
 
     // --- BLOCO A - ALA INFORMÁTICA ---
     { nome: "Bloco A - Auditório A202", tipo: "geral", categoria: "informatica", andar: "terreo", bloco_pai: "informatica", y: 630, x: 1110, subponto: true },
@@ -184,6 +184,64 @@ const lugares = [
     { nome: "Vagas Exclusivas PCD - Estacionamento", tipo: "fisica", categoria: "vaga_pcd", andar: "terreo", y: 470, x: 700, subponto: false },
 ];
 
+/* =========================================================
+   LOCAIS SALVOS PELO ADMIN (versão sem banco de dados)
+   -----------------------------------------------------------
+   O array `lugares` acima é a lista ORIGINAL do projeto. Quando o
+   admin adiciona, edita ou exclui um local, a lista inteira passa a
+   ser guardada no localStorage, e é ela que o mapa usa daí em diante
+   (no mesmo navegador). Na migração para back-end, troque estas
+   funções por chamadas de API (GET/POST/PUT/DELETE /lugares).
+   ========================================================= */
+const CHAVE_LUGARES = "accessmap_lugares";
+const LUGARES_ORIGINAIS = lugares.map(l => ({ ...l }));
+
+function lugarValido(l) {
+    return l && typeof l.nome === "string" && Number.isFinite(l.x) && Number.isFinite(l.y);
+}
+
+function carregarLugaresSalvos() {
+    try {
+        const salvos = JSON.parse(localStorage.getItem(CHAVE_LUGARES));
+        if (Array.isArray(salvos) && salvos.every(lugarValido)) {
+            lugares.splice(0, lugares.length, ...salvos);
+        }
+    } catch (_) {
+        // Dados corrompidos ou armazenamento bloqueado: usa a lista original
+    }
+}
+
+/** Salva a lista atual. Retorna false se o navegador não deixou salvar. */
+function salvarLugares() {
+    try {
+        localStorage.setItem(CHAVE_LUGARES, JSON.stringify(lugares));
+        return true;
+    } catch (erro) {
+        console.error("AccessMap: não foi possível salvar os locais.", erro);
+        return false;
+    }
+}
+
+function temLugaresPersonalizados() {
+    try {
+        return localStorage.getItem(CHAVE_LUGARES) !== null;
+    } catch (_) {
+        return false;
+    }
+}
+
+function restaurarLugaresOriginais() {
+    try {
+        localStorage.removeItem(CHAVE_LUGARES);
+    } catch (_) { /* nada a remover */ }
+    lugares.splice(0, lugares.length, ...LUGARES_ORIGINAIS.map(l => ({ ...l })));
+}
+
+carregarLugaresSalvos();
+
+/* =========================================================
+   ESTADO DO MAPA
+   ========================================================= */
 let mapa;
 let marcadores = [];
 let camadaImagem = null;
@@ -191,16 +249,33 @@ let filtroAtual = null;
 let alaAtual = "todos";
 let primeiraInicializacao = true;
 
+const LEAFLET_SHADOW = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png";
+
+const NOMES_ALAS = {
+    todos: "Mapa Geral",
+    edificacoes: "Subsolo Edificações",
+    mecanica: "Subsolo Mecânica"
+};
+
+const BLOCOS_RAIZ = {
+    "Bloco A": "informatica",
+    "Bloco B": "mecanica",
+    "Bloco C": "edificacoes",
+    "Bloco D": "administrativo"
+};
+
+const ORDEM_PRINCIPAIS = ["Bloco A", "Bloco B", "Bloco C", "Bloco D",
+    "Estacionamento interno A", "Estacionamento interno B", "Estacionamento externo"];
+
 function getAndarDaAla() {
     return (alaAtual === "todos") ? "terreo" : "subsolo";
 }
 
 function getIcon(categoria, tipo, nomeLugar) {
-    // 1. Mantém o alerta como está
     if (tipo === "alerta") {
         return L.icon({
-            iconUrl: 'assets/images/icone-alerta.png',
-            shadowUrl: "https://unpkg.com/leaflet/dist/images/marker-shadow.png",
+            iconUrl: "assets/images/icone-alerta.png",
+            shadowUrl: LEAFLET_SHADOW,
             iconSize: [25, 25],
             iconAnchor: [12, 25],
             popupAnchor: [0, -22],
@@ -210,24 +285,19 @@ function getIcon(categoria, tipo, nomeLugar) {
 
     let cor = "black"; // Cor padrão para salas internas
     let descricaoAlt = `Ponto de interesse: ${nomeLugar}`;
-
-    // 2. Lógica prioritária de cores
     const nomeLower = nomeLugar.toLowerCase();
 
     if (tipo === "fisica" && categoria === "banheiro_acessivel") {
         cor = "green"; // PCD
         descricaoAlt = `Banheiro acessível PCD em: ${nomeLugar}`;
-    } 
-    else if (nomeLower.includes("banheiro") && categoria !== "banheiro_acessivel") {
+    } else if (nomeLower.includes("banheiro") && categoria !== "banheiro_acessivel") {
         cor = "yellow"; // Banheiro normal
         descricaoAlt = `Banheiro em: ${nomeLugar}`;
-    }
-    else if (tipo === "auditiva") {
+    } else if (tipo === "auditiva") {
         cor = "red";
         descricaoAlt = `Acessibilidade auditiva em: ${nomeLugar}`;
-    }
-    else {
-        // Lógica original para blocos e áreas externas
+    } else {
+        // Blocos, áreas externas e salas
         if (categoria === "administrativo") cor = "violet";
         else if (["estacionamento", "entrada", "quadra", "refeitorio", "rampa", "escada"].includes(categoria)) cor = "orange";
         else if (categoria === "mecanica") cor = "red";
@@ -237,13 +307,11 @@ function getIcon(categoria, tipo, nomeLugar) {
         else if (categoria === "servidores") cor = "blue";
         else if (categoria === "geral") cor = "violet";
         else if (categoria === "biblioteca") cor = "grey";
-        // Salas internas (subpontos que não caíram acima) permanecem 'black'
-
     }
 
     return L.icon({
         iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${cor}.png`,
-        shadowUrl: "https://unpkg.com/leaflet/dist/images/marker-shadow.png",
+        shadowUrl: LEAFLET_SHADOW,
         iconSize: [18, 30],
         iconAnchor: [9, 30],
         popupAnchor: [1, -26],
@@ -258,16 +326,27 @@ function escaparHtml(texto) {
     return div.innerHTML;
 }
 
+// Remove acentos e hífens, para "auditorio" achar "Auditório" e
+// "bloco a" achar "Bloco A - ..."
 function normalizarTexto(txt) {
-    return txt
+    return String(txt)
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "") // remove acentos (ex: "Auditório" -> "Auditorio")
+        .replace(/[̀-ͯ]/g, "")
         .toLowerCase()
         .trim();
 }
 
+function normalizarBusca(txt) {
+    return normalizarTexto(txt).replace(/-/g, " ").replace(/\s+/g, " ");
+}
+
+function termoDeBuscaAtual() {
+    const searchInput = document.getElementById("search-input");
+    return searchInput ? normalizarBusca(searchInput.value) : "";
+}
+
 function initMap() {
-    mapa = L.map('map', {
+    mapa = L.map("map", {
         crs: L.CRS.Simple,
         minZoom: -1,
         maxZoom: 3
@@ -276,22 +355,15 @@ function initMap() {
     primeiraInicializacao = true;
     atualizarPlantaDeFundo();
 
-    mapa.on('click', function(e) {
-        console.log(`y: ${e.latlng.lat.toFixed(0)}, x: ${e.latlng.lng.toFixed(0)}`);
-    });
-
-    // Busca "ao vivo": conforme o usuário digita, a lista lateral (e os
-    // marcadores no mapa) já refletem o texto digitado, sem precisar
-    // apertar Enter. O Enter continua funcionando à parte (handleBuscaKeydown)
-    // para focar direto no primeiro resultado.
-    const searchInput = document.getElementById('search-input');
+    // Busca "ao vivo": a lista lateral e os marcadores refletem o texto
+    // digitado. O Enter (handleBuscaKeydown) vai direto ao primeiro resultado.
+    const searchInput = document.getElementById("search-input");
     if (searchInput) {
-        searchInput.addEventListener('input', aplicarFiltrosCombinados);
+        searchInput.addEventListener("input", aplicarFiltrosCombinados);
     }
 
-    // Corrige o bug do mapa "sumindo"/desalinhando quando a janela
-    // do navegador muda de tamanho (ex: ao trocar de aba pra gravar a tela).
-    // Sem isso o Leaflet mantém o tamanho antigo do container em cache.
+    // Sem isso o Leaflet mantém o tamanho antigo do container em cache
+    // quando a janela muda de tamanho.
     window.addEventListener("resize", () => {
         if (mapa) mapa.invalidateSize();
     });
@@ -317,113 +389,94 @@ function atualizarPlantaDeFundo() {
     }).addTo(mapa);
 
     mapa.fitBounds(limites);
+    atualizarTituloResultados();
     aplicarFiltrosCombinados();
 }
 
-function filtrarAla(ala, elemento) {
-    primeiraInicializacao = false;
+function atualizarTituloResultados() {
+    const titulo = document.getElementById("titulo-resultados");
+    if (titulo) titulo.textContent = `Resultados (${NOMES_ALAS[alaAtual]})`;
+}
 
+// Deixa destacado (e anunciado) o botão da ala aberta
+function marcarBotaoAla(ala) {
     document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
-        btn.classList.remove("active");
-        btn.setAttribute("aria-current", "false");
+        const ativo = btn.dataset.ala === ala;
+        btn.classList.toggle("active", ativo);
+        btn.setAttribute("aria-pressed", String(ativo));
     });
+}
 
+// Sincroniza o visual dos botões de filtro com `filtroAtual`
+function marcarBotoesFiltro() {
+    document.querySelectorAll(".filtro[data-filtro]").forEach(btn => {
+        const ativo = btn.dataset.filtro === filtroAtual;
+        btn.classList.toggle("ativo", ativo);
+        btn.setAttribute("aria-pressed", String(ativo));
+    });
+    const verTodos = document.getElementById("btn-ver-todos");
+    if (verTodos) verTodos.setAttribute("aria-pressed", String(filtroAtual === "acessibilidade"));
+}
+
+function filtrarAla(ala) {
+    if (!plantas[ala]) return;
+    primeiraInicializacao = false;
     alaAtual = ala;
-    elemento.classList.add("active");
-    elemento.setAttribute("aria-current", "true");
-
+    marcarBotaoAla(ala);
     atualizarPlantaDeFundo();
 }
 
 function aplicarFiltrosCombinados() {
-    const searchInput = document.getElementById('search-input');
-    const termo = searchInput ? searchInput.value.toLowerCase().trim() : "";
-
+    const termo = termoDeBuscaAtual();
     let filtrados;
 
     if (termo) {
-        // Fora do Mapa Geral (ou seja, dentro de um subsolo), a busca fica
-        // restrita aos locais daquele subsolo — não faz sentido achar (e
-        // tentar marcar) uma sala de outra planta enquanto se está vendo
-        // a de Mecânica ou Edificações.
+        // Dentro de um subsolo, a busca fica restrita aos locais daquele
+        // subsolo — não faz sentido achar uma sala de outra planta.
         const candidatos = (alaAtual === "todos")
             ? lugares
             : lugares.filter(l => l.bloco_pai === alaAtual && l.andar === "subsolo");
 
-        filtrados = candidatos.filter(l => {
-            const nomeNormalizado = l.nome.toLowerCase();
-            const nomeSemHifens = nomeNormalizado.replace(/-/g, "");
-            return nomeNormalizado.includes(termo) || nomeSemHifens.includes(termo.replace(/-/g, ""));
-        });
+        filtrados = candidatos.filter(l => normalizarBusca(l.nome).includes(termo));
+    } else if (alaAtual === "todos") {
+        filtrados = filtroAtual
+            ? [...lugares]
+            : lugares.filter(l => l.subponto === true && l.andar === "terreo");
     } else {
-        // Sem busca: comportamento original baseado na ala selecionada
-        if (alaAtual === "todos") {
-            if (filtroAtual) {
-                filtrados = [...lugares];
-            } else {
-                filtrados = lugares.filter(l => l.subponto === true && l.andar === "terreo");
-            }
+        filtrados = lugares.filter(l => l.bloco_pai === alaAtual && l.andar === "subsolo");
+    }
+
+    // Filtro por tipo de acessibilidade
+    if (filtroAtual) {
+        if (filtroAtual === "fisica") {
+            filtrados = filtrados.filter(l => l.tipo === "fisica" || l.tipo === "alerta");
+        } else if (filtroAtual === "acessibilidade") {
+            // "Ver Todos": física, auditiva e alertas do mapa aberto
+            filtrados = filtrados.filter(l => ["fisica", "auditiva", "alerta"].includes(l.tipo));
         } else {
-            filtrados = lugares.filter(l =>
-                l.bloco_pai === alaAtual &&
-                l.andar === "subsolo"
-            );
+            filtrados = filtrados.filter(l => l.tipo === filtroAtual);
+        }
+
+        // No mapa geral, oculta itens que pertencem ao subsolo
+        if (alaAtual === "todos") {
+            filtrados = filtrados.filter(l => l.andar !== "subsolo");
         }
     }
-
-    // Aplicação do filtro por tipo de acessibilidade
-// Aplicação do filtro por tipo de acessibilidade
-if (filtroAtual) {
-    if (filtroAtual === "fisica") {
-        filtrados = filtrados.filter(l => l.tipo === "fisica" || l.tipo === "alerta");
-    } else if (filtroAtual === "auditiva") {
-        filtrados = filtrados.filter(l => l.tipo === "auditiva");
-    } else if (filtroAtual === "acessibilidade") {
-        // Usado pelo botão "Ver Todos": junta todos os tipos de
-        // acessibilidade (física, auditiva e alertas) do mapa atualmente
-        // exibido — Mapa Geral ou um subsolo específico, sem misturar
-        // pontos de um mapa com os de outro (isso já é garantido pelo
-        // escopo de `filtrados` calculado acima, por ala/andar).
-        filtrados = filtrados.filter(l => l.tipo === "fisica" || l.tipo === "auditiva" || l.tipo === "alerta");
-    } else {
-        filtrados = filtrados.filter(l => l.tipo === filtroAtual);
-    }
-
-    // No mapa geral, oculta itens que pertencem ao subsolo
-    if (alaAtual === "todos") {
-        filtrados = filtrados.filter(l => l.andar !== "subsolo");
-    }
-}
 
     limparMarcadores();
 
     if (alaAtual === "todos" && !termo && !filtroAtual) {
-        // Estado padrão do Mapa Geral: sem busca e sem filtro de acessibilidade
-        // ativo, o mapa fica vazio (sem marcadores) e a lateral mostra só os
-        // blocos principais. Vale sempre que essa combinação ocorrer —
-        // inclusive ao voltar pra aba "Mapa Geral" ou limpar a busca/o filtro
-        // depois de já ter navegado.
+        // Estado padrão do Mapa Geral: mapa sem marcadores e lateral só
+        // com os blocos/locais principais.
         const blocosPrincipais = lugares.filter(l => l.subponto === false && l.andar === "terreo");
-        atualizarListaLateral(blocosPrincipais, "");
+        atualizarListaLateral(blocosPrincipais);
     } else if (alaAtual !== "todos" && !termo && !filtroAtual) {
-        // Estado padrão de uma ala de subsolo (Mecânica / Edificações): mesma
-        // ideia do Mapa Geral — sem busca e sem filtro ativo, o mapa fica
-        // vazio (sem marcadores), mas a lateral já mostra todos os locais
-        // daquele subsolo. Como esses locais não têm uma hierarquia
-        // bloco > sala (todos são subponto:true), usamos `mostrarTodosOsItens`
-        // pra não escondê-los.
-        atualizarListaLateral(filtrados, "", true);
+        // Estado padrão de um subsolo: mapa sem marcadores e lateral com
+        // todos os locais daquele subsolo.
+        atualizarListaLateral(filtrados, { mostrarTodos: true });
     } else {
         mostrarLugares(filtrados);
-        // -----------------------------------------------------------------
-        // Passa `termo` normalmente, e além disso avisa a lateral pra exibir
-        // tudo sem restrição de subponto quando estamos numa ala de subsolo
-        // OU quando um filtro de acessibilidade está ativo — em ambos os
-        // casos queremos ver a lista completa dos locais encontrados, e não
-        // só os pontos "principais" (essa restrição só faz sentido no estado
-        // padrão do Mapa Geral, sem busca e sem filtro).
-        // -----------------------------------------------------------------
-        atualizarListaLateral(filtrados, termo, (alaAtual !== "todos") || !!filtroAtual);
+        atualizarListaLateral(filtrados, { mostrarTodos: true });
     }
 }
 
@@ -432,20 +485,25 @@ function mostrarLugares(lista) {
     lista.forEach(lugar => adicionarMarcador(lugar));
 }
 
+function descricaoDoTipo(lugar) {
+    if (lugar.tipo === "alerta") return "<span class='tag-alerta'>⚠️ Barreira física (necessita de melhorias)</span>";
+    if (lugar.tipo === "fisica") return "Acessibilidade física";
+    if (lugar.tipo === "auditiva") return "Acessibilidade auditiva";
+    if (lugar.subponto) return `Dependência interna (${lugar.andar === "subsolo" ? "Subsolo" : "Térreo"})`;
+    return "Ponto de interesse";
+}
+
 function adicionarMarcador(lugar) {
     const marcador = L.marker([lugar.y, lugar.x], {
-        icon: getIcon(lugar.categoria, lugar.tipo, lugar.nome)
+        icon: getIcon(lugar.categoria, lugar.tipo, lugar.nome),
+        title: lugar.nome,
+        keyboard: true
     }).addTo(mapa);
 
-    let textoPopup = "Ponto de Interesse";
-    if (lugar.tipo === "alerta") textoPopup = "<span style='color:#800000; font-weight:bold;'>⚠️ Barreira Física Encontrada (Necessita de Melhorias)</span>";
-    if (lugar.tipo === "fisica") textoPopup = "Acessibilidade Física";
-    if (lugar.tipo === "auditiva") textoPopup = "Acessibilidade Auditiva";
-
     marcador.bindPopup(`
-        <div style="text-align:center;">
-            <strong style="font-size:14px; color:#5a2a83;">${escaparHtml(lugar.nome)}</strong><br>
-            <span style="color:#333333; font-size:12px;">${textoPopup}</span>
+        <div class="popup-lugar">
+            <strong>${escaparHtml(lugar.nome)}</strong>
+            <span>${descricaoDoTipo(lugar)}</span>
         </div>
     `);
 
@@ -458,141 +516,102 @@ function limparMarcadores() {
     marcadores = [];
 }
 
-function filtrar(tipo, elemento) {
+function filtrar(tipo) {
     primeiraInicializacao = false;
-
-    document.querySelectorAll(".filtro").forEach(el => {
-        el.classList.remove("ativo");
-        el.setAttribute("aria-pressed", "false");
-    });
-
-    if (filtroAtual === tipo) {
-        filtroAtual = null;
-    } else {
-        filtroAtual = tipo;
-        elemento.classList.add("ativo");
-        elemento.setAttribute("aria-pressed", "true");
-    }
+    filtroAtual = (filtroAtual === tipo) ? null : tipo;
+    marcarBotoesFiltro();
     aplicarFiltrosCombinados();
 }
 
-function atualizarListaLateral(lista, termoDeBusca = "", mostrarTodosOsItens = false) {
+function corDaBorda(lugar) {
+    const categoriaAlvo = lugar.bloco_pai || lugar.categoria;
+    if (categoriaAlvo === "informatica" || lugar.nome.includes("Bloco A")) return "#790000";
+    if (categoriaAlvo === "mecanica" || lugar.nome.includes("Bloco B")) return "#002f5e";
+    if (categoriaAlvo === "edificacoes" || lugar.nome.includes("Bloco C")) return "#005b26";
+    if (categoriaAlvo === "administrativo" || lugar.nome.includes("Bloco D")) return "#4e0071";
+    if (lugar.tipo === "alerta") return "#e67e22";
+    if (categoriaAlvo === "estacionamento") return "#f39c12";
+    if (lugar.categoria === "rampa" || lugar.categoria === "escada") return "#047c50";
+    return "#ccc";
+}
+
+/**
+ * Monta a lista lateral do mapa público.
+ * Sem `mostrarTodos`, exibe só os locais principais (subponto: false) —
+ * usado no estado padrão do Mapa Geral.
+ */
+function atualizarListaLateral(lista, { mostrarTodos = false } = {}) {
     const container = document.getElementById("lista-lugares");
     if (!container) return;
 
     container.innerHTML = "";
 
-    // LÓGICA DE FILTRAGEM:
-    // Se tem termo de busca, exibe TODOS os resultados encontrados.
-    // Se `mostrarTodosOsItens` for true (usado nas alas de subsolo, onde não
-    // existe hierarquia bloco > sala e todo item é subponto:true), também
-    // exibe tudo, sem restrição.
-    // Caso contrário (Mapa Geral sem busca), mantém a restrição de apenas
-    // pontos principais (subponto: false).
-    let listaParaExibir;
-    
-    if (termoDeBusca.length > 0 || mostrarTodosOsItens) {
-        // Busca ativa (ou lista de subsolo): exibe tudo o que foi passado
-        listaParaExibir = [...lista];
-    } else {
-        // Estado normal do Mapa Geral: exibe apenas os blocos/lugares principais
-        listaParaExibir = lista.filter(l => l.subponto === false);
-    }
+    const listaParaExibir = mostrarTodos ? [...lista] : lista.filter(l => l.subponto === false);
 
-    // Ordenação (mantendo a sua lógica original)
-    const ordemDesejada = ["Bloco A", "Bloco B", "Bloco C", "Bloco D",
-        "Estacionamento interno A", "Estacionamento interno B", "Estacionamento externo"];
-
+    // Blocos e estacionamentos principais primeiro, na ordem definida
     listaParaExibir.sort((a, b) => {
-        const iA = ordemDesejada.indexOf(a.nome);
-        const iB = ordemDesejada.indexOf(b.nome);
+        const iA = ORDEM_PRINCIPAIS.indexOf(a.nome);
+        const iB = ORDEM_PRINCIPAIS.indexOf(b.nome);
         if (iA !== -1 && iB !== -1) return iA - iB;
         if (iA !== -1) return -1;
         if (iB !== -1) return 1;
         return 0;
     });
 
+    atualizarContador(listaParaExibir.length);
+
+    if (listaParaExibir.length === 0) {
+        const vazio = document.createElement("p");
+        vazio.className = "lista-vazia";
+        const termo = document.getElementById("search-input")?.value.trim();
+        vazio.textContent = termo
+            ? `Nenhum local encontrado para "${termo}" em ${NOMES_ALAS[alaAtual]}. Confira a grafia ou troque de mapa.`
+            : "Nenhum local com esse filtro neste mapa.";
+        container.appendChild(vazio);
+        return;
+    }
+
     listaParaExibir.forEach(lugar => {
-        const item = document.createElement("div");
+        const item = document.createElement("button");
+        item.type = "button";
         item.className = "item-lugar";
-
-        let corBorda = "#ccc";
-        const categoriaAlvo = lugar.bloco_pai || lugar.categoria;
-        if (categoriaAlvo === "informatica" || lugar.nome.includes("Bloco A")) corBorda = "#790000";
-        else if (categoriaAlvo === "mecanica" || lugar.nome.includes("Bloco B") || lugar.nome.includes("Subsolo B")) corBorda = "#002f5e";
-        else if (categoriaAlvo === "edificacoes" || lugar.nome.includes("Bloco C") || lugar.nome.includes("Subsolo C")) corBorda = "#005b26";
-        else if (categoriaAlvo === "administrativo" || lugar.nome.includes("Bloco D")) corBorda = "#4e0071";
-        else if (lugar.tipo === "alerta") corBorda = "#e67e22";
-        else if (categoriaAlvo === "estacionamento") corBorda = "#f39c12";
-        else if (lugar.categoria === "rampa" || lugar.categoria === "escada") corBorda = "#047c50"; // Azul para acessos
-else if (lugar.tipo === "alerta") corBorda = "#be5900";
-
-        item.style.cssText = `
-            border-left: 5px solid ${corBorda};
-            padding: 10px 15px;
-            margin-bottom: 8px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        `;
-
-        item.onmouseenter = () => item.style.backgroundColor = "#f1f1f1";
-        item.onmouseleave = () => item.style.backgroundColor = "#f9f9f9";
-
-        let labelAcessibilidade = "Ponto de Interesse";
-        if (lugar.tipo === "alerta") {
-            labelAcessibilidade = "<span style='color:#800000; font-weight:bold;'>⚠️ Necessita de Melhorias</span>";
-        } else if (lugar.tipo === "auditiva") {
-            labelAcessibilidade = "Acessibilidade Auditiva";
-        } else if (lugar.subponto) {
-            const andarLabel = lugar.andar === "subsolo" ? "Subsolo" : "Térreo";
-            labelAcessibilidade = `Dependência Interna (${andarLabel})`;
-        }
-
+        item.style.setProperty("--cor-borda", corDaBorda(lugar));
         item.innerHTML = `
-            <p style="margin: 0 0 5px 0;"><strong>${escaparHtml(lugar.nome)}</strong></p>
-            <span style="font-size: 12px; color: #666;">${labelAcessibilidade}</span>
+            <p><strong>${escaparHtml(lugar.nome)}</strong></p>
+            <span>${descricaoDoTipo(lugar)}</span>
         `;
-
-        item.onclick = () => focarNoLugar(lugar);
-
+        item.addEventListener("click", () => focarNoLugar(lugar));
         container.appendChild(item);
     });
 }
 
-// Navega o mapa até um lugar específico, mostrando seu marcador
-// (e, se for um Bloco raiz, também as salas internas dele).
-// Usada tanto pelo clique num item da lista quanto pela busca (Enter).
+function atualizarContador(quantidade) {
+    const contador = document.getElementById("contador-resultados");
+    if (contador) {
+        contador.textContent = `${quantidade} ${quantidade === 1 ? "local" : "locais"}`;
+    }
+}
+
+// Navega o mapa até um lugar, mostrando seu marcador (e, se for um
+// Bloco raiz, também as salas internas dele).
 function focarNoLugar(lugar) {
-    mapa.setView([lugar.y, lugar.x], 2);
     primeiraInicializacao = false;
     limparMarcadores();
 
-    const blocosRaiz = ["Bloco A", "Bloco B", "Bloco C", "Bloco D"];
+    const blocoPaiAlvo = BLOCOS_RAIZ[lugar.nome];
 
-    if (blocosRaiz.includes(lugar.nome)) {
+    if (blocoPaiAlvo) {
         const blocoRaiz = adicionarMarcador(lugar);
-
-        const mapaBlocoPai = {
-            "Bloco A": "informatica",
-            "Bloco B": "mecanica",
-            "Bloco C": "edificacoes",
-            "Bloco D": "administrativo"
-        };
-        const blocoPaiAlvo = mapaBlocoPai[lugar.nome];
         const andarDaAla = getAndarDaAla();
 
-        const subSalas = lugares.filter(l => {
-            if (!l.subponto) return false;
-            if (l.bloco_pai !== blocoPaiAlvo) return false;
-            if (lugar.nome === "Bloco A" || lugar.nome === "Bloco D") {
-                return l.andar === "terreo";
-            }
-            return l.andar === andarDaAla;
-        });
+        lugares
+            .filter(l => {
+                if (!l.subponto || l.bloco_pai !== blocoPaiAlvo) return false;
+                if (lugar.nome === "Bloco A" || lugar.nome === "Bloco D") return l.andar === "terreo";
+                return l.andar === andarDaAla;
+            })
+            .forEach(sala => adicionarMarcador(sala));
 
-        subSalas.forEach(sala => adicionarMarcador(sala));
         mapa.setView([lugar.y, lugar.x], 1);
         blocoRaiz.openPopup();
         return;
@@ -603,36 +622,33 @@ function focarNoLugar(lugar) {
     marcadorUnico.openPopup();
 }
 
-// Busca por nome de sala/bloco e vai direto pro local no mapa.
-// Prioriza correspondência exata; se não achar, usa a primeira
-// correspondência parcial (ex: "auditorio" acha "Bloco A - Auditório A202").
+// Busca por nome e vai direto pro local. Prioriza correspondência exata;
+// senão usa a primeira parcial (ex: "auditorio" acha "Bloco A - Auditório A202").
 function buscarEIrParaLocal() {
-    const searchInput = document.getElementById('search-input');
+    const searchInput = document.getElementById("search-input");
     if (!searchInput) return;
 
-    const termo = normalizarTexto(searchInput.value);
+    const termo = normalizarBusca(searchInput.value);
     if (!termo) return;
 
     const encontrado =
-        lugares.find(l => normalizarTexto(l.nome) === termo) ||
-        lugares.find(l => normalizarTexto(l.nome).includes(termo));
+        lugares.find(l => normalizarBusca(l.nome) === termo) ||
+        lugares.find(l => normalizarBusca(l.nome).includes(termo));
 
     searchInput.classList.remove("busca-sem-resultado");
+    searchInput.removeAttribute("aria-invalid");
 
     if (encontrado) {
-        // Se o local buscado é um subsolo, troca a planta pra ala certa antes de focar
-        if (encontrado.andar === "subsolo" && encontrado.bloco_pai && encontrado.bloco_pai !== alaAtual) {
-            alaAtual = encontrado.bloco_pai;
-            document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
-                btn.classList.remove("active");
-                btn.setAttribute("aria-current", "false");
-            });
-            atualizarPlantaDeFundo();
-        }
+        // Local de outra planta: troca para a planta certa antes de focar
+        const alaDoLugar = encontrado.andar === "subsolo" && plantas[encontrado.bloco_pai]
+            ? encontrado.bloco_pai
+            : "todos";
+        if (alaDoLugar !== alaAtual) filtrarAla(alaDoLugar);
         focarNoLugar(encontrado);
     } else {
-        // Feedback visual rápido de "não encontrado" (sem popup/alert intrusivo)
+        // Feedback visual rápido de "não encontrado" (a lista já mostra a mensagem)
         searchInput.classList.add("busca-sem-resultado");
+        searchInput.setAttribute("aria-invalid", "true");
         setTimeout(() => searchInput.classList.remove("busca-sem-resultado"), 1200);
     }
 }
@@ -641,33 +657,17 @@ function handleBuscaKeydown(event) {
     if (event.key === "Enter") {
         event.preventDefault();
         buscarEIrParaLocal();
+    } else if (event.key === "Escape" && event.target.value) {
+        event.preventDefault();
+        event.target.value = "";
+        event.target.dispatchEvent(new Event("input"));
     }
 }
 
-function mostrarTodos(elemento) {
-    // "Ver Todos": mostra todos os pontos de acessibilidade (física,
-    // auditiva e alertas) do mapa que estiver aberto no momento — Mapa
-    // Geral ou um subsolo específico. Clicar de novo desativa e volta pro
-    // estado padrão (vazio no Mapa Geral / lista completa sem marcadores
-    // no subsolo), igual aos outros botões de filtro.
-    primeiraInicializacao = false;
-
-    document.querySelectorAll(".filtro").forEach(el => {
-        el.classList.remove("ativo");
-        el.setAttribute("aria-pressed", "false");
-    });
-
-    if (filtroAtual === "acessibilidade") {
-        filtroAtual = null;
-    } else {
-        filtroAtual = "acessibilidade";
-        if (elemento) {
-            elemento.classList.add("ativo");
-            elemento.setAttribute("aria-pressed", "true");
-        }
-    }
-
-    aplicarFiltrosCombinados();
+// "Ver Todos": todos os pontos de acessibilidade (física, auditiva e
+// alertas) do mapa aberto. Clicar de novo desativa.
+function mostrarTodos() {
+    filtrar("acessibilidade");
 }
 
 function resetarMapaCompleto() {
@@ -675,29 +675,16 @@ function resetarMapaCompleto() {
     alaAtual = "todos";
     primeiraInicializacao = true;
 
-    document.querySelectorAll(".filtro").forEach(el => {
-        el.classList.remove("ativo");
-        el.setAttribute("aria-pressed", "false");
-    });
-    document.querySelectorAll("#seletor-alas .btn-type").forEach(btn => {
-        btn.classList.remove("active");
-        btn.setAttribute("aria-current", "false");
-    });
-
-    const botoesAla = document.querySelectorAll("#seletor-alas .btn-type");
-    if (botoesAla.length > 0) {
-        botoesAla[0].classList.add("active");
-        botoesAla[0].setAttribute("aria-current", "true");
+    const searchInput = document.getElementById("search-input");
+    if (searchInput) {
+        searchInput.value = "";
+        searchInput.removeAttribute("aria-invalid");
     }
 
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) searchInput.value = '';
-
+    marcarBotoesFiltro();
+    marcarBotaoAla("todos");
     limparMarcadores();
     atualizarPlantaDeFundo();
-
-    const blocosPrincipais = lugares.filter(l => l.subponto === false && l.andar === "terreo");
-    atualizarListaLateral(blocosPrincipais, "");
 }
 
 // Promise resolvida quando o mapa já foi criado. Antes de criar o mapa,

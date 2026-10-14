@@ -99,6 +99,10 @@
                         opacity: 0.4;   // Opacidade leve para manter a identidade de exemplo
                     }
 
+                    &[aria-invalid="true"] {
+                        border-color: #A32D2D !important;
+                    }
+
                     &:focus { 
                         border-color: $color-teal;
                         background-color: $color-white;
@@ -154,6 +158,33 @@
                 transform: translateY(0px);
                 box-shadow: 0 2px 0px rgba(0,0,0,0.1);
             }
+
+            &:focus-visible {
+                outline: 3px solid $color-purple;
+                outline-offset: 3px;
+            }
+
+            // Categoria escolhida: contorno + ✓ (não depende só de cor)
+            &.selecionado {
+                outline: 3px solid $color-dark;
+                outline-offset: 3px;
+
+                &::before {
+                    content: "✓ ";
+                }
+            }
+        }
+
+        // Quando uma categoria foi escolhida, as outras ficam esmaecidas
+        &:has(.selecionado) .btn-type:not(.selecionado) {
+            opacity: 0.5;
+        }
+
+        // Enviou sem escolher categoria
+        &[aria-invalid="true"] {
+            outline: 2px dashed #A32D2D;
+            outline-offset: 6px;
+            border-radius: 14px;
         }
 
         .btn-fisica { background-color: $color-teal; }

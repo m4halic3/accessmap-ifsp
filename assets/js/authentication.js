@@ -21,16 +21,43 @@ const CHAVE_SESSAO = 'accessmap_admin_logado';
 // `npx serve` removem a extensão da URL)
 const PAGINAS_PROTEGIDAS = ['dashboard', 'admin'];
 
+function paginaAtual() {
+    return window.location.pathname.split('/').pop().replace(/\.html$/, '');
+}
+
+function estaLogado() {
+    try {
+        return sessionStorage.getItem(CHAVE_SESSAO) === 'true';
+    } catch (_) {
+        return false;
+    }
+}
+
 // Roda já no carregamento do script (no <head>), antes de a página
 // protegida ser exibida
 protegerPaginaAdmin();
 
 document.addEventListener('DOMContentLoaded', () => {
     const formLogin = document.getElementById('form-login');
+    if (!formLogin) return;
 
-    if (formLogin) {
-        formLogin.addEventListener('submit', tratarLogin);
+    // Quem já está logado não precisa ver o login de novo
+    if (estaLogado()) {
+        window.location.replace('dashboard.html');
+        return;
     }
+
+    formLogin.addEventListener('submit', tratarLogin);
+
+    // Ao digitar de novo, some a mensagem de erro
+    ['user-login', 'pass-login'].forEach(id => {
+        document.getElementById(id).addEventListener('input', limparErro);
+    });
+
+    const btnVerSenha = document.getElementById('btn-ver-senha');
+    if (btnVerSenha) btnVerSenha.addEventListener('click', alternarVisibilidadeSenha);
+
+    document.getElementById('user-login').focus();
 });
 
 /**
@@ -44,20 +71,27 @@ function tratarLogin(e) {
     const msgErro = document.getElementById('msg-erro');
 
     const usuarioDigitado = campoUsuario.value.trim();
-    const senhaDigitada = campoSenha.value.trim();
+    // A senha não passa por trim(): espaços fazem parte dela
+    const senhaDigitada = campoSenha.value;
+
+    if (!usuarioDigitado || !senhaDigitada) {
+        exibirErro(msgErro, 'Preencha o usuário e a senha.');
+        (usuarioDigitado ? campoSenha : campoUsuario).focus();
+        return;
+    }
 
     const credenciaisValidas =
         usuarioDigitado === ADMIN_TESTE.usuario &&
         senhaDigitada === ADMIN_TESTE.senha;
 
     if (credenciaisValidas) {
-        // Marca a sessão como autenticada
         sessionStorage.setItem(CHAVE_SESSAO, 'true');
-
-        // Redireciona para o dashboard
         window.location.href = 'dashboard.html';
     } else {
-        exibirErro(msgErro, 'Usuário ou senha inválidos.');
+        exibirErro(msgErro, 'Usuário ou senha incorretos. Confira e tente novamente.');
+        campoUsuario.setAttribute('aria-invalid', 'true');
+        campoSenha.setAttribute('aria-invalid', 'true');
+        campoSenha.select();
     }
 }
 
@@ -70,7 +104,27 @@ function exibirErro(elemento, mensagem) {
         return;
     }
     elemento.textContent = mensagem;
-    elemento.style.display = 'block';
+    elemento.hidden = false;
+}
+
+function limparErro() {
+    const msgErro = document.getElementById('msg-erro');
+    if (msgErro) msgErro.hidden = true;
+    ['user-login', 'pass-login'].forEach(id => {
+        document.getElementById(id).removeAttribute('aria-invalid');
+    });
+}
+
+function alternarVisibilidadeSenha() {
+    const campoSenha = document.getElementById('pass-login');
+    const btn = document.getElementById('btn-ver-senha');
+    const mostrar = campoSenha.type === 'password';
+
+    campoSenha.type = mostrar ? 'text' : 'password';
+    btn.setAttribute('aria-pressed', String(mostrar));
+    btn.setAttribute('aria-label', mostrar ? 'Ocultar senha' : 'Mostrar senha');
+    btn.innerHTML = `<i class="fas ${mostrar ? 'fa-eye-slash' : 'fa-eye'}" aria-hidden="true"></i>`;
+    campoSenha.focus();
 }
 
 /**
@@ -79,22 +133,17 @@ function exibirErro(elemento, mensagem) {
  * de volta para o login.
  */
 function protegerPaginaAdmin() {
-    const paginaAtual = window.location.pathname.split('/').pop().replace(/\.html$/, '');
-
-    if (PAGINAS_PROTEGIDAS.includes(paginaAtual)) {
-        const estaLogado = sessionStorage.getItem(CHAVE_SESSAO) === 'true';
-
-        if (!estaLogado) {
-            window.location.replace('login.html');
-        }
+    if (PAGINAS_PROTEGIDAS.includes(paginaAtual()) && !estaLogado()) {
+        window.location.replace('login.html');
     }
 }
 
 /**
- * Função opcional de logout, para usar em um botão "Sair"
- * dentro do dashboard.
+ * Encerra a sessão do administrador (botão "Sair").
  */
 function fazerLogout() {
-    sessionStorage.removeItem(CHAVE_SESSAO);
+    try {
+        sessionStorage.removeItem(CHAVE_SESSAO);
+    } catch (_) { /* nada a limpar */ }
     window.location.href = 'login.html';
 }
