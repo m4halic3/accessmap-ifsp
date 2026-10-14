@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#44025c">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
@@ -47,7 +48,7 @@
                 <label for="filtro-local">Local da Ocorrência</label>
                 <div class="input-wrapper">
                     <i class="fas fa-map-pin" aria-hidden="true"></i>
-                    <input type="text" id="filtro-local" placeholder="Ex: Bloco A, Biblioteca...">
+                    <input type="search" id="filtro-local" enterkeyhint="search" autocomplete="off" placeholder="Ex: Bloco A, Biblioteca...">
                 </div>
             </div>
 
@@ -63,7 +64,7 @@
                 <label for="filtro-relato">Palavra-chave no relato</label>
                 <div class="input-wrapper">
                     <i class="fas fa-comment-dots" aria-hidden="true"></i>
-                    <input type="text" id="filtro-relato" placeholder="Buscar no texto do relato...">
+                    <input type="search" id="filtro-relato" enterkeyhint="search" autocomplete="off" placeholder="Buscar no texto do relato...">
                 </div>
             </div>
 

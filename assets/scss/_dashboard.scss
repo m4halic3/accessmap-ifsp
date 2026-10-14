@@ -163,6 +163,7 @@ $transition-fast: 0.3s;
         color: $color-purple;
     }
 
+
     .filtro-grupo {
         margin-bottom: 18px;
 
@@ -509,8 +510,8 @@ $transition-fast: 0.3s;
 }
 
 @media (max-width: 480px) {
-    .navbar-admin {
-        .logo-text { display: none; }
+    .navbar-admin .logo .logo-text {
+        display: none;
     }
 
     .dashboard-sidebar .type-buttons {

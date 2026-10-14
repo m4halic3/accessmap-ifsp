@@ -71,7 +71,8 @@ Os dados coletados pelo AccessMap possuem um papel importante para a comunidade 
   - **locais exibidos pelo nome**, com um ícone por área, e **pinos apenas para pontos de acessibilidade e alertas** (ver [Ícones e legenda do mapa](#ícones-e-legenda-do-mapa));
   - **informações reveladas conforme o zoom**: ao abrir, o mapa mostra só a planta, limpa; ao aproximar, aparecem os prédios, as áreas principais e os pontos de acessibilidade e, aproximando mais, as salas — sem que os nomes se sobreponham;
   - legenda recolhível com o significado de cores e ícones;
-  - **plantas em alta resolução**, nítidas mesmo com zoom máximo, carregadas sob demanda para manter a página leve (ver [Imagens das plantas em alta resolução](#imagens-das-plantas-em-alta-resolução)).
+  - **plantas em alta resolução**, nítidas mesmo com zoom máximo, carregadas sob demanda para manter a página leve (ver [Imagens das plantas em alta resolução](#imagens-das-plantas-em-alta-resolução));
+  - **layout responsivo**: no computador, barra lateral ao lado do mapa; no celular e no tablet, o mapa ocupa a tela inteira e a barra lateral vira um **painel deslizante** na parte de baixo (recolhido mostra a busca e a escolha da planta; expandido, os filtros, a legenda e a lista), como em aplicativos de mapa.
 - Formulário de colaboração, no qual qualquer visitante pode relatar um problema ou sugerir uma melhoria, informando:
   - Local da ocorrência;
   - Categoria de acessibilidade (física ou auditiva, com plano de expansão para outras categorias);
@@ -159,6 +160,7 @@ accessmap-ifsp/
 │       ├── dashboard.js       # Leitura/filtro/exclusão (com desfazer) de respostas
 │       ├── icones-lugares.js  # Cores, ícones e legenda dos locais do mapa
 │       ├── mapa.js            # Dados dos locais, busca, filtros, navegação e plantas HD
+│       ├── sidebar-mapa.js    # Painel deslizante da barra lateral no celular/tablet
 │       ├── admin.js           # Inserir/editar/excluir locais (admin.html)
 │       ├── plantas-storage.js # Imagens de planta no IndexedDB
 │       └── admin-planta.js    # Modal "Atualizar imagem do mapa" (admin.html)
@@ -472,6 +474,15 @@ O AccessMap foi desenvolvido com preocupação constante em ser acessível enqua
 - Marcadores do mapa com nome acessível (ex.: "Bloco A - Biblioteca. Biblioteca — Bloco A — Informática") e significado que não depende só da cor: cada pino também tem um ícone, explicado na legenda.
 - Carrossel com botão de pausar, que também para com o mouse ou o foco em cima (WCAG 2.2.2).
 - Respeito à preferência do sistema por **menos movimento** (`prefers-reduced-motion`): animações e a troca automática do carrossel são desativadas.
+- **Uso no celular** (regras em `assets/scss/_mobile.scss` e `_admin-mobile.scss`, válidas para telas de toque e telas de até 768 px):
+  - alvos de toque de no mínimo **44×44 px** (WCAG 2.5.5) em botões, links, filtros, controles de zoom e itens de lista;
+  - campos com fonte de **16 px**, o que evita o zoom automático do iPhone ao tocar em um campo;
+  - texto de no mínimo 12 px;
+  - teclado do celular com a tecla certa para cada campo (`enterkeyhint`: buscar, próximo, entrar, enviar);
+  - respeito à área segura de telas com entalhe e barra de gestos (`viewport-fit=cover` e `env(safe-area-inset-*)`), e cor da barra do navegador na identidade do projeto (`theme-color`);
+  - no mapa, painel inferior que pode ser **arrastado** para cima e para baixo, e popups que nunca ficam escondidos atrás dele;
+  - botões de fonte e contraste agrupados em um único botão **Acessibilidade**, e filtros do painel de respostas recolhíveis;
+  - sem rolagem horizontal em nenhuma página, verificado em 320, 360 e 414 px de largura.
 
 ## Roadmap
 

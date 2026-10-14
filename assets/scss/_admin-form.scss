@@ -2,6 +2,8 @@
 @use 'variables' as *;
 
 $card-radius: 22px;
+// Largura do painel "Inserir / Atualizar local" no computador
+$largura-painel-form: 460px;
 
 .navbar .logo {
     text-decoration: none;
@@ -36,20 +38,29 @@ $card-radius: 22px;
     }
 }
 
-// Em telas pequenas, os links da navbar do admin ficam só com o ícone
-// (o texto continua disponível para leitores de tela)
+// Até 1100 px os links da navbar do admin ficam só com o ícone (o texto
+// continua para leitores de tela), para não quebrarem em duas linhas
+@media (max-width: 1100px) {
+    .nav-admin-link .nav-texto {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+    }
+
+    .nav-admin-link {
+        min-width: 44px;
+        min-height: 40px;
+        justify-content: center;
+    }
+}
+
+// Em telas pequenas, o nome do sistema também some da navbar do admin
 @media (max-width: 768px) {
     .nav-admin-link {
         padding: 8px 10px;
-
-        .nav-texto {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-        }
     }
 
     .navbar .logo .logo-text {
@@ -59,6 +70,9 @@ $card-radius: 22px;
 
 .btn-novo-local {
     width: 100%;
+    flex-shrink: 0;
+    line-height: 1.3;
+    text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -83,7 +97,7 @@ $card-radius: 22px;
     }
 
     &:focus-visible {
-        outline: 2px solid $color-dark;
+        outline: 2px solid $color-purple;
         outline-offset: 2px;
     }
 }
@@ -136,7 +150,7 @@ $card-radius: 22px;
     border-radius: 6px;
 
     &:focus-visible {
-        outline: 2px solid $color-dark;
+        outline: 2px solid $color-purple;
         outline-offset: 3px;
     }
 
@@ -179,7 +193,7 @@ $card-radius: 22px;
     }
 
     &:focus-visible {
-        outline: 2px solid $color-dark;
+        outline: 2px solid $color-purple;
         outline-offset: 2px;
     }
 }
@@ -229,7 +243,7 @@ $card-radius: 22px;
     }
 
     &:focus-visible {
-        outline: 2px solid $color-dark;
+        outline: 2px solid $color-purple;
         outline-offset: 2px;
     }
 }
@@ -246,7 +260,7 @@ $card-radius: 22px;
 }
 
 .painel-lateral {
-    width: 360px;
+    width: $largura-painel-form;
     flex-shrink: 0;
     height: 100%;
     border-left: 1px solid $color-grey;
@@ -271,14 +285,15 @@ $card-radius: 22px;
 
 .form-local-card {
     width: 100%;
-    max-width: 360px;
+    max-width: $largura-painel-form;
     box-sizing: border-box;
     background: $color-white;
     font-family: $font-secondary;
 }
 
 .form-local-header {
-    background: $color-dark;
+    // Cabeçalho dos painéis "Inserir / Atualizar local" e "Atualizar imagem do mapa"
+    background: $color-purple;
     color: $color-white;
     padding: 18px 24px;
     display: flex;
@@ -349,8 +364,9 @@ $card-radius: 22px;
 
         &:focus {
             outline: none;
-            border-color: $color-dark;
+            border-color: $color-purple;
             background: $color-white;
+            box-shadow: 0 0 0 3px rgba($color-purple, 0.15);
         }
 
         &:disabled {
@@ -457,7 +473,7 @@ $card-radius: 22px;
         }
 
         &:has(input:focus-visible) {
-            outline: 2px solid $color-dark;
+            outline: 2px solid $color-purple;
             outline-offset: 2px;
         }
     }
@@ -524,7 +540,7 @@ $card-radius: 22px;
     }
 
     &:focus-visible {
-        outline: 2px solid $color-dark;
+        outline: 2px solid $color-purple;
         outline-offset: 2px;
     }
 }
@@ -536,7 +552,7 @@ $card-radius: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 2100; // acima do painel de edição (1100) e do painel inferior do mapa
     padding: 24px;
 
     &.oculto {
@@ -619,11 +635,11 @@ $card-radius: 22px;
 }
 
 .btn-confirm-ok {
-    background: $color-dark;
+    background: $color-purple;
     color: $color-white;
 
     &:hover {
-        background: color.adjust($color-dark, $lightness: 15%);
+        background: color.adjust($color-purple, $lightness: -8%);
     }
 
     // Ações destrutivas (excluir, restaurar) ficam em vermelho
@@ -642,58 +658,84 @@ $card-radius: 22px;
     body:has(#painel-form:not(.oculto)) {
         .widget-acessibilidade-nativo,
         div[vw].enabled {
-            right: 380px !important;
+            right: calc(#{$largura-painel-form} + 20px) !important;
         }
     }
 }
 
+// Celular e tablet: mapa em tela cheia (ver _internal-map.scss); o painel
+// de edição vira um painel inferior sobre o mapa, que continua clicável
+// na parte de cima para ajustar a posição do ponto
 @media (max-width: 992px) {
-    .container-mapa {
-        flex-direction: column !important;
-        height: auto !important;
+    .container-mapa .mapa-e-painel {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
     }
 
-    .sidebar {
-        width: 100% !important;
-        height: auto !important;
-        padding: 20px !important;
-
-        #lista-lugares-admin {
-            max-height: 40vh;
-            overflow-y: auto;
-            margin-bottom: 20px;
-        }
+    // No admin o #map fica dentro de .mapa-e-painel
+    .container-mapa .mapa-e-painel #map {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
     }
 
-    .mapa-e-painel {
-        width: 100% !important;
-        flex-direction: column !important;
-        height: auto !important;
-    }
-
-    #map {
-        width: 100% !important;
-        height: 400px !important;
-        flex: none !important;
+    .container-mapa .sidebar #lista-lugares-admin {
+        max-height: none;
+        overflow: visible;
+        margin-bottom: 12px;
     }
 
     .painel-lateral {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
         width: 100% !important;
-        height: auto !important;
-        max-height: 45vh;
+        height: auto;
+        max-height: 78%; // ainda deixa uma faixa do mapa visível para ajustar o ponto
         border-left: none;
-        border-top: 1px solid $color-grey;
+        border-radius: 18px 18px 0 0;
+        box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.2);
+        z-index: 1100;
+        opacity: 1;
+        transform: translateY(0);
+        transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.3s;
 
         &.oculto {
             width: 100% !important;
-            height: 0 !important;
-            max-height: 0;
-            border: none;
+            opacity: 1;
+            transform: translateY(100%);
+        }
+
+        .form-local-card {
+            max-width: none;
+        }
+
+        // à direita: espaço dos botões flutuantes de acessibilidade
+        .form-local-body {
+            padding-right: 70px;
+        }
+
+        // Cabeçalho (com o botão fechar) sempre visível ao rolar o formulário
+        .form-local-header {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            border-radius: 18px 18px 0 0;
         }
     }
 
-    .form-local-card {
-        width: 100%;
+    // Com o formulário aberto, o painel da barra lateral sai de cena
+    body:has(#painel-form:not(.oculto)) .container-mapa .sidebar {
+        transform: translateY(100%);
+    }
+}
+
+@media (max-width: 768px) {
+    .painel-lateral .form-local-body {
+        padding-right: 58px;
     }
 }
 
@@ -703,7 +745,7 @@ $card-radius: 22px;
     }
 
     .form-local-body {
-        padding: 20px 18px 18px;
+        padding: 20px 58px 18px 18px;
     }
 
     .tipo-opcoes .tipo-grade {

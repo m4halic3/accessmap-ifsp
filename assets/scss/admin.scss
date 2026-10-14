@@ -2,3 +2,4 @@
 // Compilar com:  sass assets/scss/admin.scss assets/css/admin.css --style=compressed
 @use 'admin-form';
 @use 'admin-planta';
+@use 'admin-mobile'; // por último: ajustes de toque no celular

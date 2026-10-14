@@ -1,0 +1,260 @@
+@use 'variables' as *;
+
+// =========================================================================
+// CELULAR E TELAS DE TOQUE
+// -------------------------------------------------------------------------
+// Regras de uso no celular reunidas num só lugar (carregadas por último):
+//   • alvos de toque de no mínimo 44x44 px (WCAG 2.5.5 / Apple / Google);
+//   • campos com fonte de 16 px (abaixo disso o iPhone dá zoom ao tocar);
+//   • texto de no mínimo 12 px;
+//   • áreas seguras de telas com entalhe (notch) e barra de gestos.
+// "Toque" = pointer: coarse (vale também para tablets e notebooks com tela
+// de toque); "tela pequena" = até 768 px de largura.
+// =========================================================================
+
+$alvo-toque: 44px;
+
+// Sem o "flash" cinza do toque no Android/iOS; o foco e o :active já dão retorno
+html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+@media (pointer: coarse), (max-width: 768px) {
+    // --- Campos: 16 px evita o zoom automático do iOS ao focar ---
+    input:not([type="radio"]):not([type="checkbox"]):not([type="range"]),
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+
+    // --- Navegação ---
+    .navbar .logo,
+    .navbar-admin .logo {
+        min-height: $alvo-toque;
+    }
+
+    #menu-bar {
+        height: $alvo-toque !important;
+    }
+
+    .navbar-admin .nav-right .btn-logout {
+        min-height: $alvo-toque;
+    }
+
+    // --- Botões flutuantes de acessibilidade ---
+    .widget-acessibilidade-nativo button {
+        width: $alvo-toque !important;
+        height: $alvo-toque !important;
+    }
+
+    // --- Carrossel ---
+    .carousel-container .btn-pausar {
+        width: $alvo-toque;
+        height: $alvo-toque;
+    }
+
+    // As bolinhas continuam pequenas na tela, mas a área de toque é maior
+    .indicadores {
+        gap: 26px;
+
+        .dot {
+            position: relative;
+
+            &::after {
+                content: "";
+                position: absolute;
+                inset: -17px -12px;
+            }
+        }
+    }
+
+    // Botões de escolha (planta do mapa, categoria do formulário, filtros)
+    .btn-type {
+        min-height: $alvo-toque;
+    }
+
+    // --- Mapa (barra lateral) ---
+    .container-mapa .sidebar {
+        .btn-limpar-mapa {
+            min-height: $alvo-toque;
+        }
+
+        .header-filtros .btn-reset {
+            min-height: $alvo-toque;
+            padding: 0 18px;
+            font-size: 0.8rem;
+        }
+
+        .item-lugar {
+            min-height: $alvo-toque;
+        }
+    }
+
+    .legenda-mapa summary {
+        display: flex;
+        align-items: center;
+        min-height: $alvo-toque;
+    }
+
+    // Botões + / − do Leaflet
+    .leaflet-touch .leaflet-bar a {
+        width: $alvo-toque;
+        height: $alvo-toque;
+        line-height: $alvo-toque;
+        font-size: 22px;
+    }
+
+    // --- Login ---
+    .autenticacao {
+        .auth-header .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: $alvo-toque;
+            padding: 0 10px;
+        }
+
+        .auth-card .input-group input {
+            min-height: $alvo-toque;
+        }
+
+        .auth-card .input-group.input-senha .btn-ver-senha {
+            width: $alvo-toque;
+            height: $alvo-toque;
+        }
+    }
+
+    // --- Painel de respostas ---
+    .btn-limpar-filtros {
+        min-height: $alvo-toque;
+    }
+
+    // O campo ocupa a moldura inteira, para todo o retângulo responder ao toque
+    .dashboard-sidebar .input-wrapper {
+        padding-top: 0;
+        padding-bottom: 0;
+
+        input,
+        select {
+            min-height: $alvo-toque;
+        }
+    }
+
+    .btn-excluir-resposta {
+        width: $alvo-toque !important;
+        height: $alvo-toque !important;
+    }
+
+    // --- Texto pequeno demais para ler no celular ---
+    .navbar-admin .logo .badge-admin {
+        font-size: 0.75rem;
+    }
+
+    .resposta-tag {
+        font-size: 0.75rem !important;
+    }
+}
+
+// =========================================================================
+// TELAS PEQUENAS (até 768 px): ajustes de layout da página inicial
+// =========================================================================
+@media (max-width: 768px) {
+    // Carrossel em 4:3: as imagens (16:9) têm o conteúdo no centro e fundo
+    // liso nas laterais; assim o corte pega só o fundo e o texto fica maior
+    .carousel-container {
+        height: auto;
+        aspect-ratio: 4 / 3;
+    }
+
+    .secao-carrossel {
+        margin-top: 0;
+        padding: 20px 0;
+    }
+
+    // Bloco do mapa da página inicial menos alto (era 80% da tela)
+    .map-section {
+        margin: 24px auto;
+
+        .map-container {
+            height: 55vh;
+            min-height: 320px;
+        }
+    }
+
+    // Formulário com mais espaço útil para os campos
+    .contact-section {
+        padding: 40px 16px;
+    }
+
+    .contact-container {
+        gap: 28px;
+    }
+
+    .contact-card {
+        padding: 24px 18px !important;
+    }
+
+    .contact-info h2 {
+        font-size: 1.7rem !important;
+        line-height: 1.2;
+    }
+}
+
+// =========================================================================
+// MAPA NO CELULAR: painel deslizante (ver também _internal-map.scss)
+// =========================================================================
+@media (max-width: 992px) {
+    // Os botões flutuantes de acessibilidade ficam POR BAIXO do painel quando
+    // ele está expandido (continuam acessíveis ao recolher). Assim o painel
+    // usa a largura inteira, sem reservar espaço para eles.
+    .container-mapa .sidebar {
+        padding-right: 20px;
+        // barra de gestos / área segura do iPhone
+        padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+        transform: translateY(calc(100% - var(--altura-recolhida, 230px) - env(safe-area-inset-bottom, 0px)));
+    }
+
+    .container-mapa .sidebar-alca {
+        width: calc(100% + 40px);
+        margin-right: -20px;
+        touch-action: none; // o arrasto da alça é tratado pelo sidebar-mapa.js
+    }
+
+    // Nas páginas de mapa, A+ / A- / contraste ficam no ALTO da tela, logo
+    // abaixo da navbar: essa faixa do mapa continua visível com o painel
+    // expandido ou com o formulário aberto, então o botão nunca some.
+    body:has(.container-mapa) .widget-acessibilidade-nativo {
+        top: 72px !important;
+    }
+
+    // O VLibras fica por baixo do painel expandido (e do formulário do admin)
+    // para não cobrir a lista; volta a aparecer ao recolher o painel.
+    // O botão dele é desenhado dentro de um Shadow DOM em
+    // #vlibras-access-wrapper, então o próprio contêiner vira um contexto de
+    // empilhamento abaixo do painel (z-index 1000).
+    body.painel-mapa-expandido,
+    body:has(#painel-form:not(.oculto)) {
+        div[vw].enabled {
+            z-index: 900 !important;
+        }
+
+        #vlibras-access-wrapper {
+            position: relative;
+            z-index: 900;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .container-mapa .sidebar {
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+
+    .container-mapa .sidebar-alca {
+        width: calc(100% + 32px);
+        margin: 0 -16px 8px;
+    }
+}
