@@ -60,7 +60,7 @@
         el.btnVoltar = $("btn-voltar-planta");
         el.btnRestaurar = $("btn-restaurar-planta");
         el.btnPublicar = $("btn-publicar-planta");
-        el.status = $("planta-status");
+        el.status = $("admin-status");
 
         el.btnAbrir.addEventListener("click", abrirModal);
         el.btnFechar.addEventListener("click", fecharModal);
@@ -324,7 +324,8 @@
             `Tem certeza que deseja substituir a imagem de "${NOMES_PLANTAS[ala]}" por "${arquivo.name}"? ` +
             "A nova imagem passa a aparecer no mapa público deste navegador. " +
             "Se for preciso, você poderá voltar ao mapa anterior depois.",
-            confirmarPublicar
+            confirmarPublicar,
+            { rotulo: "Publicar" }
         );
     }
 
@@ -371,7 +372,8 @@
         abrirConfirmacao(
             "Restaurar mapa original",
             `Tem certeza que deseja voltar "${NOMES_PLANTAS[ala]}" para a imagem original do projeto? A imagem enviada e o histórico dela serão removidos.`,
-            confirmarRestaurar
+            confirmarRestaurar,
+            { rotulo: "Restaurar", perigo: true }
         );
     }
 
@@ -398,7 +400,8 @@
         abrirConfirmacao(
             "Voltar ao mapa anterior",
             `Tem certeza que deseja voltar "${NOMES_PLANTAS[ala]}" para o mapa anterior? A imagem que está em uso agora será descartada.`,
-            confirmarVoltar
+            confirmarVoltar,
+            { rotulo: "Voltar ao anterior", perigo: true }
         );
     }
 
@@ -422,7 +425,7 @@
 
     // Mensagem fora do modal (leitores de tela anunciam por causa do aria-live)
     function mostrarStatus(texto) {
-        el.status.textContent = texto;
+        mostrarStatusAdmin(texto); // definida em admin.js
     }
 
     mapaPronto.then(iniciar);

@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <title>AccessMap - Acessibilidade no Campus</title>
@@ -12,11 +15,14 @@
 </head>
 
 <body>
+    <a href="#conteudo-principal" class="skip-link">Pular para o conteúdo</a>
+
     <nav class="navbar" aria-label="Navegação Principal">
-        <div class="logo">
-            <img src="assets/images/logo-branca.png" alt="Logotipo AccessMap com símbolo de localização" class="logo-img">
+        <a href="#" class="logo" style="text-decoration:none;">
+            <img src="assets/images/logo-branca.png" alt="" class="logo-img">
             <span class="logo-text">ACCESSMAP</span>
-        </div>
+            <span class="sr-only">— início da página</span>
+        </a>
 
         <ul class="nav-links-desktop desktop-only">
             <li><a href="#">Início</a></li>
@@ -31,19 +37,19 @@
         </div>
 
         <div id="menu" class="mobile-only">
-            <div id="menu-bar" onclick="menuOnClick()" role="button" aria-expanded="false" aria-controls="nav" aria-label="Menu de Navegação" tabindex="0">
+            <div id="menu-bar" onclick="menuOnClick()" role="button" aria-expanded="false" aria-controls="nav" aria-label="Abrir menu de navegação" tabindex="0">
                 <div id="bar1" class="bar"></div>
                 <div id="bar2" class="bar"></div>
                 <div id="bar3" class="bar"></div>
             </div>
             <nav class="nav-mobile" id="nav" aria-label="Navegação móvel">
                 <ul>
-                    <li><a href="#" onclick="menuOnClick()">Início</a></li>
-                    <li><a href="#mapa" onclick="menuOnClick()">Mapa</a></li>
-                    <li><a href="#estatisticas" onclick="menuOnClick()">Estatísticas</a></li>
-                    <li><a href="#contato" onclick="menuOnClick()">Contato</a></li>
-                    <li><a href="#sobre" onclick="menuOnClick()">Quem Somos</a></li>
-                    <li><a href="login.html" onclick="menuOnClick()" style="color: #FF4D8D; font-weight: 800;">Entrar</a></li>
+                    <li><a href="#" onclick="fecharMenuSeAberto()">Início</a></li>
+                    <li><a href="#mapa" onclick="fecharMenuSeAberto()">Mapa</a></li>
+                    <li><a href="#estatisticas" onclick="fecharMenuSeAberto()">Estatísticas</a></li>
+                    <li><a href="#contato" onclick="fecharMenuSeAberto()">Contato</a></li>
+                    <li><a href="#sobre" onclick="fecharMenuSeAberto()">Quem Somos</a></li>
+                    <li><a href="login.html" style="color: #FF4D8D; font-weight: 800;">Entrar</a></li>
                 </ul>
             </nav>
         </div>
@@ -52,21 +58,24 @@
 
     <main id="conteudo-principal">
 
-        <section class="secao-carrossel" aria-label="Destaques Informativos">
-            <div class="carousel-container">
-                <div class="slides-wrapper" id="slider">
-                    <div class="slide"><img src="assets/images/motivacao.png" alt="Logo AccessMap: Encontre blocos e laboratórios no campus de forma rápida."></div>
-                    <div class="slide"><img src="assets/images/simbolos.png" alt="Infográfico: Símbolos universais de acessibilidade física e auditiva."></div>
-                    <div class="slide"><img src="assets/images/slide-final.png" alt="Mapa do campus com pinos de localização: Mova-se com autonomia."></div>
+        <section class="secao-carrossel" aria-label="Destaques informativos">
+            <div class="carousel-container" aria-roledescription="carrossel" aria-label="Destaques do AccessMap">
+                <button type="button" id="btn-pausar-carrossel" class="btn-pausar" aria-pressed="false" aria-label="Pausar troca automática dos slides">
+                    <i class="fas fa-pause" aria-hidden="true"></i>
+                </button>
+                <div class="slides-wrapper" id="slider" aria-live="off">
+                    <div class="slide" role="group" aria-roledescription="slide" aria-label="1 de 3"><img src="assets/images/motivacao.png" alt="Logo AccessMap: Encontre blocos e laboratórios no campus de forma rápida."></div>
+                    <div class="slide" role="group" aria-roledescription="slide" aria-label="2 de 3"><img src="assets/images/simbolos.png" alt="Infográfico: Símbolos universais de acessibilidade física e auditiva."></div>
+                    <div class="slide" role="group" aria-roledescription="slide" aria-label="3 de 3"><img src="assets/images/slide-final.png" alt="Mapa do campus com pinos de localização: Mova-se com autonomia."></div>
                 </div>
 
-                <button class="seta esquerda" onclick="btnMove(-1)" aria-label="Slide Anterior">❮</button>
-                <button class="seta direita" onclick="btnMove(1)" aria-label="Próximo Slide">❯</button>
+                <button type="button" class="seta esquerda" onclick="btnMove(-1)" aria-label="Slide anterior"><span aria-hidden="true">❮</span></button>
+                <button type="button" class="seta direita" onclick="btnMove(1)" aria-label="Próximo slide"><span aria-hidden="true">❯</span></button>
 
-                <div class="indicadores" role="tablist" aria-label="Indicadores dos slides">
-                    <button class="dot active" onclick="jumpToSlide(0)" role="tab" aria-selected="true" aria-label="Ir para o slide 1"></button>
-                    <button class="dot" onclick="jumpToSlide(1)" role="tab" aria-selected="false" aria-label="Ir para o slide 2"></button>
-                    <button class="dot" onclick="jumpToSlide(2)" role="tab" aria-selected="false" aria-label="Ir para o slide 3"></button>
+                <div class="indicadores" role="group" aria-label="Escolher slide">
+                    <button type="button" class="dot active" onclick="jumpToSlide(0)" aria-current="true" aria-label="Ir para o slide 1"></button>
+                    <button type="button" class="dot" onclick="jumpToSlide(1)" aria-label="Ir para o slide 2"></button>
+                    <button type="button" class="dot" onclick="jumpToSlide(2)" aria-label="Ir para o slide 3"></button>
                 </div>
             </div>
         </section>
@@ -80,9 +89,7 @@
                 </iframe>
 
                 <div class="map-overlay">
-                    <button type="button" class="btn-mapa" onclick="window.location.href='mapa.html'">
-                        IR PARA O MAPA
-                    </button>
+                    <a href="mapa.html" class="btn-mapa">Ir para o mapa</a>
                 </div>
             </div>
         </section>
@@ -130,18 +137,18 @@
         <section id="contato" class="contact-section">
             <div class="contact-container">
                 <div class="contact-card">
-                    <form id="form-contato" action="#" method="POST">
+                    <form id="form-contato" action="#" method="POST" novalidate>
                         <div class="form-group">
                             <label for="local-ocorrencia">Local da Ocorrência</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-map-pin" aria-hidden="true"></i> 
-                                <input type="text" id="local-ocorrencia" placeholder="Ex: Bloco A, Biblioteca, Rampa central..." required>
+                                <input type="text" id="local-ocorrencia" placeholder="Ex: Bloco A, Biblioteca, Rampa central..." maxlength="120" required>
                             </div>
                         </div>
 
                         <fieldset class="form-group fieldset-reset">
                             <legend class="label-style">Categoria de Acessibilidade</legend>
-                            <div class="type-buttons" role="group" aria-label="Escolha o tipo de acessibilidade afetada">
+                            <div class="type-buttons" id="grupo-categoria" role="group" aria-label="Escolha o tipo de acessibilidade afetada (obrigatório)">
                                 <button type="button" class="btn-type btn-fisica" data-categoria="fisica" aria-pressed="false">FÍSICA</button>
                                 <button type="button" class="btn-type btn-auditiva" data-categoria="auditiva" aria-pressed="false">AUDITIVA</button>
                             </div>
@@ -151,11 +158,11 @@
                             <label for="relato-sugestao">Sua sugestão ou relato</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-comment-dots" aria-hidden="true"></i>
-                                <textarea id="relato-sugestao" placeholder="Descreva aqui o problema de acessibilidade encontrado..." required></textarea>
+                                <textarea id="relato-sugestao" placeholder="Descreva aqui o problema de acessibilidade encontrado..." minlength="10" maxlength="2000" required></textarea>
                             </div>
                         </div>
 
-                        <p id="msg-contato" class="msg-feedback" style="display:none;"></p>
+                        <p id="msg-contato" class="msg-feedback" role="status" aria-live="polite" hidden></p>
 
                         <button type="submit" class="btn-submit">ENVIAR COLABORAÇÃO</button>
                     </form>
@@ -224,16 +231,13 @@
     <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles manuais de acessibilidade">
         <button type="button" id="btn-aumentar" onclick="mudarFonte(1)" aria-label="Aumentar tamanho do texto">A+</button>
         <button type="button" id="btn-diminuir" onclick="mudarFonte(-1)" aria-label="Diminuir tamanho do texto">A-</button>
-        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alternar alto contraste">
+        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alto contraste" aria-pressed="false">
             <i class="fas fa-adjust" aria-hidden="true"></i>
         </button>
     </div>
     
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <script>
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-    </script>
-    
+    <script src="assets/js/acessibilidade.js"></script>
     <script src="assets/js/script.js"></script>
 </body>
 

@@ -1,0 +1,119 @@
+@use "sass:color";
+@use 'variables' as *;
+
+// =========================================================================
+// UTILITÁRIOS GLOBAIS (usados em várias páginas)
+// =========================================================================
+
+// Esconde visualmente, mas mantém o conteúdo para leitores de tela
+.sr-only {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+// Link "Pular para o conteúdo" — aparece só ao receber foco pelo teclado
+.skip-link {
+    position: fixed;
+    top: -100px;
+    left: 16px;
+    z-index: 2147483647;
+    background: $color-white;
+    color: $color-purple;
+    font-family: $font-primary;
+    font-weight: 800;
+    padding: 10px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    text-decoration: none;
+
+    &:focus {
+        top: 12px;
+    }
+}
+
+// Mensagens de retorno de formulários (sucesso / erro)
+.msg-feedback {
+    margin: 12px 0 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-family: $font-secondary;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: left;
+
+    &[hidden] {
+        display: none;
+    }
+
+    &.msg-sucesso {
+        background: rgba($color-green, 0.1);
+        color: color.adjust($color-green, $lightness: -8%);
+        border: 1.5px solid rgba($color-green, 0.4);
+    }
+
+    &.msg-erro {
+        background: rgba(#A32D2D, 0.08);
+        color: #8a1f1f;
+        border: 1.5px solid rgba(#A32D2D, 0.4);
+    }
+}
+
+// Aviso flutuante (toast) com ação opcional, ex.: "Desfazer"
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: calc(100% - 32px);
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: $color-dark;
+    color: $color-white;
+    font-family: $font-secondary;
+    font-size: 0.9rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+    &[hidden] {
+        display: none;
+    }
+
+    button {
+        background: transparent;
+        border: 1.5px solid rgba($color-white, 0.6);
+        color: $color-white;
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-family: $font-primary;
+        font-weight: 700;
+        font-size: 0.8rem;
+        cursor: pointer;
+
+        &:hover {
+            background: rgba($color-white, 0.15);
+        }
+    }
+}
+
+// Respeita quem pediu menos animação no sistema operacional
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

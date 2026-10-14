@@ -1,3 +1,10 @@
+/* =========================================================
+   ADMIN - INSERIR / EDITAR / EXCLUIR LOCAIS DO MAPA
+   -----------------------------------------------------------
+   Depende de mapa.js (carregado antes): usa `lugares`, `mapa`,
+   `alaAtual`, `mapaPronto` e as funções de filtro/foco de lá.
+   As alterações são salvas com salvarLugares() (localStorage).
+   ========================================================= */
 const modoAdmin =
     document.body.dataset.admin === "sempre" ||
     new URLSearchParams(window.location.search).get("admin") === "1";
@@ -13,18 +20,20 @@ const OPCOES_BLOCO = [
 let indiceEmEdicao = null;
 let coordsClicadas = null;
 let elementoComFocoAntesDoModal = null;
+let elementoComFocoAntesDoPainel = null;
 let marcadorTemporario = null;
+
+function painelFormAberto() {
+    return !document.getElementById("painel-form").classList.contains("oculto");
+}
 
 function iniciarAdmin() {
     if (!modoAdmin) return;
 
-    document.querySelectorAll(".somente-admin").forEach(el => el.classList.remove("somente-admin-oculto"));
-    const decoracao = document.querySelector(".sidebar-decoracao");
-    if (decoracao) decoracao.style.display = "none";
-
     popularSelectBlocos();
     renderizarListaAdmin();
     ligarEventosAdmin();
+    atualizarBotaoRestaurarLocais();
 
     primeiraInicializacao = false;
     aplicarFiltrosCombinados();
@@ -35,9 +44,7 @@ function iniciarAdmin() {
             y: Math.round(e.latlng.lat)
         };
 
-        const painelAberto = !document.getElementById("overlay-form").classList.contains("oculto");
-
-        if (!painelAberto) {
+        if (!painelFormAberto()) {
             // Nenhum formulário aberto: o clique já inicia a inserção nesse ponto
             abrirFormulario(null, null, coords);
             return;
@@ -47,6 +54,7 @@ function iniciarAdmin() {
         coordsClicadas = coords;
         atualizarTextoCoords();
         mostrarMarcadorTemporario();
+        mostrarErroForm("");
     });
 }
 
@@ -62,25 +70,29 @@ function popularSelectBlocos() {
     });
 }
 
+// Planta em que o local aparece (subsolos têm planta própria)
+function alaDoLugarAdmin(lugar) {
+    return lugar.andar === "subsolo" && plantas[lugar.bloco_pai] ? lugar.bloco_pai : "todos";
+}
+
+// Troca para a planta certa (se precisar) e foca o local
+function irParaLugar(lugar) {
+    const ala = alaDoLugarAdmin(lugar);
+    if (ala !== alaAtual) filtrarAla(ala);
+    focarNoLugar(lugar);
+}
+
 // -----------------------------------------------------------------------
-// Lista lateral do admin: por padrão (sem busca) mostra só os pontos
-// essenciais — os mesmos "principais" que o mapa público usa como estado
-// inicial (subponto: false: blocos, estacionamentos, quadra, etc.) — pra
-// não poluir a barra lateral com centenas de salas internas de uma vez.
-//
-// Quando há um termo de busca, a lista passa a procurar em TODO o array
-// `lugares`, sem nenhuma restrição de ala/andar/subponto — no admin faz
-// sentido encontrar (e poder editar) qualquer local do sistema, mesmo um
-// que pertença a uma planta diferente da que está aberta no momento.
+// Lista lateral do admin: sem busca mostra só os locais principais
+// (subponto: false), para não poluir a barra lateral com centenas de
+// salas. Com busca, procura em TODO o array `lugares`, de qualquer
+// planta — no admin faz sentido poder encontrar e editar qualquer local.
 // -----------------------------------------------------------------------
 function obterLugaresParaListaAdmin() {
-    const searchInput = document.getElementById("search-input");
-    const termo = searchInput ? normalizarTexto(searchInput.value) : "";
-
+    const termo = termoDeBuscaAtual();
     if (termo) {
-        return lugares.filter(l => normalizarTexto(l.nome).includes(termo));
+        return lugares.filter(l => normalizarBusca(l.nome).includes(termo));
     }
-
     return lugares.filter(l => l.subponto === false);
 }
 
@@ -91,26 +103,37 @@ function renderizarListaAdmin() {
 
     const listaParaExibir = obterLugaresParaListaAdmin();
 
+    if (listaParaExibir.length === 0) {
+        const vazio = document.createElement("p");
+        vazio.className = "lista-vazia-admin";
+        vazio.textContent = "Nenhum local encontrado. Para cadastrar um novo, clique no ponto desejado do mapa.";
+        container.appendChild(vazio);
+        return;
+    }
+
     listaParaExibir.forEach((lugar) => {
         const indice = lugares.indexOf(lugar);
 
         const item = document.createElement("div");
         item.className = "item-lugar-admin";
 
-        const info = document.createElement("div");
+        const info = document.createElement("button");
+        info.type = "button";
         info.className = "item-lugar-admin-info";
-        info.innerHTML = `<p>${escaparHtml(lugar.nome)}</p><span>Ponto de Interesse</span>`;
-        info.onclick = () => focarNoLugar(lugar);
+        info.setAttribute("aria-label", `Ver ${lugar.nome} no mapa`);
+        info.innerHTML = `<p>${escaparHtml(lugar.nome)}</p><span>${descricaoDoTipo(lugar)}</span>`;
+        info.addEventListener("click", () => irParaLugar(lugar));
 
         const btnEditar = document.createElement("button");
         btnEditar.type = "button";
         btnEditar.className = "btn-editar-local";
         btnEditar.setAttribute("aria-label", `Editar ${lugar.nome}`);
+        btnEditar.title = "Editar";
         btnEditar.innerHTML = '<i class="fas fa-pencil-alt" aria-hidden="true"></i>';
-        btnEditar.onclick = (ev) => {
-            ev.stopPropagation();
+        btnEditar.addEventListener("click", () => {
+            irParaLugar(lugar);
             abrirFormulario(lugar, indice);
-        };
+        });
 
         item.appendChild(info);
         item.appendChild(btnEditar);
@@ -119,11 +142,9 @@ function renderizarListaAdmin() {
 }
 
 // -----------------------------------------------------------------------
-// Rótulo do campo "Bloco / Setor". Quando o admin está inserindo um local
-// direto dentro de um subsolo (Subsolo Mec. / Subsolo Edif.), o campo fica
-// travado no bloco daquela ala — não dá pra escolher outro bloco enquanto
-// se está fisicamente naquela planta, senão o local nasce com bloco_pai e
-// andar inconsistentes entre si e nunca aparece em nenhuma aba do mapa.
+// Rótulo do campo "Bloco / Setor". Ao inserir um local direto num
+// subsolo, o campo fica travado no bloco daquela ala — senão o local
+// nasce com bloco_pai e andar inconsistentes e não aparece em nenhuma aba.
 // -----------------------------------------------------------------------
 function atualizarLabelBloco(travado, nomeBlocoTravado) {
     const label = document.querySelector('label[for="form-bloco"]');
@@ -133,19 +154,32 @@ function atualizarLabelBloco(travado, nomeBlocoTravado) {
         : "Bloco / Setor";
 }
 
+function marcarTipo(tipo) {
+    const radio = document.querySelector(`input[name="form-tipo"][value="${tipo}"]`)
+        || document.querySelector('input[name="form-tipo"][value="geral"]');
+    radio.checked = true;
+}
+
+function tipoSelecionado() {
+    const marcado = document.querySelector('input[name="form-tipo"]:checked');
+    return marcado ? marcado.value : "geral";
+}
+
 function abrirFormulario(lugar = null, indice = null, coordsForcadas = null) {
+    if (!painelFormAberto()) elementoComFocoAntesDoPainel = document.activeElement;
+
     indiceEmEdicao = indice;
     coordsClicadas = lugar ? { x: lugar.x, y: lugar.y } : coordsForcadas;
 
-    document.getElementById("form-titulo").textContent = lugar ? "Atualizar Local" : "Inserir Local";
+    document.getElementById("form-titulo").textContent = lugar ? "Atualizar local" : "Inserir local";
     document.getElementById("form-nome").value = lugar ? lugar.nome : "";
+    document.getElementById("btn-salvar-local").textContent = lugar ? "Salvar alterações" : "Adicionar local";
     atualizarTextoCoords();
+    mostrarErroForm("");
 
     const selectBloco = document.getElementById("form-bloco");
 
     if (!lugar && alaAtual !== "todos") {
-        // Inserindo direto num subsolo: trava o bloco pra bater com a ala aberta,
-        // evitando bloco_pai/andar inconsistentes.
         selectBloco.value = alaAtual;
         selectBloco.disabled = true;
         const opcaoAtual = OPCOES_BLOCO.find(op => op.valor === alaAtual);
@@ -156,26 +190,36 @@ function abrirFormulario(lugar = null, indice = null, coordsForcadas = null) {
         atualizarLabelBloco(false);
     }
 
-    document.getElementById("form-acessivel").checked = !!lugar && lugar.tipo === "fisica";
-    document.getElementById("form-alerta").checked = !!lugar && lugar.tipo === "alerta";
+    marcarTipo(lugar ? lugar.tipo : "geral");
 
     document.getElementById("btn-excluir-local").classList.toggle("oculto", lugar === null);
-    document.getElementById("overlay-form").classList.remove("oculto");
+    document.getElementById("painel-form").classList.remove("oculto");
     document.getElementById("form-nome").focus();
 
+    // O painel muda a largura do mapa; o Leaflet precisa recalcular
+    mapa.invalidateSize();
     mostrarMarcadorTemporario();
 }
 
 function fecharFormulario() {
-    document.getElementById("overlay-form").classList.add("oculto");
+    document.getElementById("painel-form").classList.add("oculto");
     indiceEmEdicao = null;
     coordsClicadas = null;
     limparMarcadorTemporario();
+    mostrarErroForm("");
+    mapa.invalidateSize();
 
-    // Restaura o select pro estado padrão (destravado) pra próxima abertura
     const selectBloco = document.getElementById("form-bloco");
     selectBloco.disabled = false;
     atualizarLabelBloco(false);
+
+    const destino = elementoComFocoAntesDoPainel;
+    elementoComFocoAntesDoPainel = null;
+    if (destino && document.body.contains(destino) && typeof destino.focus === "function") {
+        destino.focus();
+    } else {
+        document.getElementById("btn-novo-local").focus();
+    }
 }
 
 function atualizarTextoCoords() {
@@ -183,6 +227,7 @@ function atualizarTextoCoords() {
     el.textContent = coordsClicadas
         ? `X: ${coordsClicadas.x}px, Y: ${coordsClicadas.y}px`
         : "Clique no mapa para marcar a posição";
+    el.closest(".coord-row").classList.toggle("sem-coords", !coordsClicadas);
 }
 
 function mostrarMarcadorTemporario() {
@@ -204,8 +249,32 @@ function limparMarcadorTemporario() {
     }
 }
 
+function mostrarErroForm(texto, campo) {
+    const el = document.getElementById("form-erro");
+    el.textContent = texto;
+    el.hidden = !texto;
+
+    const nome = document.getElementById("form-nome");
+    if (campo === "nome") {
+        nome.setAttribute("aria-invalid", "true");
+        nome.focus();
+    } else {
+        nome.removeAttribute("aria-invalid");
+    }
+}
+
+// Mensagem fora do painel (anunciada por leitores de tela via aria-live)
+function mostrarStatusAdmin(texto) {
+    const status = document.getElementById("admin-status");
+    if (!status) return;
+    status.textContent = "";
+    // pequeno atraso para o leitor de tela anunciar mesmo se o texto repetir
+    setTimeout(() => { status.textContent = texto; }, 50);
+}
+
 // ---------- Modal de confirmação genérico ----------
-function abrirConfirmacao(titulo, texto, aoConfirmar) {
+// opcoes: { rotulo: texto do botão de confirmar, perigo: true para ação destrutiva }
+function abrirConfirmacao(titulo, texto, aoConfirmar, opcoes = {}) {
     const overlay = document.getElementById("overlay-confirmacao");
     const tituloEl = document.getElementById("confirm-titulo");
     const textoEl = document.getElementById("confirm-texto");
@@ -214,6 +283,8 @@ function abrirConfirmacao(titulo, texto, aoConfirmar) {
 
     tituloEl.textContent = titulo;
     textoEl.textContent = texto;
+    btnOk.textContent = opcoes.rotulo || "Confirmar";
+    btnOk.classList.toggle("btn-confirm-ok--perigo", !!opcoes.perigo);
 
     elementoComFocoAntesDoModal = document.activeElement;
 
@@ -227,7 +298,10 @@ function abrirConfirmacao(titulo, texto, aoConfirmar) {
         btnOk.removeEventListener("click", onConfirmar);
         btnCancelar.removeEventListener("click", onCancelar);
         overlay.removeEventListener("keydown", onKeydown);
-        if (elementoComFocoAntesDoModal) elementoComFocoAntesDoModal.focus();
+        overlay.removeEventListener("click", onCliqueFora);
+        if (elementoComFocoAntesDoModal && document.body.contains(elementoComFocoAntesDoModal)) {
+            elementoComFocoAntesDoModal.focus();
+        }
     }
 
     function onConfirmar() {
@@ -239,8 +313,13 @@ function abrirConfirmacao(titulo, texto, aoConfirmar) {
         limpar();
     }
 
+    function onCliqueFora(e) {
+        if (e.target === overlay) onCancelar();
+    }
+
     function onKeydown(e) {
         if (e.key === "Escape") {
+            e.stopPropagation();
             onCancelar();
             return;
         }
@@ -248,17 +327,15 @@ function abrirConfirmacao(titulo, texto, aoConfirmar) {
             const focaveis = [btnCancelar, btnOk];
             const indice = focaveis.indexOf(document.activeElement);
             e.preventDefault();
-            if (e.shiftKey) {
-                focaveis[(indice - 1 + focaveis.length) % focaveis.length].focus();
-            } else {
-                focaveis[(indice + 1) % focaveis.length].focus();
-            }
+            const passo = e.shiftKey ? -1 : 1;
+            focaveis[(indice + passo + focaveis.length) % focaveis.length].focus();
         }
     }
 
     btnOk.addEventListener("click", onConfirmar);
     btnCancelar.addEventListener("click", onCancelar);
     overlay.addEventListener("keydown", onKeydown);
+    overlay.addEventListener("click", onCliqueFora);
 }
 
 // ---------- Salvar (com confirmação antes) ----------
@@ -266,49 +343,82 @@ function salvarLocal() {
     const nome = document.getElementById("form-nome").value.trim();
 
     if (!nome) {
-        alert('Digite um nome pro local antes de salvar.');
+        mostrarErroForm("Digite um nome para o local.", "nome");
         return;
     }
     if (!coordsClicadas) {
-        alert('Clique em um ponto do mapa pra definir a posição.');
+        mostrarErroForm("Clique no mapa para marcar a posição do local.");
         return;
     }
+    const duplicado = lugares.some((l, i) =>
+        i !== indiceEmEdicao && normalizarTexto(l.nome) === normalizarTexto(nome));
+    if (duplicado) {
+        mostrarErroForm(`Já existe um local chamado "${nome}". Use um nome diferente.`, "nome");
+        return;
+    }
+    mostrarErroForm("");
 
-    const acao = indiceEmEdicao !== null ? "atualizar" : "adicionar";
+    const editando = indiceEmEdicao !== null;
     abrirConfirmacao(
-        indiceEmEdicao !== null ? "Atualizar local" : "Adicionar local",
-        `Tem certeza que deseja ${acao} o local "${nome}"?`,
-        confirmarSalvarLocal
+        editando ? "Salvar alterações" : "Adicionar local",
+        editando
+            ? `Salvar as alterações em "${nome}"?`
+            : `Adicionar "${nome}" ao mapa?`,
+        confirmarSalvarLocal,
+        { rotulo: editando ? "Salvar" : "Adicionar" }
     );
 }
 
 function confirmarSalvarLocal() {
     const nome = document.getElementById("form-nome").value.trim();
     const blocoPai = document.getElementById("form-bloco").value;
-    const acessivel = document.getElementById("form-acessivel").checked;
-    const alerta = document.getElementById("form-alerta").checked;
-    const tipo = alerta ? "alerta" : (acessivel ? "fisica" : "geral");
+    const tipo = tipoSelecionado();
+    const editando = indiceEmEdicao !== null;
 
-    const dados = {
-        nome,
-        tipo,
-        categoria: blocoPai || "geral",
-        andar: alaAtual === "todos" ? "terreo" : "subsolo",
-        y: coordsClicadas.y,
-        x: coordsClicadas.x,
-        subponto: !!blocoPai
-    };
-    if (blocoPai) dados.bloco_pai = blocoPai;
+    let lugarSalvo;
 
-    if (indiceEmEdicao !== null) {
-        lugares[indiceEmEdicao] = { ...lugares[indiceEmEdicao], ...dados };
+    if (editando) {
+        const original = lugares[indiceEmEdicao];
+        const blocoMudou = (original.bloco_pai || "") !== blocoPai;
+        lugarSalvo = {
+            ...original,
+            nome,
+            tipo,
+            x: coordsClicadas.x,
+            y: coordsClicadas.y,
+            // Só recalcula categoria/subponto se o bloco mudou, para não
+            // perder categorias específicas (estacionamento, rampa, ...)
+            categoria: blocoMudou ? (blocoPai || "geral") : original.categoria,
+            subponto: blocoMudou ? !!blocoPai : original.subponto
+        };
+        if (blocoPai) lugarSalvo.bloco_pai = blocoPai;
+        else delete lugarSalvo.bloco_pai;
+        lugares[indiceEmEdicao] = lugarSalvo;
     } else {
-        lugares.push(dados);
+        lugarSalvo = {
+            nome,
+            tipo,
+            categoria: blocoPai || "geral",
+            andar: getAndarDaAla(),
+            y: coordsClicadas.y,
+            x: coordsClicadas.x,
+            subponto: !!blocoPai
+        };
+        if (blocoPai) lugarSalvo.bloco_pai = blocoPai;
+        lugares.push(lugarSalvo);
     }
+
+    const salvou = salvarLugares();
 
     fecharFormulario();
     renderizarListaAdmin();
+    atualizarBotaoRestaurarLocais();
     aplicarFiltrosCombinados();
+    irParaLugar(lugarSalvo);
+
+    mostrarStatusAdmin(salvou
+        ? `"${nome}" foi ${editando ? "atualizado" : "adicionado"} e salvo neste navegador.`
+        : `"${nome}" foi ${editando ? "atualizado" : "adicionado"}, mas o navegador não deixou salvar: a alteração some ao recarregar a página.`);
 }
 
 // ---------- Excluir (com confirmação antes) ----------
@@ -319,32 +429,68 @@ function excluirLocal() {
     abrirConfirmacao(
         "Excluir local",
         `Tem certeza que quer excluir "${nomeLocal}"? Essa ação não pode ser desfeita.`,
-        confirmarExcluirLocal
+        confirmarExcluirLocal,
+        { rotulo: "Excluir", perigo: true }
     );
 }
 
 function confirmarExcluirLocal() {
-    lugares.splice(indiceEmEdicao, 1);
+    const [removido] = lugares.splice(indiceEmEdicao, 1);
+    const salvou = salvarLugares();
+
     fecharFormulario();
     renderizarListaAdmin();
+    atualizarBotaoRestaurarLocais();
     aplicarFiltrosCombinados();
+
+    mostrarStatusAdmin(salvou
+        ? `"${removido.nome}" foi excluído.`
+        : `"${removido.nome}" foi excluído, mas o navegador não deixou salvar: ele volta ao recarregar a página.`);
+}
+
+// ---------- Restaurar a lista original de locais ----------
+function atualizarBotaoRestaurarLocais() {
+    const btn = document.getElementById("btn-restaurar-locais");
+    if (btn) btn.hidden = !temLugaresPersonalizados();
+}
+
+function pedirRestaurarLocais() {
+    abrirConfirmacao(
+        "Restaurar locais originais",
+        "Todos os locais adicionados, editados ou excluídos neste navegador voltarão à lista original do projeto. Continuar?",
+        () => {
+            if (painelFormAberto()) fecharFormulario();
+            restaurarLugaresOriginais();
+            renderizarListaAdmin();
+            atualizarBotaoRestaurarLocais();
+            aplicarFiltrosCombinados();
+            mostrarStatusAdmin("A lista original de locais foi restaurada.");
+        },
+        { rotulo: "Restaurar", perigo: true }
+    );
 }
 
 function ligarEventosAdmin() {
-    document.getElementById("btn-novo-local").onclick = () => abrirFormulario();
-    document.getElementById("btn-fechar-form").onclick = fecharFormulario;
-    document.getElementById("btn-salvar-local").onclick = salvarLocal;
-    document.getElementById("btn-excluir-local").onclick = excluirLocal;
+    document.getElementById("btn-novo-local").addEventListener("click", () => abrirFormulario());
+    document.getElementById("btn-fechar-form").addEventListener("click", fecharFormulario);
+    document.getElementById("btn-excluir-local").addEventListener("click", excluirLocal);
+    document.getElementById("btn-restaurar-locais").addEventListener("click", pedirRestaurarLocais);
 
-    document.getElementById("overlay-confirmacao").addEventListener("click", (e) => {
-        if (e.target.id === "overlay-confirmacao") {
-            document.getElementById("btn-confirmar-cancelar").click();
+    // Enviar o formulário (botão "Salvar" ou Enter no campo de nome)
+    document.getElementById("form-local").addEventListener("submit", (e) => {
+        e.preventDefault();
+        salvarLocal();
+    });
+
+    // Esc fecha o painel
+    document.getElementById("painel-form").addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            e.preventDefault();
+            fecharFormulario();
         }
     });
 
-    // A busca já dispara aplicarFiltrosCombinados() a cada tecla (via
-    // listener registrado em mapa.js); aqui só garantimos que a lista
-    // lateral do admin também reaja em tempo real ao que for digitado.
+    // A busca já atualiza o mapa (listener em mapa.js); aqui a lista do admin
     const searchInput = document.getElementById("search-input");
     if (searchInput) {
         searchInput.addEventListener("input", renderizarListaAdmin);
@@ -352,53 +498,3 @@ function ligarEventosAdmin() {
 }
 
 mapaPronto.then(iniciarAdmin);
-
-/* =========================================================
-   ACESSIBILIDADE: FONTE E CONTRASTE
-   ========================================================= */
-let nivelFonte = 0;
-const maxNivel = 3;
-const minNivel = -2;
-
-function mudarFonte(direcao) {
-    const novoNivel = nivelFonte + direcao;
-
-    if (novoNivel > maxNivel || novoNivel < minNivel) return;
-
-    nivelFonte = novoNivel;
-    const htmlElement = document.documentElement;
-
-    switch (nivelFonte) {
-        case 0:
-            htmlElement.style.fontSize = "100%";
-            break;
-        case 1:
-            htmlElement.style.fontSize = "110%";
-            break;
-        case 2:
-            htmlElement.style.fontSize = "120%";
-            break;
-        case 3:
-            htmlElement.style.fontSize = "130%";
-            break;
-        case -1:
-            htmlElement.style.fontSize = "90%";
-            break;
-        case -2:
-            htmlElement.style.fontSize = "80%";
-            break;
-    }
-}
-
-function toggleContraste() {
-    document.body.classList.toggle("alto-contraste");
-
-    const estadoAtivo = document.body.classList.contains("alto-contraste");
-    localStorage.setItem("altoContrasteState", estadoAtivo);
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-    if (localStorage.getItem("altoContrasteState") === "true") {
-        document.body.classList.add("alto-contraste");
-    }
-});

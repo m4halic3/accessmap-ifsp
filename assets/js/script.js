@@ -1,153 +1,153 @@
 /* =========================================================
+   PÁGINA INICIAL (index.html): MENU, CARROSSEL E FORMULÁRIO
+   (fonte/contraste/VLibras ficam em acessibilidade.js)
+   ========================================================= */
+
+/* =========================================================
    NAVEGAÇÃO / MENU MOBILE
    ========================================================= */
+function menuEstaAberto() {
+    const nav = document.getElementById("nav");
+    return !!nav && nav.classList.contains("change");
+}
+
 function menuOnClick() {
     const menuBar = document.getElementById("menu-bar");
     const nav = document.getElementById("nav");
     const menuBg = document.getElementById("menu-bg");
+    if (!menuBar || !nav) return;
 
-    if (menuBar) menuBar.classList.toggle("change");
-    if (nav) nav.classList.toggle("change");
-    if (menuBg) menuBg.classList.toggle("change-bg");
+    const abrir = !menuEstaAberto();
+
+    menuBar.classList.toggle("change", abrir);
+    nav.classList.toggle("change", abrir);
+    if (menuBg) menuBg.classList.toggle("change-bg", abrir);
+
+    menuBar.setAttribute("aria-expanded", String(abrir));
+    menuBar.setAttribute("aria-label", abrir ? "Fechar menu de navegação" : "Abrir menu de navegação");
+
+    if (abrir) {
+        const primeiroLink = nav.querySelector("a");
+        if (primeiroLink) primeiroLink.focus();
+    }
 }
+
+function fecharMenuSeAberto() {
+    if (menuEstaAberto()) menuOnClick();
+}
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && menuEstaAberto()) {
+        menuOnClick();
+        const menuBar = document.getElementById("menu-bar");
+        if (menuBar) menuBar.focus();
+    }
+});
 
 /* =========================================================
    CARROSSEL
    ========================================================= */
+const INTERVALO_CARROSSEL = 6000;
+const reduzirMovimento = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 let indexAtivo = 0;
 let isMoving = false;
+let autoPlay = null;
+// Quem prefere menos movimento começa com o carrossel parado
+let pausadoPeloUsuario = reduzirMovimento;
+let pausadoPorInteracao = false;
+
 const slider = document.getElementById("slider");
+const slides = slider ? slider.querySelectorAll(".slide") : [];
 const bolinhas = document.querySelectorAll(".dot");
-const totalSlides = bolinhas.length;
+const totalSlides = slides.length;
 
 function atualizarCarrossel() {
     if (slider) {
         slider.style.transform = `translateX(-${indexAtivo * 100}%)`;
     }
-    bolinhas.forEach((dot, i) => {
-        dot.classList.toggle("active", i === indexAtivo);
+    slides.forEach((slide, i) => {
+        const ativo = i === indexAtivo;
+        slide.setAttribute("aria-hidden", String(!ativo));
     });
+    bolinhas.forEach((dot, i) => {
+        const ativo = i === indexAtivo;
+        dot.classList.toggle("active", ativo);
+        if (ativo) dot.setAttribute("aria-current", "true");
+        else dot.removeAttribute("aria-current");
+    });
+}
+
+function irParaSlide(n) {
+    if (totalSlides === 0) return;
+    indexAtivo = (n + totalSlides) % totalSlides;
+    atualizarCarrossel();
 }
 
 function btnMove(direcao) {
     if (isMoving) return;
-
     isMoving = true;
-    indexAtivo += direcao;
-
-    if (indexAtivo >= totalSlides) {
-        indexAtivo = 0;
-    } else if (indexAtivo < 0) {
-        indexAtivo = totalSlides - 1;
-    }
-
-    atualizarCarrossel();
+    irParaSlide(indexAtivo + direcao);
     reiniciarTimer();
-
-    setTimeout(() => {
-        isMoving = false;
-    }, 1200);
+    setTimeout(() => { isMoving = false; }, 600);
 }
 
 function jumpToSlide(n) {
-    if (isMoving || indexAtivo === n) return;
-
-    isMoving = true;
-    indexAtivo = n;
-    atualizarCarrossel();
+    if (indexAtivo === n) return;
+    irParaSlide(n);
     reiniciarTimer();
-
-    setTimeout(() => {
-        isMoving = false;
-    }, 1200);
 }
-
-let autoPlay = setInterval(() => {
-    btnMove(1);
-}, 5000);
 
 function reiniciarTimer() {
     clearInterval(autoPlay);
-    autoPlay = setInterval(() => {
-        btnMove(1);
-    }, 5000);
+    autoPlay = null;
+    if (totalSlides < 2 || pausadoPeloUsuario || pausadoPorInteracao) return;
+    autoPlay = setInterval(() => irParaSlide(indexAtivo + 1), INTERVALO_CARROSSEL);
 }
 
-/* =========================================================
-   ACESSIBILIDADE: FONTE E CONTRASTE
-   ========================================================= */
-let nivelFonte = 0;
-const maxNivel = 3;
-const minNivel = -2;
-
-function mudarFonte(direcao) {
-    const novoNivel = nivelFonte + direcao;
-
-    if (novoNivel > maxNivel || novoNivel < minNivel) return;
-
-    nivelFonte = novoNivel;
-    const htmlElement = document.documentElement;
-
-    switch (nivelFonte) {
-        case 0:
-            htmlElement.style.fontSize = "100%";
-            break;
-        case 1:
-            htmlElement.style.fontSize = "110%";
-            break;
-        case 2:
-            htmlElement.style.fontSize = "120%";
-            break;
-        case 3:
-            htmlElement.style.fontSize = "130%";
-            break;
-        case -1:
-            htmlElement.style.fontSize = "90%";
-            break;
-        case -2:
-            htmlElement.style.fontSize = "80%";
-            break;
-    }
+function atualizarBotaoPausa() {
+    const btn = document.getElementById("btn-pausar-carrossel");
+    if (!btn) return;
+    btn.setAttribute("aria-pressed", String(pausadoPeloUsuario));
+    btn.setAttribute("aria-label", pausadoPeloUsuario ? "Retomar troca automática dos slides" : "Pausar troca automática dos slides");
+    btn.innerHTML = pausadoPeloUsuario
+        ? '<i class="fas fa-play" aria-hidden="true"></i>'
+        : '<i class="fas fa-pause" aria-hidden="true"></i>';
 }
 
-function toggleContraste() {
-    document.body.classList.toggle("alto-contraste");
-
-    const estadoAtivo = document.body.classList.contains("alto-contraste");
-    localStorage.setItem("altoContrasteState", estadoAtivo);
+function alternarPausaCarrossel() {
+    pausadoPeloUsuario = !pausadoPeloUsuario;
+    atualizarBotaoPausa();
+    reiniciarTimer();
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-    if (localStorage.getItem("altoContrasteState") === "true") {
-        document.body.classList.add("alto-contraste");
-    }
-});
+function iniciarCarrossel() {
+    const container = document.querySelector(".carousel-container");
+    if (!container || totalSlides === 0) return;
 
-/* =========================================================
-   MODAL - GUIA DO USUÁRIO
-   ========================================================= */
-function abrirGuiaUsuario() {
-    const modal = document.getElementById("modal-guia");
-    if (modal) {
-        modal.style.display = "flex";
-        document.body.style.overflow = "hidden";
-    }
+    // Pausa enquanto o mouse está em cima ou o foco está dentro (WCAG 2.2.2)
+    const pausar = () => { pausadoPorInteracao = true; reiniciarTimer(); };
+    const retomar = () => { pausadoPorInteracao = false; reiniciarTimer(); };
+    container.addEventListener("mouseenter", pausar);
+    container.addEventListener("mouseleave", retomar);
+    container.addEventListener("focusin", pausar);
+    container.addEventListener("focusout", (e) => {
+        if (!container.contains(e.relatedTarget)) retomar();
+    });
+
+    // Setas do teclado trocam o slide quando o foco está no carrossel
+    container.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight") { e.preventDefault(); btnMove(1); }
+        if (e.key === "ArrowLeft") { e.preventDefault(); btnMove(-1); }
+    });
+
+    const btnPausa = document.getElementById("btn-pausar-carrossel");
+    if (btnPausa) btnPausa.addEventListener("click", alternarPausaCarrossel);
+
+    atualizarBotaoPausa();
+    atualizarCarrossel();
+    reiniciarTimer();
 }
-
-function fecharGuiaUsuario() {
-    const modal = document.getElementById("modal-guia");
-    if (modal) {
-        modal.style.display = "none";
-        document.body.style.overflow = "auto";
-    }
-}
-
-window.onclick = function (event) {
-    const modal = document.getElementById("modal-guia");
-    if (event.target === modal) {
-        fecharGuiaUsuario();
-    }
-};
 
 /* =========================================================
    FORMULÁRIO DE COLABORAÇÃO
@@ -156,21 +156,22 @@ window.onclick = function (event) {
    a mesma lida pelo dashboard.js na área administrativa.
    Quando existir back-end, troque por uma chamada de API (fetch/POST).
    ========================================================= */
-
-const CHAVE_RESPOSTAS_FORM = 'accessmap_respostas';
+const CHAVE_RESPOSTAS_FORM = "accessmap_respostas";
+const TAMANHO_MINIMO_RELATO = 10;
 let categoriaSelecionada = null;
+let timerFeedback = null;
 
 function selecionarCategoria(botao) {
-    const categoria = botao.dataset.categoria;
+    categoriaSelecionada = botao.dataset.categoria;
 
-    document.querySelectorAll('.btn-type[data-categoria]').forEach(btn => {
-        btn.setAttribute('aria-pressed', 'false');
-        btn.classList.remove('selecionado');
+    document.querySelectorAll("#form-contato .btn-type[data-categoria]").forEach(btn => {
+        const ativo = btn === botao;
+        btn.setAttribute("aria-pressed", String(ativo));
+        btn.classList.toggle("selecionado", ativo);
     });
 
-    categoriaSelecionada = categoria;
-    botao.setAttribute('aria-pressed', 'true');
-    botao.classList.add('selecionado');
+    const grupo = document.getElementById("grupo-categoria");
+    if (grupo) grupo.removeAttribute("aria-invalid");
 }
 
 function lerRespostasForm() {
@@ -188,63 +189,109 @@ function salvarNovaResposta(resposta) {
 }
 
 function exibirFeedbackForm(mensagem, tipo) {
-    const msg = document.getElementById('msg-contato');
-    if (!msg) {
-        alert(mensagem);
-        return;
-    }
-    msg.textContent = mensagem;
-    msg.className = 'msg-feedback ' + (tipo === 'erro' ? 'msg-erro' : 'msg-sucesso');
-    msg.style.display = 'block';
+    const msg = document.getElementById("msg-contato");
+    if (!msg) return;
 
-    setTimeout(() => {
-        msg.style.display = 'none';
-    }, 4000);
+    clearTimeout(timerFeedback);
+    msg.textContent = mensagem;
+    msg.className = "msg-feedback " + (tipo === "erro" ? "msg-erro" : "msg-sucesso");
+    msg.hidden = false;
+
+    // Só a mensagem de sucesso some sozinha; o erro fica até ser corrigido
+    if (tipo !== "erro") {
+        timerFeedback = setTimeout(() => { msg.hidden = true; }, 6000);
+    }
+}
+
+function marcarCampoInvalido(campo, invalido) {
+    if (!campo) return;
+    if (invalido) campo.setAttribute("aria-invalid", "true");
+    else campo.removeAttribute("aria-invalid");
 }
 
 function tratarEnvioFormulario(e) {
     e.preventDefault();
 
-    const local = document.getElementById('local-ocorrencia').value.trim();
-    const relato = document.getElementById('relato-sugestao').value.trim();
+    const campoLocal = document.getElementById("local-ocorrencia");
+    const campoRelato = document.getElementById("relato-sugestao");
+    const local = campoLocal.value.trim();
+    const relato = campoRelato.value.trim();
 
-    if (!local || !relato) {
-        exibirFeedbackForm('Preencha todos os campos obrigatórios.', 'erro');
+    marcarCampoInvalido(campoLocal, !local);
+    marcarCampoInvalido(campoRelato, relato.length < TAMANHO_MINIMO_RELATO);
+
+    if (!local) {
+        exibirFeedbackForm("Informe o local da ocorrência.", "erro");
+        campoLocal.focus();
         return;
     }
 
     if (!categoriaSelecionada) {
-        exibirFeedbackForm('Selecione uma categoria de acessibilidade.', 'erro');
+        exibirFeedbackForm("Selecione uma categoria de acessibilidade (Física ou Auditiva).", "erro");
+        const grupo = document.getElementById("grupo-categoria");
+        if (grupo) grupo.setAttribute("aria-invalid", "true");
+        const primeiroBotao = document.querySelector("#form-contato .btn-type[data-categoria]");
+        if (primeiroBotao) primeiroBotao.focus();
+        return;
+    }
+
+    if (relato.length < TAMANHO_MINIMO_RELATO) {
+        exibirFeedbackForm(`Descreva o problema com pelo menos ${TAMANHO_MINIMO_RELATO} caracteres.`, "erro");
+        campoRelato.focus();
         return;
     }
 
     const novaResposta = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
-        local: local,
+        local,
         categoria: categoriaSelecionada,
-        relato: relato,
+        relato,
         data: new Date().toISOString()
     };
 
-    salvarNovaResposta(novaResposta);
+    try {
+        salvarNovaResposta(novaResposta);
+    } catch (erro) {
+        console.error("AccessMap: não foi possível salvar a colaboração.", erro);
+        exibirFeedbackForm("Não foi possível enviar agora (o navegador bloqueou o armazenamento). Tente novamente.", "erro");
+        return;
+    }
 
-    exibirFeedbackForm('Colaboração enviada com sucesso! Obrigado por ajudar o AccessMap.', 'sucesso');
+    exibirFeedbackForm("Colaboração enviada com sucesso! Obrigado por ajudar o AccessMap.", "sucesso");
 
-    document.getElementById('form-contato').reset();
-    document.querySelectorAll('.btn-type[data-categoria]').forEach(btn => {
-        btn.setAttribute('aria-pressed', 'false');
-        btn.classList.remove('selecionado');
+    document.getElementById("form-contato").reset();
+    document.querySelectorAll("#form-contato .btn-type[data-categoria]").forEach(btn => {
+        btn.setAttribute("aria-pressed", "false");
+        btn.classList.remove("selecionado");
     });
     categoriaSelecionada = null;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const formContato = document.getElementById('form-contato');
-    if (formContato) {
-        formContato.addEventListener('submit', tratarEnvioFormulario);
+document.addEventListener("DOMContentLoaded", () => {
+    const menuBar = document.getElementById("menu-bar");
+    if (menuBar) {
+        // É um <div role="button">: precisa responder a Enter e Espaço
+        menuBar.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                menuOnClick();
+            }
+        });
     }
 
-    document.querySelectorAll('.btn-type[data-categoria]').forEach(botao => {
-        botao.addEventListener('click', () => selecionarCategoria(botao));
+    const formContato = document.getElementById("form-contato");
+    if (formContato) {
+        formContato.addEventListener("submit", tratarEnvioFormulario);
+
+        // Ao corrigir um campo, tira a marcação de erro
+        formContato.querySelectorAll("input, textarea").forEach(campo => {
+            campo.addEventListener("input", () => marcarCampoInvalido(campo, false));
+        });
+    }
+
+    document.querySelectorAll("#form-contato .btn-type[data-categoria]").forEach(botao => {
+        botao.addEventListener("click", () => selecionarCategoria(botao));
     });
+
+    iniciarCarrossel();
 });

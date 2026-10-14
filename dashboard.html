@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <title>AccessMap - Painel do Administrador</title>
@@ -13,9 +16,12 @@
 </head>
 
 <body class="pagina-dashboard">
+    <a href="#respostas-lista" class="skip-link">Pular para as respostas</a>
+
     <nav class="navbar navbar-admin" aria-label="Navegação do Painel Administrativo">
 <a href="index.html" class="logo">
-    <img src="assets/images/logo-branca.png" alt="Logotipo AccessMap com símbolo de localização" class="logo-img">
+    <img src="assets/images/logo-branca.png" alt="" class="logo-img">
+    <span class="sr-only">Página inicial do</span>
     <span class="logo-text">ACCESSMAP</span>
     <span class="badge-admin">ADMIN</span>
 </a>
@@ -92,10 +98,10 @@
                     <h1>Respostas Coletadas</h1>
                     <p>Relatos enviados pelo formulário de colaboração da página principal.</p>
                 </div>
-                <span class="contador-respostas" id="contador-respostas">0 respostas</span>
+                <span class="contador-respostas" id="contador-respostas" aria-live="polite">0 respostas</span>
             </header>
 
-            <div class="respostas-lista" id="respostas-lista">
+            <div class="respostas-lista" id="respostas-lista" tabindex="-1">
                 <p class="respostas-vazio" id="respostas-vazio" hidden>
                     Nenhuma resposta encontrada para os filtros selecionados.
                 </p>
@@ -104,17 +110,30 @@
 
     </main>
 
-    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles manuais de acessibilidade">
+    <!-- Aviso de exclusão com opção de desfazer -->
+    <div id="toast" class="toast" hidden>
+        <span id="toast-texto"></span>
+        <button type="button" id="toast-desfazer">Desfazer</button>
+        <button type="button" id="toast-fechar" aria-label="Fechar aviso">&times;</button>
+    </div>
+    <p id="anuncio-dashboard" class="sr-only" aria-live="polite"></p>
+
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+
+    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles de acessibilidade">
         <button type="button" id="btn-aumentar" onclick="mudarFonte(1)" aria-label="Aumentar tamanho do texto">A+</button>
         <button type="button" id="btn-diminuir" onclick="mudarFonte(-1)" aria-label="Diminuir tamanho do texto">A-</button>
-        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alternar alto contraste">
+        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alto contraste" aria-pressed="false">
             <i class="fas fa-adjust" aria-hidden="true"></i>
         </button>
     </div>
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <script>
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-    </script>
+    <script src="assets/js/acessibilidade.js"></script>
     <script src="assets/js/dashboard.js"></script>
 </body>
 

@@ -5,7 +5,7 @@
 .container-mapa {
     display: flex;
     width: 100%;
-    height: calc(100vh - 80px); 
+    height: calc(100vh - 60px); // 60px = altura da navbar fixa
     background-color: #f4f4f4;
     overflow: hidden;
 
@@ -19,12 +19,21 @@
         box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
         z-index: 10;
         padding: 25px;
+        overflow-y: auto;
 
         h2 {
             font-family: $font-primary;
             font-size: 1.5rem;
             color: #000000; // Todo texto em preto puro
-            margin-bottom: 20px;
+            margin-bottom: 4px;
+        }
+
+        // Quantos locais a lista está mostrando (atualizado pelo mapa.js)
+        .contador-resultados {
+            font-family: $font-secondary;
+            font-size: 0.8rem;
+            color: #444;
+            margin-bottom: 18px;
         }
 
         // --- BARRA DE PESQUISA ---
@@ -124,6 +133,11 @@
                 background-color: #f0f0f0;
             }
 
+            &:focus-visible {
+                outline: 3px solid $color-purple;
+                outline-offset: 2px;
+            }
+
             // Configuração customizada para o estado ativo de cada botão
             &.active {
                 color: #ffffff; // Texto branco padrão para contraste
@@ -149,6 +163,44 @@
         }
     }
 }
+
+        // --- BOTÃO "LIMPAR MAPA E FILTROS" ---
+        .btn-limpar-mapa {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 15px;
+            background-color: $color-green;
+            color: $color-white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-family: $font-primary;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+            &:hover {
+                background-color: color.adjust($color-green, $lightness: -6%);
+                box-shadow: 0 4px 12px rgba(74, 85, 104, 0.25);
+                transform: translateY(-1px);
+            }
+
+            &:active {
+                transform: scale(0.98);
+            }
+
+            &:focus-visible {
+                outline: 3px solid $color-purple;
+                outline-offset: 2px;
+            }
+        }
 
         // --- CABEÇALHO DOS FILTROS ---
         .header-filtros {
@@ -187,6 +239,17 @@
                 &:active {
                     transform: translateY(0);
                 }
+
+                &:focus-visible {
+                    outline: 3px solid $color-purple;
+                    outline-offset: 2px;
+                }
+
+                // "Ver Todos" ativo
+                &[aria-pressed="true"] {
+                    background: $color-purple;
+                    box-shadow: 0 0 0 3px rgba($color-purple, 0.25);
+                }
             }
         }
 
@@ -199,6 +262,8 @@
             .filtro {
                 width: 60px;
                 height: 60px;
+                padding: 0;
+                font: inherit;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -217,6 +282,11 @@
                 &:hover {
                     transform: translateY(-3px);
                     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                }
+
+                &:focus-visible {
+                    outline: 3px solid $color-purple;
+                    outline-offset: 2px;
                 }
 
                 &.ativo {
@@ -244,19 +314,35 @@
                 border-radius: 10px;
             }
 
+            // Cada local é um <button>, para funcionar com teclado e leitor de tela.
+            // A cor da borda esquerda vem do mapa.js via --cor-borda.
             .item-lugar {
-                padding: 15px;
-                background: #fff;
+                display: block;
+                width: 100%;
+                text-align: left;
+                font: inherit;
+                padding: 12px 15px;
+                background: #f9f9f9;
                 border: 1px solid #eee;
-                border-radius: 10px;
-                margin-bottom: 12px;
+                border-left: 5px solid var(--cor-borda, #ccc);
+                border-radius: 6px;
+                margin-bottom: 8px;
                 cursor: pointer;
-                transition: all 0.2s ease;
+                transition: background-color 0.2s ease, transform 0.2s ease;
 
                 &:hover {
-                    background: #fdfdfd;
-                    border-color: $color-pink;
-                    transform: translateX(5px);
+                    background: #f1f1f1;
+                    transform: translateX(3px);
+                }
+
+                &:focus-visible {
+                    outline: 3px solid $color-purple;
+                    outline-offset: 2px;
+                }
+
+                .tag-alerta {
+                    color: #800000;
+                    font-weight: 700;
                 }
 
                 p {
@@ -273,6 +359,18 @@
                 }
             }
         }
+
+        // Mensagem quando a busca/filtro não encontra nenhum local
+        .lista-vazia {
+            padding: 16px;
+            border: 1.5px dashed #ccc;
+            border-radius: 10px;
+            font-family: $font-secondary;
+            font-size: 0.85rem;
+            color: #333;
+            text-align: center;
+            line-height: 1.5;
+        }
     }
 
     // Lado Direito - Mapa
@@ -280,7 +378,26 @@
         flex: 1;
         height: 100%;
         background-color: #e5e5e5;
-        cursor: crosshair; 
+
+        // Popup do marcador (o conteúdo é montado no mapa.js)
+        .popup-lugar {
+            text-align: center;
+
+            strong {
+                font-size: 14px;
+                color: $color-purple !important;
+            }
+
+            span {
+                color: #333;
+                font-size: 12px;
+            }
+
+            .tag-alerta {
+                color: #800000;
+                font-weight: 700;
+            }
+        }
 
         // Estilização dos Popups do Leaflet
         .leaflet-popup-content-wrapper {

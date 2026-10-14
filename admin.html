@@ -3,65 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Locais do Mapa - AccessMap</title>
+    <!-- Protege a página: sem login, redireciona para login.html antes de exibir -->
+    <script src="assets/js/authentication.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/admin.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <title>Admin - Locais - AccessMap</title>
-    <script src="assets/js/authentication.js"></script>
     <link rel="icon" type="image/png" href="assets/images/logo-roxa.png">
 </head>
 <body data-admin="sempre">
-    <nav class="navbar" aria-label="Navegação Principal">
+    <a href="#map" class="skip-link">Pular para o mapa</a>
+
+    <nav class="navbar" aria-label="Navegação do administrador">
         <a href="index.html" class="logo">
-            <img src="assets/images/logo-branca.png" alt="Logotipo do AccessMap" class="logo-img">
+            <img src="assets/images/logo-branca.png" alt="" class="logo-img">
             <span class="logo-text">ACCESSMAP</span>
+            <span class="sr-only">— página inicial</span>
         </a>
-        <div class="nav-right desktop-only" style="margin-left:auto;">
+        <div class="nav-right" style="gap:10px;">
+            <a href="mapa.html" class="nav-admin-link">
+                <i class="fas fa-map" aria-hidden="true"></i> <span class="nav-texto">Ver mapa público</span>
+            </a>
             <a href="dashboard.html" class="nav-admin-link">
-                <i class="fas fa-inbox" aria-hidden="true"></i> Respostas do formulário
+                <i class="fas fa-inbox" aria-hidden="true"></i> <span class="nav-texto">Respostas do formulário</span>
             </a>
             <a href="login.html" class="nav-admin-link" onclick="fazerLogout(); return false;">
-                <i class="fas fa-right-from-bracket" aria-hidden="true"></i> Sair
+                <i class="fas fa-right-from-bracket" aria-hidden="true"></i> <span class="nav-texto">Sair</span>
             </a>
         </div>
     </nav>
 
-    <main class="container-mapa" id="container-mapa-conteudo" style="position: relative;">
+    <main class="container-mapa" id="container-mapa-conteudo">
         <div class="sidebar">
-            <h2>Resultados (geral)</h2>
+            <h1 class="sr-only">Edição dos locais do mapa</h1>
+            <h2 id="titulo-resultados">Resultados (Mapa Geral)</h2>
 
             <div class="search-container">
                 <label for="search-input" class="sr-only">Pesquisar local no campus</label>
                 <i class="fas fa-search search-icon" aria-hidden="true"></i>
-                <input type="text" id="search-input" placeholder="Pesquisar local... (Enter para ir)" onkeydown="handleBuscaKeydown(event)">
+                <input type="search" id="search-input" placeholder="Pesquisar local... (Enter para ir)" autocomplete="off" onkeydown="handleBuscaKeydown(event)">
             </div>
 
-            <div class="fieldset-reset" style="margin-bottom: 20px;" role="region" aria-label="Controles de filtragem por pavimentos">
-                <span id="titulo-filtro-ala" style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px; color: #000;">Filtrar por Ala</span>
-                <div class="type-buttons" id="seletor-alas" style="display: flex; gap: 8px; margin-bottom: 10px;" role="group" aria-labelledby="titulo-filtro-ala">
-                    <button type="button" class="btn-type active" aria-current="true" onclick="filtrarAla('todos', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Mapa Geral</button>
-                    <button type="button" class="btn-type" aria-current="false" onclick="filtrarAla('edificacoes', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Subsolo Edif.</button>
-                    <button type="button" class="btn-type" aria-current="false" onclick="filtrarAla('mecanica', this)" style="flex: 1; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; border: 2px solid #f0f0f0; border-radius: 8px;">Subsolo Mec.</button>
+            <div class="fieldset-reset" role="group" aria-labelledby="titulo-filtro-ala">
+                <span id="titulo-filtro-ala">Mapa exibido</span>
+                <div class="type-buttons" id="seletor-alas">
+                    <button type="button" class="btn-type active" data-ala="todos" aria-pressed="true" onclick="filtrarAla('todos')">Mapa Geral</button>
+                    <button type="button" class="btn-type" data-ala="edificacoes" aria-pressed="false" onclick="filtrarAla('edificacoes')">Subsolo Edif.</button>
+                    <button type="button" class="btn-type" data-ala="mecanica" aria-pressed="false" onclick="filtrarAla('mecanica')">Subsolo Mec.</button>
                 </div>
 
-                <button type="button" class="btn-limpar-mapa" onclick="resetarMapaCompleto()" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:15px;background-color:#007750;color:#ffffff;padding:10px 16px;border:none;border-radius:8px;font-family:system-ui,-apple-system,sans-serif;font-weight:700;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;">
-                    <i class="fas fa-eraser" aria-hidden="true"></i> Limpar Mapa e Filtros
+                <button type="button" class="btn-limpar-mapa" onclick="resetarMapaCompleto()">
+                    <i class="fas fa-eraser" aria-hidden="true"></i> Limpar mapa e filtros
                 </button>
             </div>
 
             <div class="header-filtros">
-                <h3>Filtrar por Acessibilidade</h3>
-                <button class="btn-reset" onclick="mostrarTodos()">Ver Todos</button>
+                <h3 id="titulo-filtro-acess">Filtrar por acessibilidade</h3>
+                <button type="button" id="btn-ver-todos" class="btn-reset" aria-pressed="false" onclick="mostrarTodos()">Ver todos</button>
             </div>
 
-            <div class="filtros" role="group" aria-label="Filtros de categorias de acessibilidade">
-                <div class="filtro" id="filtro-fisica" onclick="filtrar('fisica', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); filtrar('fisica', this);}" role="button" tabindex="0" aria-label="Filtrar por Acessibilidade Física" aria-pressed="false">
-                    <img src="assets/images/simbolo-fisica.png" alt="Símbolo Internacional de Acessibilidade retratando uma pessoa em cadeira de rodas em verde">
-                </div>
-                <div class="filtro" id="filtro-auditiva" onclick="filtrar('auditiva', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); filtrar('auditiva', this);}" role="button" tabindex="0" aria-label="Filtrar por Acessibilidade Auditiva" aria-pressed="false">
-                    <img src="assets/images/simbolo-auditiva.png" alt="Símbolo Internacional de Deficiência Auditiva retratando um ouvido atravessado por uma linha em roxo">
-                </div>
+            <div class="filtros" role="group" aria-labelledby="titulo-filtro-acess">
+                <button type="button" class="filtro" data-filtro="fisica" aria-pressed="false" onclick="filtrar('fisica')" title="Acessibilidade física">
+                    <img src="assets/images/simbolo-fisica.png" alt="Acessibilidade física">
+                </button>
+                <button type="button" class="filtro" data-filtro="auditiva" aria-pressed="false" onclick="filtrar('auditiva')" title="Acessibilidade auditiva">
+                    <img src="assets/images/simbolo-auditiva.png" alt="Acessibilidade auditiva">
+                </button>
             </div>
 
             <button type="button" id="btn-novo-local" class="btn-novo-local">
@@ -71,46 +82,59 @@
             <button type="button" id="btn-atualizar-planta" class="btn-novo-local btn-novo-local--secundario" aria-haspopup="dialog">
                 <i class="fas fa-image" aria-hidden="true"></i> Atualizar imagem do mapa
             </button>
-            <p id="planta-status" class="planta-status" role="status" aria-live="polite"></p>
+            <p class="dica-admin">Dica: clique em qualquer ponto do mapa para cadastrar um local ali.</p>
+            <p id="admin-status" class="planta-status" role="status" aria-live="polite"></p>
 
             <div id="lista-lugares-admin" role="region" aria-label="Lista de locais cadastrados"></div>
+
+            <button type="button" id="btn-restaurar-locais" class="btn-texto" hidden>
+                Restaurar lista original de locais
+            </button>
         </div>
 
-        <div id="map" aria-label="Mapa interativo do campus (modo admin)"></div>
+        <div class="mapa-e-painel">
+            <div id="map" role="application" aria-label="Mapa do campus em modo de edição. Clique em um ponto para cadastrar um local."></div>
 
-        <!-- Painel "Inserir / Atualizar Local" -->
-        <div id="overlay-form" class="overlay-form oculto">
-            <div class="form-local-card">
-                <div class="form-local-header">
-                    <i class="fas fa-map-pin" aria-hidden="true"></i>
-                    <span id="form-titulo">Inserir / Atualizar Local</span>
-                    <button type="button" id="btn-fechar-form" class="btn-fechar-form" aria-label="Fechar formulário">&times;</button>
+            <!-- Painel "Inserir / Atualizar Local" (ao lado do mapa, que continua clicável) -->
+            <aside id="painel-form" class="painel-lateral oculto" aria-labelledby="form-titulo">
+                <div class="form-local-card">
+                    <div class="form-local-header">
+                        <i class="fas fa-map-pin" aria-hidden="true"></i>
+                        <span id="form-titulo">Inserir local</span>
+                        <button type="button" id="btn-fechar-form" class="btn-fechar-form" aria-label="Fechar formulário" title="Fechar (Esc)">&times;</button>
+                    </div>
+                    <form id="form-local" class="form-local-body" novalidate>
+                        <label for="form-nome">Nome do local</label>
+                        <input type="text" id="form-nome" maxlength="120" required autocomplete="off" placeholder="Ex: Bloco A - Biblioteca">
+
+                        <span class="rotulo-campo" id="rotulo-coords">Posição no mapa</span>
+                        <div class="coord-row sem-coords">
+                            <span id="form-coords" aria-labelledby="rotulo-coords" aria-live="polite">Clique no mapa para marcar a posição</span>
+                        </div>
+                        <p class="dica-coords">Clique no mapa para marcar ou mudar a posição. O painel continua aberto.</p>
+
+                        <label for="form-bloco">Bloco / Setor</label>
+                        <select id="form-bloco"></select>
+
+                        <fieldset class="tipo-opcoes">
+                            <legend>Tipo do local</legend>
+                            <div class="tipo-grade">
+                                <label><input type="radio" name="form-tipo" value="geral" checked> Ponto de interesse</label>
+                                <label><input type="radio" name="form-tipo" value="fisica"> Acessib. física</label>
+                                <label><input type="radio" name="form-tipo" value="auditiva"> Acessib. auditiva</label>
+                                <label><input type="radio" name="form-tipo" value="alerta"> Alerta (barreira)</label>
+                            </div>
+                        </fieldset>
+
+                        <p id="form-erro" class="msg-feedback msg-erro" role="alert" hidden></p>
+
+                        <div class="form-local-actions">
+                            <button type="button" id="btn-excluir-local" class="btn-excluir oculto">Excluir</button>
+                            <button type="submit" id="btn-salvar-local" class="btn-salvar">Adicionar local</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="form-local-body">
-                    <label for="form-nome">Nome do local</label>
-                    <input type="text" id="form-nome" placeholder="Ex: Bloco A - Biblioteca">
-
-                    <label for="form-coords">Coordenadas (X, Y - Leaflet)</label>
-                    <div class="coord-row">
-                        <span id="form-coords">X: —, Y: —</span>
-                    </div>
-                    <p class="dica-coords">Clique em qualquer ponto do mapa pra marcar a posição; as coordenadas são preenchidas automaticamente.</p>
-
-                    <label for="form-bloco">Bloco / Setor</label>
-                    <select id="form-bloco"></select>
-
-                    <label>Atributos</label>
-                    <div class="atributos-row">
-                        <label><input type="checkbox" id="form-acessivel"> Acessível</label>
-                        <label><input type="checkbox" id="form-alerta"> Alerta</label>
-                    </div>
-
-                    <div class="form-local-actions">
-                        <button type="button" id="btn-excluir-local" class="btn-excluir oculto">Excluir</button>
-                        <button type="button" id="btn-salvar-local" class="btn-salvar">Salvar</button>
-                    </div>
-                </div>
-            </div>
+            </aside>
         </div>
 
         <!-- Modal "Atualizar imagem do mapa" (enviar nova planta do campus) -->
@@ -179,23 +203,27 @@
         </div>
     </main>
 
- 
-    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles manuais de acessibilidade">
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+
+    <div class="widget-acessibilidade-nativo" role="group" aria-label="Controles de acessibilidade">
         <button type="button" id="btn-aumentar" onclick="mudarFonte(1)" aria-label="Aumentar tamanho do texto">A+</button>
         <button type="button" id="btn-diminuir" onclick="mudarFonte(-1)" aria-label="Diminuir tamanho do texto">A-</button>
-        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alternar alto contraste">
+        <button type="button" id="btn-contraste" onclick="toggleContraste()" aria-label="Alto contraste" aria-pressed="false">
             <i class="fas fa-adjust" aria-hidden="true"></i>
         </button>
     </div>
-       
+
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <script>
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-    </script>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="assets/js/plantas-storage.js"></script>
-<script src="assets/js/mapa.js"></script>
-<script src="assets/js/admin.js"></script>
-<script src="assets/js/admin-planta.js"></script>
+    <script src="assets/js/acessibilidade.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="assets/js/plantas-storage.js"></script>
+    <script src="assets/js/mapa.js"></script>
+    <script src="assets/js/admin.js"></script>
+    <script src="assets/js/admin-planta.js"></script>
 </body>
 </html>

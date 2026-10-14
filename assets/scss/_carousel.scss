@@ -68,6 +68,39 @@
 
         &.esquerda { left: 25px; } 
         &.direita { right: 25px; } 
+
+        &:focus-visible {
+            outline: 3px solid $color-purple;
+            outline-offset: 3px;
+        }
+    }
+
+    // Pausar / retomar a troca automática (WCAG 2.2.2)
+    .btn-pausar {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 20;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid #ffffff;
+        background: rgba(0, 0, 0, 0.55);
+        color: #ffffff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+
+        &:hover {
+            background: $color-purple;
+        }
+
+        &:focus-visible {
+            outline: 3px solid $color-pink;
+            outline-offset: 3px;
+        }
     }
 }
 
@@ -96,6 +129,11 @@
             border-color: #ffffff; 
             width: 30px;
             border-radius: 20px;
+        }
+
+        &:focus-visible {
+            outline: 3px solid $color-purple;
+            outline-offset: 3px;
         }
     }
 }

@@ -1,0 +1,4 @@
+// Folha de estilo da página admin.html (carregada junto com style.css).
+// Compilar com:  sass assets/scss/admin.scss assets/css/admin.css --style=compressed
+@use 'admin-form';
+@use 'admin-planta';

@@ -114,13 +114,19 @@ Nesta versão, os requisitos acima estão implementados da seguinte forma:
 accessmap-ifsp/
 ├── assets/
 │   ├── css/
-│   │   └── style.css          # CSS compilado a partir do SCSS
-│   ├── images/                # Logos, ícones, fotos da equipe, slides
+│   │   ├── style.css          # CSS compilado de scss/style.scss (todas as páginas)
+│   │   └── admin.css          # CSS compilado de scss/admin.scss (só admin.html)
+│   ├── scss/                  # Código-fonte dos estilos (partials _*.scss)
+│   ├── images/                # Logos, ícones, fotos da equipe, slides, plantas
 │   └── js/
-│       ├── script.js          # Menu, carrossel, acessibilidade, formulário público
-│       ├── authentication.js  # Autenticação do administrador
-│       ├── dashboard.js       # Leitura/filtro/exclusão de respostas no painel
-│       └── mapa.js            # Busca, navegação e clique para cadastro de pontos no mapa
+│       ├── acessibilidade.js  # A+/A-, alto contraste e VLibras (todas as páginas)
+│       ├── script.js          # Menu, carrossel e formulário público (index.html)
+│       ├── authentication.js  # Login e proteção das páginas do administrador
+│       ├── dashboard.js       # Leitura/filtro/exclusão (com desfazer) de respostas
+│       ├── mapa.js            # Dados dos locais, busca, filtros e navegação no mapa
+│       ├── admin.js           # Inserir/editar/excluir locais (admin.html)
+│       ├── plantas-storage.js # Imagens de planta no IndexedDB
+│       └── admin-planta.js    # Modal "Atualizar imagem do mapa" (admin.html)
 ├── index.html                 # Página institucional / pública
 ├── login.html                 # Login exclusivo do administrador
 ├── dashboard.html              # Painel administrativo (protegido)
@@ -137,7 +143,8 @@ Como o projeto ainda não possui um back-end, toda a "persistência de dados" da
 | Mecanismo | Uso no AccessMap | Escopo |
 |---|---|---|
 | `sessionStorage` | Guarda o estado de sessão do administrador logado (`accessmap_admin_logado`) | Expira ao fechar o navegador |
-| `localStorage` | Guarda as colaborações enviadas pelo formulário público (`accessmap_respostas`) e a preferência de alto contraste (`altoContrasteState`) | Persiste entre sessões, no mesmo navegador/dispositivo |
+| `localStorage` | Guarda as colaborações enviadas pelo formulário público (`accessmap_respostas`), os locais do mapa depois que o admin adiciona/edita/exclui algum (`accessmap_lugares`) e as preferências de alto contraste (`altoContrasteState`) e tamanho da fonte (`accessmap_nivel_fonte`) | Persiste entre sessões, no mesmo navegador/dispositivo |
+| IndexedDB | Guarda as imagens de planta enviadas pelo admin (banco `accessmap`, tabela `plantas`), com a versão anterior para desfazer | Persiste entre sessões, no mesmo navegador/dispositivo |
 
 Essa abordagem tem uma limitação intencional e conhecida: os dados ficam restritos ao navegador/dispositivo em que foram inseridos, não sendo compartilhados entre diferentes usuários ou máquinas. Isso é aceitável para fins de demonstração e avaliação acadêmica da v1, mas será substituído por um back-end real (API + banco de dados) nas próximas versões — ver [Migração para Banco de Dados Real](#migração-para-banco-de-dados-real).
 
@@ -350,6 +357,21 @@ Por não depender de back-end ou banco de dados, o projeto pode ser executado in
    ```
    e acesse `http://localhost:8000`.
 3. Para acessar a área administrativa, use a [conta de teste](#acesso-administrativo-ambiente-de-avaliação) na tela de login.
+
+### Editando os estilos (SCSS)
+
+Os arquivos em `assets/css/` são gerados — edite os `.scss` em `assets/scss/` e recompile:
+
+```bash
+npx sass assets/scss/style.scss assets/css/style.css --style=compressed
+npx sass assets/scss/admin.scss assets/css/admin.css --style=compressed
+```
+
+### Testando os locais do mapa
+
+1. No admin, clique em qualquer ponto do mapa: o painel **Inserir local** abre ao lado, e o mapa continua clicável para ajustar a posição.
+2. Preencha o nome, escolha o tipo e clique em **Adicionar local**. O local fica salvo neste navegador e aparece também em `mapa.html` (busque pelo nome).
+3. Para voltar à lista original, use **Restaurar lista original de locais**, no fim da barra lateral.
 
 ### Testando a atualização da imagem do mapa
 

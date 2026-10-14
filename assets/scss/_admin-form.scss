@@ -36,6 +36,27 @@ $card-radius: 22px;
     }
 }
 
+// Em telas pequenas, os links da navbar do admin ficam só com o ícone
+// (o texto continua disponível para leitores de tela)
+@media (max-width: 768px) {
+    .nav-admin-link {
+        padding: 8px 10px;
+
+        .nav-texto {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+        }
+    }
+
+    .navbar .logo .logo-text {
+        display: none;
+    }
+}
+
 .btn-novo-local {
     width: 100%;
     display: flex;
@@ -106,6 +127,18 @@ $card-radius: 22px;
     flex: 1;
     min-width: 0;
     cursor: pointer;
+    // é um <button>: zera o visual padrão do navegador
+    background: none;
+    border: none;
+    padding: 0;
+    text-align: left;
+    font: inherit;
+    border-radius: 6px;
+
+    &:focus-visible {
+        outline: 2px solid $color-dark;
+        outline-offset: 3px;
+    }
 
     p {
         margin: 0 0 2px;
@@ -163,6 +196,42 @@ $card-radius: 22px;
     flex: 1;
     min-width: 0;
     height: 100%;
+    cursor: crosshair; // no admin, clicar no mapa marca um ponto
+}
+
+// Mensagem de "nenhum local encontrado" na lista do admin
+.lista-vazia-admin {
+    padding: 14px;
+    border: 1.5px dashed $color-grey;
+    border-radius: 10px;
+    font-family: $font-secondary;
+    font-size: 0.8rem;
+    text-align: center;
+    color: #333;
+}
+
+// Botão discreto, com aparência de link (ações secundárias)
+.btn-texto {
+    background: none;
+    border: none;
+    padding: 4px 0;
+    margin: 0 0 14px;
+    font-family: $font-secondary;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #8a1f1f;
+    text-decoration: underline;
+    cursor: pointer;
+    align-self: flex-start;
+
+    &[hidden] {
+        display: none;
+    }
+
+    &:focus-visible {
+        outline: 2px solid $color-dark;
+        outline-offset: 2px;
+    }
 }
 
 @keyframes formAparecer {
@@ -183,6 +252,7 @@ $card-radius: 22px;
     border-left: 1px solid $color-grey;
     background: $color-white;
     overflow-y: auto;
+    overflow-x: hidden;
     transition: width 0.25s ease, opacity 0.2s ease;
 
     &.oculto {
@@ -191,6 +261,7 @@ $card-radius: 22px;
         overflow: hidden;
         border: none;
         pointer-events: none;
+        visibility: hidden; // impede que o Tab chegue nos campos escondidos
     }
 
     &:not(.oculto) .form-local-card {
@@ -199,7 +270,8 @@ $card-radius: 22px;
 }
 
 .form-local-card {
-    width: 360px;
+    width: 100%;
+    max-width: 360px;
     box-sizing: border-box;
     background: $color-white;
     font-family: $font-secondary;
@@ -297,11 +369,40 @@ $card-radius: 22px;
     }
 }
 
+// Rótulo de campo que não é <label> (ex.: posição no mapa)
+.form-local-body .rotulo-campo {
+    display: block;
+    font-family: $font-primary;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: $color-dark;
+    margin: 18px 0 8px;
+}
+
+.form-local-body input[aria-invalid="true"] {
+    border-color: #A32D2D;
+}
+
+// Dica abaixo dos botões da sidebar
+.dica-admin {
+    margin: -4px 0 14px;
+    font-family: $font-secondary;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: #333;
+}
+
 .coord-row {
     border: 1.5px solid $color-grey;
     border-radius: 12px;
     background: $color-bg-light;
     padding: 12px 14px;
+
+    // Ainda não há ponto marcado: destaca que falta clicar no mapa
+    &.sem-coords {
+        border-style: dashed;
+        border-color: $color-orange;
+    }
 
     #form-coords {
         font-size: 0.85rem;
@@ -315,24 +416,56 @@ $card-radius: 22px;
     color: color.adjust($color-dark, $lightness: 45%);
 }
 
-.atributos-row {
-    display: flex;
-    gap: 24px;
+// Tipo do local (radio): geral / física / auditiva / alerta
+.tipo-opcoes {
+    border: none;
+    margin: 18px 0 0;
+    padding: 0;
+
+    legend {
+        font-family: $font-primary;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: $color-dark;
+        margin-bottom: 8px;
+    }
+
+    .tipo-grade {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
 
     label {
         display: flex;
         align-items: center;
         gap: 8px;
         margin: 0;
-        font-weight: 500;
+        padding: 10px 12px;
+        border: 1.5px solid $color-grey;
+        border-radius: 10px;
+        background: $color-bg-light;
         font-family: $font-secondary;
+        font-weight: 600;
+        font-size: 0.8rem;
         cursor: pointer;
+        transition: border-color 0.2s ease, background-color 0.2s ease;
+
+        &:has(input:checked) {
+            border-color: $color-purple;
+            background: rgba($color-purple, 0.06);
+        }
+
+        &:has(input:focus-visible) {
+            outline: 2px solid $color-dark;
+            outline-offset: 2px;
+        }
     }
 
-    input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
+    input[type="radio"] {
+        width: 16px;
+        height: 16px;
+        margin: 0;
         accent-color: $color-purple;
     }
 }
@@ -492,6 +625,26 @@ $card-radius: 22px;
     &:hover {
         background: color.adjust($color-dark, $lightness: 15%);
     }
+
+    // Ações destrutivas (excluir, restaurar) ficam em vermelho
+    &.btn-confirm-ok--perigo {
+        background: #A32D2D;
+
+        &:hover {
+            background: color.adjust(#A32D2D, $lightness: -8%);
+        }
+    }
+}
+
+// Com o painel aberto (desktop), os botões flutuantes de acessibilidade
+// (VLibras, A+, A-, contraste) se afastam para não cobrir o formulário
+@media (min-width: 993px) {
+    body:has(#painel-form:not(.oculto)) {
+        .widget-acessibilidade-nativo,
+        div[vw].enabled {
+            right: 380px !important;
+        }
+    }
 }
 
 @media (max-width: 992px) {
@@ -553,8 +706,7 @@ $card-radius: 22px;
         padding: 20px 18px 18px;
     }
 
-    .atributos-row {
-        flex-direction: column;
-        gap: 10px;
+    .tipo-opcoes .tipo-grade {
+        grid-template-columns: 1fr;
     }
 }
