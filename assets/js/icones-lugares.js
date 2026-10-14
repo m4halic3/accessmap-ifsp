@@ -223,6 +223,10 @@ function montarLegenda() {
     ];
 
     alvo.innerHTML = `
+        <p class="legenda-explicacao">
+            <span class="pino-legenda" aria-hidden="true"><i class="fas fa-wheelchair"></i></span>
+            <span><strong>Pinos</strong> marcam pontos de acessibilidade e alertas. Os demais locais aparecem pelo <strong>nome</strong>; aproxime o zoom para ver as salas.</span>
+        </p>
         <p class="legenda-subtitulo">Cor: onde fica</p>
         <ul class="legenda-lista">
             ${cores.map(c => `<li><span class="legenda-cor" style="--cor-lugar:${c.cor}" aria-hidden="true"></span>${c.rotulo}</li>`).join("")}

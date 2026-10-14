@@ -38,24 +38,37 @@ function iniciarAdmin() {
     primeiraInicializacao = false;
     aplicarFiltrosCombinados();
 
-    mapa.on("click", (e) => {
-        const coords = {
-            x: Math.round(e.latlng.lng),
-            y: Math.round(e.latlng.lat)
-        };
-
-        if (!painelFormAberto()) {
-            // Nenhum formulário aberto: o clique já inicia a inserção nesse ponto
-            abrirFormulario(null, null, coords);
-            return;
+    // Clique no nome/pino de um local: sem painel aberto, abre a edição dele;
+    // com o painel aberto, vale como clique no mapa (reposiciona o ponto)
+    window.aoClicarLugarNoMapa = (lugar, e) => {
+        if (painelFormAberto()) {
+            aoClicarNoMapa(e);
+        } else {
+            abrirFormulario(lugar, lugares.indexOf(lugar));
         }
+        return true;
+    };
 
-        // Painel já aberto (inserindo ou editando): só reposiciona o ponto
-        coordsClicadas = coords;
-        atualizarTextoCoords();
-        mostrarMarcadorTemporario();
-        mostrarErroForm("");
-    });
+    mapa.on("click", aoClicarNoMapa);
+}
+
+function aoClicarNoMapa(e) {
+    const coords = {
+        x: Math.round(e.latlng.lng),
+        y: Math.round(e.latlng.lat)
+    };
+
+    if (!painelFormAberto()) {
+        // Nenhum formulário aberto: o clique já inicia a inserção nesse ponto
+        abrirFormulario(null, null, coords);
+        return;
+    }
+
+    // Painel já aberto (inserindo ou editando): só reposiciona o ponto
+    coordsClicadas = coords;
+    atualizarTextoCoords();
+    mostrarMarcadorTemporario();
+    mostrarErroForm("");
 }
 
 function popularSelectBlocos() {
@@ -234,6 +247,7 @@ function mostrarMarcadorTemporario() {
     limparMarcadorTemporario();
     if (!coordsClicadas) return;
     marcadorTemporario = L.circleMarker([coordsClicadas.y, coordsClicadas.x], {
+        pane: "destaque", // acima dos nomes e pinos dos locais
         radius: 9,
         color: "#ff5900",
         weight: 3,

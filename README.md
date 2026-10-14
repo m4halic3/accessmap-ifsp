@@ -68,7 +68,8 @@ Os dados coletados pelo AccessMap possuem um papel importante para a comunidade 
   - três plantas: Mapa Geral, Subsolo Edificações (Bloco C) e Subsolo Mecânica (Bloco B);
   - busca por nome ao digitar (ignora acentos e hífens) e Enter para ir direto ao local, trocando de planta se necessário;
   - filtros por acessibilidade física e auditiva e o botão "Ver todos";
-  - **marcadores com ícone por área** — a cor indica onde o local fica e o ícone indica o que ele é (ver [Ícones e legenda do mapa](#ícones-e-legenda-do-mapa));
+  - **locais exibidos pelo nome**, com um ícone por área, e **pinos apenas para pontos de acessibilidade e alertas** (ver [Ícones e legenda do mapa](#ícones-e-legenda-do-mapa));
+  - **informações reveladas conforme o zoom**: ao abrir, o mapa mostra só a planta, limpa; ao aproximar, aparecem os prédios, as áreas principais e os pontos de acessibilidade e, aproximando mais, as salas — sem que os nomes se sobreponham;
   - legenda recolhível com o significado de cores e ícones;
   - **plantas em alta resolução**, nítidas mesmo com zoom máximo, carregadas sob demanda para manter a página leve (ver [Imagens das plantas em alta resolução](#imagens-das-plantas-em-alta-resolução)).
 - Formulário de colaboração, no qual qualquer visitante pode relatar um problema ou sugerir uma melhoria, informando:
@@ -81,7 +82,11 @@ Os dados coletados pelo AccessMap possuem um papel importante para a comunidade 
 
 #### Ícones e legenda do mapa
 
-Cada local é exibido como um pino colorido com um ícone ([Font Awesome](https://fontawesome.com/)), seguindo uma regra única no mapa, na lista lateral e nos popups:
+No mapa, os locais do campus aparecem pelo **nome**, acompanhado de um pequeno ícone; **pinos** são usados apenas para o que é o foco do projeto — pontos de acessibilidade física, auditiva e alertas de barreira. Os prédios aparecem como etiquetas destacadas.
+
+O que aparece depende do zoom (como em mapas do tipo Airbnb): ao abrir a tela, o mapa fica limpo, só com a planta; no primeiro passo de zoom aparecem os prédios, as áreas principais (estacionamentos, quadra, refeitório…) e os pinos de acessibilidade; aproximando mais, os nomes das salas vão surgindo. A busca, os filtros de acessibilidade e o local aberto pela lista lateral são exibidos mesmo sem zoom. Os nomes nunca se sobrepõem — os mais importantes têm prioridade e os demais aparecem quando há espaço na tela. Na busca, os resultados ficam destacados e o restante do mapa fica esmaecido. No modo administrador, clicar no nome de um local abre a edição dele.
+
+Ícones e cores seguem uma regra única no mapa, na lista lateral e nos popups ([Font Awesome](https://fontawesome.com/)):
 
 - **A cor diz onde fica**: Bloco A — Informática (bordô), Bloco B — Mecânica (azul-marinho), Bloco C — Edificações (verde), Bloco D (roxo) e cores próprias para estacionamento, quadra, refeitório e canteiro. Pontos de **acessibilidade física** ficam em azul (cor do Símbolo Internacional de Acessibilidade), de **acessibilidade auditiva** em magenta e **alertas** de barreira em amarelo, como uma placa de aviso.
 - **O ícone diz o que é**: laboratório de informática, laboratório de mecânica, laboratório de construção, laboratório de ciências, sala de aula, sala dos professores, auditório, biblioteca, refeitório/cantina, secretaria e coordenações, estacionamento, quadra, banheiro, elevador, escada, rampa, vaga PCD, NAPNE, depósito, entre outros.

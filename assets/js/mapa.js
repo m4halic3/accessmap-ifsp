@@ -263,7 +263,6 @@ carregarLugaresSalvos();
    ESTADO DO MAPA
    ========================================================= */
 let mapa;
-let marcadores = [];
 let camadaImagem = null;
 let pedacosHD = [];      // [{ limites, camada, url }] da planta aberta
 let filtroAtual = null;
@@ -332,7 +331,18 @@ function initMap() {
     // por cima dela, ambos abaixo dos marcadores e do marcador temporário
     mapa.createPane("planta").style.zIndex = 250;
     mapa.createPane("plantaHD").style.zIndex = 260;
+    // Nomes dos locais abaixo dos pinos; "destaque" (marcador temporário do
+    // admin) acima de tudo, menos dos popups
+    mapa.createPane("rotulos").style.zIndex = 590;
+    mapa.createPane("destaque").style.zIndex = 650;
     mapa.on("zoomend moveend", atualizarCamadaHD);
+    mapa.on("zoomend moveend", atualizarVisibilidadeMapa);
+
+    // A+ / A- muda o tamanho dos nomes: mede tudo de novo
+    document.addEventListener("accessmap:fonte", () => {
+        itensMapa.forEach(item => { item.tamanho = null; });
+        atualizarVisibilidadeMapa();
+    });
 
     primeiraInicializacao = true;
     atualizarPlantaDeFundo();
@@ -372,6 +382,7 @@ function atualizarPlantaDeFundo() {
     }).addTo(mapa);
 
     prepararPedacosHD(dadosPlanta);
+    zoomEnquadrado = mapa.getBoundsZoom(limites);
     mapa.fitBounds(limites);
     atualizarCamadaHD();
     atualizarTituloResultados();
@@ -472,6 +483,8 @@ function filtrarAla(ala) {
     if (!plantas[ala]) return;
     primeiraInicializacao = false;
     alaAtual = ala;
+    lugarSelecionado = null;
+    mapa.closePopup();
     marcarBotaoAla(ala);
     atualizarPlantaDeFundo();
 }
@@ -513,26 +526,17 @@ function aplicarFiltrosCombinados() {
         }
     }
 
-    limparMarcadores();
+    // No mapa, os resultados da busca ficam sempre visíveis e destacados
+    destaquesMapa = termo ? new Set(filtrados) : new Set();
+    atualizarVisibilidadeMapa();
 
     if (alaAtual === "todos" && !termo && !filtroAtual) {
-        // Estado padrão do Mapa Geral: mapa sem marcadores e lateral só
-        // com os blocos/locais principais.
+        // Estado padrão do Mapa Geral: lateral só com os blocos/locais principais
         const blocosPrincipais = lugares.filter(l => l.subponto === false && l.andar === "terreo");
         atualizarListaLateral(blocosPrincipais);
-    } else if (alaAtual !== "todos" && !termo && !filtroAtual) {
-        // Estado padrão de um subsolo: mapa sem marcadores e lateral com
-        // todos os locais daquele subsolo.
-        atualizarListaLateral(filtrados, { mostrarTodos: true });
     } else {
-        mostrarLugares(filtrados);
         atualizarListaLateral(filtrados, { mostrarTodos: true });
     }
-}
-
-function mostrarLugares(lista) {
-    limparMarcadores();
-    lista.forEach(lugar => adicionarMarcador(lugar));
 }
 
 // Texto curto "o que é · onde fica" (ícones e cores: icones-lugares.js)
@@ -547,33 +551,235 @@ function descricaoDoTipo(lugar) {
     return `${escaparHtml(estilo.oQue)} · ${escaparHtml(estilo.area)}${andar}`;
 }
 
-function adicionarMarcador(lugar) {
-    const estilo = estiloDoLugar(lugar);
-    const marcador = L.marker([lugar.y, lugar.x], {
-        icon: criarIconeLugar(lugar),
-        title: lugar.nome,
-        keyboard: true
-    }).addTo(mapa);
+/* =========================================================
+   CAMADAS DO MAPA: NOMES (TEXTO) E PINOS DE ACESSIBILIDADE
+   -----------------------------------------------------------
+   • Todo local da planta aberta aparece como NOME em texto.
+   • Só pontos de acessibilidade (física/auditiva) e alertas viram PINO.
+   • Os itens aparecem conforme o zoom (como no Airbnb): de longe só os
+     prédios e áreas principais; aproximando, surgem as salas. Nomes que
+     se sobreporiam a outros mais importantes ficam escondidos até haver
+     espaço na tela.
+   ========================================================= */
+const ZOOM_SALAS = 0.5;          // zoom a partir do qual as salas do Mapa Geral aparecem
+const ZOOM_AFASTADO = 0;         // abaixo disso, as etiquetas dos prédios ficam compactas
+// Ao abrir a planta o mapa fica limpo: os locais só aparecem depois que a
+// pessoa aproxima pelo menos um passo a partir do enquadramento inicial
+const PASSO_PARA_MOSTRAR = 0.5;
+let zoomEnquadrado = -Infinity;  // zoom em que a planta inteira cabe na tela
+const MARGEM_ROTULO = 4;         // px de folga entre nomes
 
-    // Nome acessível do marcador (o pino é um <div>, sem alt)
-    const el = marcador.getElement();
-    if (el) el.setAttribute("aria-label", `${lugar.nome}. ${estilo.descricao}`);
+let itensMapa = [];              // [{ lugar, marcador, ePino, prioridade, zoomMinimo, tamanho }]
+let assinaturaItens = "";
+let destaquesMapa = new Set();   // resultados da busca (sempre visíveis)
+let lugarSelecionado = null;     // local aberto pela lista/busca (sempre visível)
+let popupAberto = null;
+let mapaAfastado = null;
 
-    marcador.bindPopup(`
+function ePontoDeAcessibilidade(lugar) {
+    return lugar.tipo === "fisica" || lugar.tipo === "auditiva" || lugar.tipo === "alerta";
+}
+
+function lugaresDaPlanta() {
+    return alaAtual === "todos"
+        ? lugares.filter(l => l.andar !== "subsolo")
+        : lugares.filter(l => l.bloco_pai === alaAtual && l.andar === "subsolo");
+}
+
+// "Bloco A - Lab A (A206)" -> "Lab A (A206)": no mapa o bloco já é visível
+function nomeCurto(lugar) {
+    return lugar.nome.replace(/^(Bloco [A-D]|Subsolo [A-D]) - /, "");
+}
+
+// Prédios ("Bloco A") viram "Bloco" + letra, para a etiqueta poder ficar
+// compacta (em duas linhas) quando o zoom está afastado
+function textoDoRotulo(lugar) {
+    const predio = /^Bloco ([A-D])$/.exec(lugar.nome);
+    if (predio) {
+        return `<span class="rotulo-texto"><span class="rotulo-predio-palavra">Bloco</span> <span class="rotulo-predio-letra">${predio[1]}</span></span>`;
+    }
+    return `<span class="rotulo-texto">${escaparHtml(nomeCurto(lugar))}</span>`;
+}
+
+function conteudoPopup(lugar) {
+    return `
         <div class="popup-lugar">
             ${seloDoLugar(lugar, "selo-lugar--popup")}
             <strong>${escaparHtml(lugar.nome)}</strong>
             <span>${descricaoDoTipo(lugar)}</span>
-        </div>
-    `);
-
-    marcadores.push(marcador);
-    return marcador;
+        </div>`;
 }
 
-function limparMarcadores() {
-    marcadores.forEach(m => mapa.removeLayer(m));
-    marcadores = [];
+function abrirPopupDoLugar(lugar) {
+    popupAberto = L.popup({ offset: ePontoDeAcessibilidade(lugar) ? [0, -36] : [0, -10] })
+        .setLatLng([lugar.y, lugar.x])
+        .setContent(conteudoPopup(lugar))
+        .openOn(mapa);
+}
+
+// Prioridade (menor = mais importante) e zoom mínimo de cada item
+// Os prédios vêm antes de tudo (orientação); depois os pinos de acessibilidade
+function prioridadeDoItem(lugar, ePino) {
+    if (AREA_DOS_BLOCOS[lugar.nome]) return 0;
+    if (ePino) return { alerta: 1, fisica: 2, auditiva: 3 }[lugar.tipo];
+    return lugar.subponto ? 30 : 20;
+}
+
+function zoomMinimoDoItem(lugar, ePino) {
+    if (ePino || alaAtual !== "todos" || !lugar.subponto) return -Infinity;
+    return ZOOM_SALAS;
+}
+
+function criarItemMapa(lugar) {
+    const ePino = ePontoDeAcessibilidade(lugar);
+    let marcador;
+
+    if (ePino) {
+        const estilo = estiloDoLugar(lugar);
+        marcador = L.marker([lugar.y, lugar.x], {
+            icon: criarIconeLugar(lugar),
+            title: lugar.nome,
+            keyboard: true
+        });
+        marcador.on("add", () => {
+            // Nome acessível do pino (é um <div>, sem alt)
+            marcador.getElement().setAttribute("aria-label", `${lugar.nome}. ${estilo.descricao}`);
+        });
+    } else {
+        const estilo = estiloDoLugar(lugar);
+        const nivel = AREA_DOS_BLOCOS[lugar.nome] ? "predio" : (lugar.subponto ? "sala" : "area");
+        marcador = L.marker([lugar.y, lugar.x], {
+            pane: "rotulos",
+            keyboard: false, // pelo teclado, os locais são acessados pela lista lateral
+            icon: L.divIcon({
+                className: "rotulo-wrap",
+                iconSize: [0, 0],
+                iconAnchor: [0, 0],
+                html: `<span class="rotulo-lugar rotulo-lugar--${nivel}" style="--cor-lugar:${estilo.cor};--cor-icone:${estilo.corIcone}" aria-hidden="true">` +
+                      `<i class="fas ${estilo.icone}"></i>${textoDoRotulo(lugar)}</span>`
+            })
+        });
+    }
+
+    // O admin pode tratar o clique (ex.: abrir a edição); senão abre o popup
+    marcador.on("click", (e) => {
+        if (typeof window.aoClicarLugarNoMapa === "function" && window.aoClicarLugarNoMapa(lugar, e)) return;
+        abrirPopupDoLugar(lugar);
+    });
+
+    return {
+        lugar,
+        marcador,
+        ePino,
+        prioridade: prioridadeDoItem(lugar, ePino),
+        zoomMinimo: zoomMinimoDoItem(lugar, ePino),
+        tamanho: null
+    };
+}
+
+// Recria os itens só quando a planta ou os dados mudam
+function garantirItensMapa() {
+    const assinatura = alaAtual + "|" + JSON.stringify(lugaresDaPlanta().map(l =>
+        [l.nome, l.x, l.y, l.tipo, l.categoria, l.bloco_pai, l.andar, l.subponto]));
+    if (assinatura === assinaturaItens) return;
+    assinaturaItens = assinatura;
+
+    itensMapa.forEach(item => mapa.removeLayer(item.marcador));
+    itensMapa = lugaresDaPlanta().map(criarItemMapa);
+    itensMapa.forEach(item => {
+        item.marcador.addTo(mapa);
+        item.marcador.getElement().classList.add("item-mapa-oculto");
+    });
+    if (lugarSelecionado && !lugares.includes(lugarSelecionado)) lugarSelecionado = null;
+}
+
+function passaNoFiltro(lugar) {
+    if (!filtroAtual || filtroAtual === "acessibilidade") return true;
+    if (filtroAtual === "fisica") return lugar.tipo === "fisica" || lugar.tipo === "alerta";
+    return lugar.tipo === filtroAtual;
+}
+
+// Retângulo ocupado na tela (px do contêiner do mapa)
+function retanguloDoItem(item, ponto) {
+    if (item.ePino) {
+        // corpo do pino (sem a ponta), um pouco menor para pinos vizinhos caberem
+        return { x1: ponto.x - 11, y1: ponto.y - 38, x2: ponto.x + 11, y2: ponto.y - 14 };
+    }
+    const { w, h } = item.tamanho;
+    return {
+        x1: ponto.x - w / 2 - MARGEM_ROTULO, y1: ponto.y - h / 2 - MARGEM_ROTULO,
+        x2: ponto.x + w / 2 + MARGEM_ROTULO, y2: ponto.y + h / 2 + MARGEM_ROTULO
+    };
+}
+
+function sobrepoe(a, b) {
+    return a.x1 < b.x2 && a.x2 > b.x1 && a.y1 < b.y2 && a.y2 > b.y1;
+}
+
+function atualizarVisibilidadeMapa() {
+    if (!mapa) return;
+    garantirItensMapa();
+
+    const zoom = mapa.getZoom();
+    const areaVisivel = mapa.getBounds().pad(0.15);
+    const aproximou = zoom >= zoomEnquadrado + PASSO_PARA_MOSTRAR;
+    // Com filtro de acessibilidade ativo, os pinos aparecem mesmo sem zoom
+    const filtroAtivo = !!filtroAtual;
+    const comBusca = destaquesMapa.size > 0;
+    mapa.getContainer().classList.toggle("mapa-com-busca", comBusca);
+
+    // Zoom afastado: etiquetas dos prédios compactas (precisam ser medidas de novo)
+    const afastado = zoom < ZOOM_AFASTADO;
+    if (afastado !== mapaAfastado) {
+        mapaAfastado = afastado;
+        mapa.getContainer().classList.toggle("mapa-afastado", afastado);
+        itensMapa.forEach(item => { if (AREA_DOS_BLOCOS[item.lugar.nome]) item.tamanho = null; });
+    }
+
+    // 1) Lê os tamanhos que faltam (todas as leituras antes das escritas)
+    itensMapa.forEach(item => {
+        if (!item.ePino && !item.tamanho) {
+            const el = item.marcador.getElement().firstElementChild;
+            item.tamanho = { w: el.offsetWidth, h: el.offsetHeight };
+        }
+    });
+
+    // 2) Decide quem aparece. O local selecionado sempre aparece; os
+    //    resultados da busca têm prioridade, mas também não se sobrepõem
+    //    (os que não couberem surgem ao aproximar o zoom).
+    const forcado = (item) => item.lugar === lugarSelecionado;
+    const destacado = (item) => destaquesMapa.has(item.lugar);
+    const ordenados = [...itensMapa].sort((a, b) =>
+        (forcado(b) - forcado(a)) || (destacado(b) - destacado(a)) || (a.prioridade - b.prioridade));
+
+    const ocupados = [];
+    const visiveis = new Set();
+
+    ordenados.forEach(item => {
+        const eForcado = forcado(item);
+        const latlng = [item.lugar.y, item.lugar.x];
+
+        if (!eForcado && !destacado(item)) {
+            if (item.ePino && !passaNoFiltro(item.lugar)) return;
+            const liberadoPeloFiltro = item.ePino && filtroAtivo;
+            if (!aproximou && !liberadoPeloFiltro) return;   // tela inicial limpa
+            if (zoom < item.zoomMinimo && !liberadoPeloFiltro) return;
+        }
+        if (!eForcado && !areaVisivel.contains(latlng)) return;
+
+        const ret = retanguloDoItem(item, mapa.latLngToContainerPoint(latlng));
+        if (!eForcado && ocupados.some(o => sobrepoe(o, ret))) return;
+
+        ocupados.push(ret);
+        visiveis.add(item);
+    });
+
+    // 3) Aplica (só escritas)
+    itensMapa.forEach(item => {
+        const el = item.marcador.getElement();
+        el.classList.toggle("item-mapa-oculto", !visiveis.has(item));
+        el.classList.toggle("item-mapa-destaque", forcado(item) || destacado(item));
+    });
 }
 
 function filtrar(tipo) {
@@ -644,34 +850,26 @@ function atualizarContador(quantidade) {
     }
 }
 
-// Navega o mapa até um lugar, mostrando seu marcador (e, se for um
-// Bloco raiz, também as salas internas dele).
+// Navega o mapa até um lugar e abre o popup dele. Para um prédio, o zoom
+// fica no nível em que as salas internas começam a aparecer.
 function focarNoLugar(lugar) {
     primeiraInicializacao = false;
-    limparMarcadores();
+    lugarSelecionado = lugar;
 
-    const blocoPaiAlvo = BLOCOS_RAIZ[lugar.nome];
+    const zoomAlvo = AREA_DOS_BLOCOS[lugar.nome]
+        ? Math.max(ZOOM_SALAS + 0.5, 1)
+        : Math.max(mapa.getZoom(), 1.5);
 
-    if (blocoPaiAlvo) {
-        const blocoRaiz = adicionarMarcador(lugar);
-        const andarDaAla = getAndarDaAla();
-
-        lugares
-            .filter(l => {
-                if (!l.subponto || l.bloco_pai !== blocoPaiAlvo) return false;
-                if (lugar.nome === "Bloco A" || lugar.nome === "Bloco D") return l.andar === "terreo";
-                return l.andar === andarDaAla;
-            })
-            .forEach(sala => adicionarMarcador(sala));
-
-        mapa.setView([lugar.y, lugar.x], 1);
-        blocoRaiz.openPopup();
-        return;
-    }
-
-    const marcadorUnico = adicionarMarcador(lugar);
-    mapa.setView([lugar.y, lugar.x], 1);
-    marcadorUnico.openPopup();
+    let abriu = false;
+    const abrir = () => {
+        if (abriu) return;
+        abriu = true;
+        atualizarVisibilidadeMapa();
+        abrirPopupDoLugar(lugar);
+    };
+    mapa.once("moveend", abrir);
+    mapa.setView([lugar.y, lugar.x], zoomAlvo);
+    setTimeout(abrir, 450); // caso o mapa já esteja nessa posição (sem "moveend")
 }
 
 // Busca por nome e vai direto pro local. Prioriza correspondência exata;
@@ -733,9 +931,12 @@ function resetarMapaCompleto() {
         searchInput.removeAttribute("aria-invalid");
     }
 
+    lugarSelecionado = null;
+    destaquesMapa = new Set();
+    if (mapa) mapa.closePopup();
+
     marcarBotoesFiltro();
     marcarBotaoAla("todos");
-    limparMarcadores();
     atualizarPlantaDeFundo();
 }
 
