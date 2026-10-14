@@ -63,13 +63,30 @@ Os dados coletados pelo AccessMap possuem um papel importante para a comunidade 
 
 ### Área Pública (sem necessidade de login)
 
-- Página inicial institucional com carrossel informativo, seção de estatísticas e apresentação do projeto.
-- Mapa interativo do campus, com possibilidade futura de marcadores por categoria de acessibilidade.
+- Página inicial institucional com carrossel informativo (com botão de pausar), seção de estatísticas e apresentação do projeto.
+- **Mapa interativo do campus** (`mapa.html`), com:
+  - três plantas: Mapa Geral, Subsolo Edificações (Bloco C) e Subsolo Mecânica (Bloco B);
+  - busca por nome ao digitar (ignora acentos e hífens) e Enter para ir direto ao local, trocando de planta se necessário;
+  - filtros por acessibilidade física e auditiva e o botão "Ver todos";
+  - **marcadores com ícone por área** — a cor indica onde o local fica e o ícone indica o que ele é (ver [Ícones e legenda do mapa](#ícones-e-legenda-do-mapa));
+  - legenda recolhível com o significado de cores e ícones;
+  - **plantas em alta resolução**, nítidas mesmo com zoom máximo, carregadas sob demanda para manter a página leve (ver [Imagens das plantas em alta resolução](#imagens-das-plantas-em-alta-resolução)).
 - Formulário de colaboração, no qual qualquer visitante pode relatar um problema ou sugerir uma melhoria, informando:
   - Local da ocorrência;
   - Categoria de acessibilidade (física ou auditiva, com plano de expansão para outras categorias);
   - Relato ou sugestão em texto livre.
-- Widget de acessibilidade nativo (aumento/diminuição de fonte e alto contraste) e integração com o **VLibras**, tradutor de Libras do Governo Federal.
+
+  O formulário valida os campos e mostra a mensagem de erro junto ao campo a corrigir.
+- Widget de acessibilidade nativo (aumento/diminuição de fonte e alto contraste, com a preferência mantida entre as páginas) e integração com o **VLibras**, tradutor de Libras do Governo Federal.
+
+#### Ícones e legenda do mapa
+
+Cada local é exibido como um pino colorido com um ícone ([Font Awesome](https://fontawesome.com/)), seguindo uma regra única no mapa, na lista lateral e nos popups:
+
+- **A cor diz onde fica**: Bloco A — Informática (bordô), Bloco B — Mecânica (azul-marinho), Bloco C — Edificações (verde), Bloco D (roxo) e cores próprias para estacionamento, quadra, refeitório e canteiro. Pontos de **acessibilidade física** ficam em azul (cor do Símbolo Internacional de Acessibilidade), de **acessibilidade auditiva** em magenta e **alertas** de barreira em amarelo, como uma placa de aviso.
+- **O ícone diz o que é**: laboratório de informática, laboratório de mecânica, laboratório de construção, laboratório de ciências, sala de aula, sala dos professores, auditório, biblioteca, refeitório/cantina, secretaria e coordenações, estacionamento, quadra, banheiro, elevador, escada, rampa, vaga PCD, NAPNE, depósito, entre outros.
+
+O ícone é escolhido automaticamente pelo nome do local (ex.: um local chamado "Bloco A - Banheiro…" recebe o ícone de banheiro) e, se o nome não for específico, pela área. Assim, locais novos cadastrados pelo administrador já recebem o ícone certo. Todas as regras ficam em `assets/js/icones-lugares.js`.
 
 ### Área Administrativa (restrita, mediante login)
 
@@ -85,14 +102,22 @@ Levantada na Fase 1 do cronograma do projeto, a área administrativa deve atende
 
 Nesta versão, os requisitos acima estão implementados da seguinte forma:
 
-- Autenticação de administrador.
+- Autenticação de administrador, com proteção de `dashboard.html` e `admin.html` (sem login, o acesso é redirecionado para `login.html`) e botão **Sair** em todas as páginas administrativas.
 - Dashboard de respostas coletadas pelo formulário público, com:
   - Filtro por local;
   - Filtro por categoria de acessibilidade;
   - Busca por palavra-chave no relato;
   - Ordenação (mais recentes, mais antigos, ordem alfabética por local);
-  - Exclusão de respostas já tratadas.
-- Edição de pontos do mapa (`admin.html`), incluindo a inserção de novos pontos por clique direto sobre o mapa, com captura automática de latitude e longitude.
+  - Exclusão de respostas já tratadas, com opção de **Desfazer**;
+  - Contador de respostas e mensagens distintas para "ainda não há respostas" e "nenhum resultado para os filtros".
+- Edição de pontos do mapa (`admin.html`):
+  - inserção de novos locais por clique direto sobre o mapa, com captura automática das coordenadas (X, Y) na planta;
+  - painel lateral de edição que mantém o mapa clicável para ajustar a posição;
+  - escolha do tipo do local (ponto de interesse, acessibilidade física, acessibilidade auditiva ou alerta) e do bloco/setor;
+  - edição e exclusão de locais existentes, sempre com confirmação;
+  - aviso de nome duplicado e mensagens de erro no próprio formulário;
+  - alterações salvas no navegador, refletidas no mapa público e com opção de **restaurar a lista original**.
+- **Atualização da imagem do mapa** (planta), para quando o campus mudar: envio de nova imagem com pré-visualização, aviso de proporção diferente ou de resolução baixa, e opções **Voltar ao mapa anterior** e **Restaurar original**.
 
 ## Tecnologias Utilizadas
 
@@ -101,10 +126,12 @@ Nesta versão, os requisitos acima estão implementados da seguinte forma:
 | Estrutura | **HTML5** | Marcação semântica e acessível |
 | Estilo | **SASS (SCSS)** | Estilização avançada, arquitetura modular e design responsivo |
 | Interatividade | **JavaScript (Vanilla)** | Carrossel, menus, autenticação, formulário, dashboard, interação com o mapa |
-| Persistência (atual) | **Web Storage API** (`localStorage` / `sessionStorage`) | Simulação de banco de dados no navegador enquanto não há back-end |
-| Ícones | **Font Awesome 6** | Iconografia da interface |
+| Persistência (atual) | **Web Storage API** (`localStorage` / `sessionStorage`) e **IndexedDB** | Simulação de banco de dados no navegador enquanto não há back-end; o IndexedDB guarda as imagens de planta enviadas pelo admin |
+| Ícones | **Font Awesome 6** | Iconografia da interface e ícones dos locais no mapa |
+| Tipografia | **Google Fonts** (Montserrat e Open Sans) | Fontes da identidade visual |
 | Acessibilidade | **VLibras** (Governo Federal) | Tradução de conteúdo para Libras |
-| Mapas | **Leaflet** | Visualização geográfica interativa do campus |
+| Mapas | **Leaflet 1.9.4** | Mapa interativo das plantas do campus (`CRS.Simple`) |
+| Imagens | **WebP**, **Real-ESRGAN** e **ImageMagick** | Plantas em alta resolução: ampliação 4x com IA e geração das imagens base e dos pedaços HD |
 
 > A escolha por manter a v1 inteiramente funcional no front-end, sem depender de um back-end ou banco de dados, foi proposital: garante que a aplicação possa ser avaliada, testada e demonstrada em qualquer navegador, sem necessidade de infraestrutura de servidor.
 
@@ -125,7 +152,8 @@ accessmap-ifsp/
 │       ├── script.js          # Menu, carrossel e formulário público (index.html)
 │       ├── authentication.js  # Login e proteção das páginas do administrador
 │       ├── dashboard.js       # Leitura/filtro/exclusão (com desfazer) de respostas
-│       ├── mapa.js            # Dados dos locais, busca, filtros e navegação no mapa
+│       ├── icones-lugares.js  # Cores, ícones e legenda dos locais do mapa
+│       ├── mapa.js            # Dados dos locais, busca, filtros, navegação e plantas HD
 │       ├── admin.js           # Inserir/editar/excluir locais (admin.html)
 │       ├── plantas-storage.js # Imagens de planta no IndexedDB
 │       └── admin-planta.js    # Modal "Atualizar imagem do mapa" (admin.html)
@@ -142,7 +170,7 @@ accessmap-ifsp/
 
 ## Arquitetura da Versão Atual (v1 — sem banco de dados)
 
-Como o projeto ainda não possui um back-end, toda a "persistência de dados" da v1 é feita através da **Web Storage API** do próprio navegador, o que permite que o sistema funcione de ponta a ponta — captação de relatos, login administrativo, cadastro de pontos no mapa e visualização no dashboard — sem depender de servidor.
+Como o projeto ainda não possui um back-end, toda a "persistência de dados" da v1 é feita no próprio navegador, através da **Web Storage API** e do **IndexedDB**, o que permite que o sistema funcione de ponta a ponta — captação de relatos, login administrativo, cadastro de pontos no mapa e visualização no dashboard — sem depender de servidor.
 
 | Mecanismo | Uso no AccessMap | Escopo |
 |---|---|---|
@@ -222,14 +250,17 @@ Para tornar explícito como a v1 simula esse modelo relacional usando apenas o n
 
 ```mermaid
 flowchart LR
-    subgraph Publico["Área Pública (index.html)"]
-        F[Formulário de Colaboração]
+    subgraph Publico["Área Pública"]
+        F[index.html - Formulário de Colaboração]
+        M[mapa.html - Mapa]
     end
 
-    subgraph Armazenamento["Web Storage do Navegador"]
+    subgraph Armazenamento["Armazenamento do Navegador"]
         LS1[("localStorage:\naccessmap_respostas")]
-        LS2[("localStorage:\naltoContrasteState")]
+        LS3[("localStorage:\naccessmap_lugares")]
+        LS2[("localStorage:\npreferências de fonte\ne contraste")]
         SS1[("sessionStorage:\naccessmap_admin_logado")]
+        IDB[("IndexedDB:\naccessmap / plantas")]
     end
 
     subgraph Admin["Área Administrativa"]
@@ -242,9 +273,14 @@ flowchart LR
     D -- "lê / filtra / exclui" --> LS1
     L -- "grava sessão ao autenticar" --> SS1
     D -- "verifica sessão ativa" --> SS1
-    A -- "clique no mapa cria ponto" --> LS1
+    A -- "verifica sessão ativa" --> SS1
+    A -- "adiciona / edita / exclui locais" --> LS3
+    A -- "publica nova imagem de planta" --> IDB
+    M -- "lê locais" --> LS3
+    M -- "lê planta enviada" --> IDB
     D -.futuro.-> API[("API + Banco de Dados\n(v2)")]
     LS1 -.migração futura.-> API
+    LS3 -.migração futura.-> API
 ```
 
 ### Dicionário de Dados
@@ -273,6 +309,8 @@ flowchart LR
 | `cor_identificacao` | VARCHAR(7) | Não | Cor em hexadecimal usada para identificar a categoria visualmente |
 
 > Modelar a categoria como tabela própria (em vez de um valor fixo no código) é o que permite, futuramente, adicionar novas categorias de acessibilidade sem alterar o front-end.
+>
+> Na v1, os campos `icone` e `cor_identificacao` já são aplicados na interface pelo arquivo `assets/js/icones-lugares.js`, que define a cor de cada área e tipo de acessibilidade e o ícone de cada tipo de local.
 
 #### Tabela `ponto_acessibilidade`
 
@@ -288,6 +326,8 @@ flowchart LR
 | `status` | VARCHAR(20) | Sim | Situação do ponto (`ativo`, `em_manutencao`, `inativo`) |
 | `criado_em` | DATETIME | Sim | Data de cadastro do ponto |
 | `atualizado_em` | DATETIME | Não | Data da última atualização do ponto |
+
+> Na v1, os pontos ficam no array `lugares` (em `mapa.js`) e, depois que o administrador altera algum, em `localStorage` sob a chave `accessmap_lugares`. Cada ponto tem os campos `nome`, `tipo` (`geral`, `fisica`, `auditiva` ou `alerta`), `categoria`, `andar` (`terreo` ou `subsolo`), `bloco_pai`, `subponto` e as coordenadas `x` e `y`. Como o mapa usa as plantas do campus (e não um mapa geográfico), `x`/`y` são posições na planta, que farão o papel de `longitude`/`latitude` no modelo completo.
 
 #### Tabela `colaboracao`
 
@@ -311,9 +351,10 @@ Quando o projeto avançar para uma versão com back-end, a proposta é que a tra
 
 1. Substituir as funções `lerRespostasForm()` / `salvarNovaResposta()` (em `script.js`) e `lerRespostas()` / `salvarRespostas()` (em `dashboard.js`) por chamadas `fetch` a uma API REST (`GET/POST/DELETE /colaboracoes`).
 2. Substituir a autenticação fixa em `authentication.js` por uma rota de login real (`POST /auth/login`), retornando um token de sessão (JWT ou similar) em vez de uma flag no `sessionStorage`.
-3. Substituir a lógica de clique no mapa, hoje gravada diretamente em `localStorage`, por uma chamada `POST /pontos`, persistindo latitude, longitude e categoria no banco de dados real.
-4. Popular a tabela `categoria_acessibilidade` com as categorias já usadas na v1 (física, auditiva) e abrir espaço para novas categorias (visual, cognitiva, etc.).
-5. Migrar os registros já existentes no `localStorage` (se necessário, via rotina de importação) para as novas tabelas `ponto_acessibilidade` e `colaboracao`.
+3. Substituir `carregarLugaresSalvos()` / `salvarLugares()` (em `mapa.js`), que hoje gravam os locais em `localStorage`, por chamadas a uma API (`GET/POST/PUT/DELETE /pontos`), persistindo coordenadas, tipo e categoria no banco de dados real.
+4. Substituir o armazenamento das imagens de planta no IndexedDB (`plantas-storage.js`) por envio a um servidor de arquivos (`POST/GET/DELETE /plantas/:ala`).
+5. Popular a tabela `categoria_acessibilidade` com as categorias já usadas na v1 (física, auditiva) e abrir espaço para novas categorias (visual, cognitiva, etc.).
+6. Migrar os registros já existentes no `localStorage` (se necessário, via rotina de importação) para as novas tabelas `ponto_acessibilidade` e `colaboracao`.
 
 ## Fluxos do Sistema
 
@@ -321,15 +362,21 @@ Quando o projeto avançar para uma versão com back-end, a proposta é que a tra
 
 1. O visitante acessa `index.html` e preenche o formulário de colaboração na seção "Contato".
 2. Seleciona a categoria de acessibilidade (física ou auditiva) e descreve o relato.
-3. Ao enviar, o relato é validado e salvo no armazenamento local do navegador.
+3. Ao enviar, o relato é validado (com mensagem de erro junto ao campo que falta) e salvo no armazenamento local do navegador.
 4. Uma mensagem de sucesso é exibida e o formulário é limpo, sem necessidade de recarregar a página.
+
+### Fluxo do visitante (mapa)
+
+1. O visitante abre `mapa.html` pela página inicial ("Ir para o mapa").
+2. Escolhe a planta (Mapa Geral ou um dos subsolos), busca um local pelo nome ou filtra por acessibilidade física/auditiva.
+3. Ao clicar em um local da lista ou em um marcador, o mapa se aproxima e mostra o nome, o tipo e a área do local; a legenda explica cores e ícones.
 
 ### Fluxo do administrador
 
 1. O administrador acessa `login.html` e informa usuário e senha da conta de teste.
 2. Após autenticação, é redirecionado para `dashboard.html`.
 3. O painel carrega automaticamente todas as colaborações já registradas, permitindo filtrar, ordenar e excluir relatos.
-4. A partir do dashboard, o administrador acessa `admin.html` para editar o mapa, podendo clicar em um ponto do mapa para cadastrar um novo local, editar um local existente ou removê-lo, retornando ao dashboard ao final.
+4. A partir do dashboard, o administrador acessa `admin.html` para editar o mapa, podendo clicar em um ponto do mapa para cadastrar um novo local, editar um local existente ou removê-lo, e também atualizar a imagem de uma planta, retornando ao dashboard ao final.
 5. Tentativas de acessar `dashboard.html` ou `admin.html` diretamente, sem login prévio, são redirecionadas de volta para `login.html`.
 
 ## Acesso Administrativo (Ambiente de Avaliação)
@@ -401,7 +448,7 @@ scripts/gerar-plantas-hd.sh mecanica mecanica-x4.png 1200 800
 ### Testando a atualização da imagem do mapa
 
 1. Faça login e clique em **Ir para Edição do Mapa** (`admin.html`).
-2. Clique em **Atualizar imagem do mapa**, escolha qual planta será trocada (Mapa Geral ou um dos subsolos) e selecione uma imagem PNG, JPG ou WEBP (até 10 MB, mínimo 300×300 px). Para os pontos continuarem no lugar, use a mesma proporção da planta atual.
+2. Clique em **Atualizar imagem do mapa**, escolha qual planta será trocada (Mapa Geral ou um dos subsolos) e selecione uma imagem PNG, JPG ou WEBP (até 25 MB, mínimo 300×300 px). Para os pontos continuarem no lugar, use a mesma proporção e o mesmo enquadramento da planta atual; para ficar nítida no zoom, envie em alta resolução (ideal: 6000 px de largura no Mapa Geral e 4800 px nos subsolos).
 3. Clique em **Publicar novo mapa** e confirme. A nova imagem aparece na hora no admin e também em `mapa.html` (no mesmo navegador).
 4. Para desfazer, abra o mesmo modal e use **Voltar ao mapa anterior** ou **Restaurar original**.
 
@@ -412,9 +459,14 @@ scripts/gerar-plantas-hd.sh mecanica mecanica-x4.png 1200 800
 O AccessMap foi desenvolvido com preocupação constante em ser acessível enquanto ferramenta — e não apenas em seu conteúdo:
 
 - Marcação semântica em HTML5, com uso de `aria-label`, `role` e `fieldset`/`legend` nos formulários.
-- Widget nativo de controle de tamanho de fonte e alto contraste, disponível em todas as páginas.
-- Integração com o **VLibras** para tradução de conteúdo em Libras.
-- Navegação por teclado nos menus e controles interativos.
+- Widget nativo de controle de tamanho de fonte e alto contraste, disponível em todas as páginas, com a preferência mantida ao navegar entre elas.
+- Integração com o **VLibras** para tradução de conteúdo em Libras (se o serviço estiver fora do ar, a página continua funcionando).
+- Navegação completa por teclado: botões reais nos filtros e listas, foco sempre visível, menu mobile com Enter/Espaço e Esc, painéis e modais que fecham com Esc.
+- Link "Pular para o conteúdo" no início de cada página.
+- Mensagens de status e erro anunciadas por leitores de tela (`aria-live`, `role="alert"`) e campos inválidos marcados com `aria-invalid`.
+- Marcadores do mapa com nome acessível (ex.: "Bloco A - Biblioteca. Biblioteca — Bloco A — Informática") e significado que não depende só da cor: cada pino também tem um ícone, explicado na legenda.
+- Carrossel com botão de pausar, que também para com o mouse ou o foco em cima (WCAG 2.2.2).
+- Respeito à preferência do sistema por **menos movimento** (`prefers-reduced-motion`): animações e a troca automática do carrossel são desativadas.
 
 ## Roadmap
 
