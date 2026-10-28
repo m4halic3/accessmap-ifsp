@@ -396,13 +396,14 @@
             text-align: center;
 
             strong {
-                font-size: 14px;
+                font-size: 18px;
+                line-height: 1.3;
                 color: $color-purple !important;
             }
 
             span {
                 color: #333;
-                font-size: 12px;
+                font-size: 15px;
             }
 
             .tag-alerta {
@@ -414,7 +415,7 @@
         // Estilização dos Popups do Leaflet
         .leaflet-popup-content-wrapper {
             border-radius: 12px;
-            padding: 5px;
+            padding: 8px 6px;
             box-shadow: 0 3px 14px rgba(0,0,0,0.2);
         }
 
@@ -426,7 +427,20 @@
             strong { 
                 color: #000000; // Título em negrito do popup em preto puro
                 display: block;
-                margin-bottom: 2px;
+                margin-bottom: 4px;
+            }
+        }
+
+        // "×" de fechar maior, fácil de acertar
+        a.leaflet-popup-close-button {
+            width: 32px;
+            height: 32px;
+            font-size: 26px;
+            line-height: 30px;
+            color: #555;
+
+            &:hover {
+                color: $color-purple;
             }
         }
     }

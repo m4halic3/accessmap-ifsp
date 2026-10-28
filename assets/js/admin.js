@@ -3,7 +3,9 @@
    -----------------------------------------------------------
    Depende de mapa.js (carregado antes): usa `lugares`, `mapa`,
    `alaAtual`, `mapaPronto` e as funções de filtro/foco de lá.
-   As alterações são salvas com salvarLugares() (localStorage).
+   As alterações são gravadas no banco de dados pela API
+   (POST/PUT/DELETE /api/pontos, ver api.js) e só então aplicadas
+   ao array `lugares` e ao mapa.
    ========================================================= */
 const modoAdmin =
     document.body.dataset.admin === "sempre" ||
@@ -37,6 +39,10 @@ function iniciarAdmin() {
 
     primeiraInicializacao = false;
     aplicarFiltrosCombinados();
+
+    if (!lugaresDoServidor) {
+        mostrarStatusAdmin("Não foi possível falar com o servidor: o mapa mostra a lista original e as alterações não serão salvas. Recarregue a página para tentar de novo.");
+    }
 
     // Clique no nome/pino de um local: sem painel aberto, abre a edição dele;
     // com o painel aberto, vale como clique no mapa (reposiciona o ponto)
@@ -383,18 +389,32 @@ function salvarLocal() {
     );
 }
 
-function confirmarSalvarLocal() {
+// Corpo enviado à API (mesmos campos do array `lugares`, sem o id)
+function dadosParaApi(lugar) {
+    return {
+        nome: lugar.nome,
+        tipo: lugar.tipo,
+        categoria: lugar.categoria,
+        andar: lugar.andar,
+        bloco_pai: lugar.bloco_pai || null,
+        x: lugar.x,
+        y: lugar.y,
+        subponto: lugar.subponto
+    };
+}
+
+async function confirmarSalvarLocal() {
     const nome = document.getElementById("form-nome").value.trim();
     const blocoPai = document.getElementById("form-bloco").value;
     const tipo = tipoSelecionado();
     const editando = indiceEmEdicao !== null;
 
-    let lugarSalvo;
+    let dados;
 
     if (editando) {
         const original = lugares[indiceEmEdicao];
         const blocoMudou = (original.bloco_pai || "") !== blocoPai;
-        lugarSalvo = {
+        dados = {
             ...original,
             nome,
             tipo,
@@ -403,36 +423,49 @@ function confirmarSalvarLocal() {
             // Só recalcula categoria/subponto se o bloco mudou, para não
             // perder categorias específicas (estacionamento, rampa, ...)
             categoria: blocoMudou ? (blocoPai || "geral") : original.categoria,
-            subponto: blocoMudou ? !!blocoPai : original.subponto
+            subponto: blocoMudou ? !!blocoPai : original.subponto,
+            bloco_pai: blocoPai || null
         };
-        if (blocoPai) lugarSalvo.bloco_pai = blocoPai;
-        else delete lugarSalvo.bloco_pai;
-        lugares[indiceEmEdicao] = lugarSalvo;
     } else {
-        lugarSalvo = {
+        dados = {
             nome,
             tipo,
             categoria: blocoPai || "geral",
             andar: getAndarDaAla(),
             y: coordsClicadas.y,
             x: coordsClicadas.x,
-            subponto: !!blocoPai
+            subponto: !!blocoPai,
+            bloco_pai: blocoPai || null
         };
-        if (blocoPai) lugarSalvo.bloco_pai = blocoPai;
+    }
+
+    const btnSalvar = document.getElementById("btn-salvar-local");
+    btnSalvar.disabled = true;
+
+    let lugarSalvo;
+    try {
+        lugarSalvo = editando
+            ? await AccessMapApi.atualizarPonto(lugares[indiceEmEdicao].id, dadosParaApi(dados))
+            : await AccessMapApi.criarPonto(dadosParaApi(dados));
+    } catch (erro) {
+        mostrarErroForm(`Não foi possível salvar: ${erro.message}`, erro.status === 409 ? "nome" : undefined);
+        return;
+    } finally {
+        btnSalvar.disabled = false;
+    }
+
+    if (editando) {
+        lugares[indiceEmEdicao] = lugarSalvo;
+    } else {
         lugares.push(lugarSalvo);
     }
 
-    const salvou = salvarLugares();
-
     fecharFormulario();
     renderizarListaAdmin();
-    atualizarBotaoRestaurarLocais();
     aplicarFiltrosCombinados();
     irParaLugar(lugarSalvo);
 
-    mostrarStatusAdmin(salvou
-        ? `"${nome}" foi ${editando ? "atualizado" : "adicionado"} e salvo neste navegador.`
-        : `"${nome}" foi ${editando ? "atualizado" : "adicionado"}, mas o navegador não deixou salvar: a alteração some ao recarregar a página.`);
+    mostrarStatusAdmin(`"${nome}" foi ${editando ? "atualizado" : "adicionado"} e salvo no banco de dados.`);
 }
 
 // ---------- Excluir (com confirmação antes) ----------
@@ -448,35 +481,48 @@ function excluirLocal() {
     );
 }
 
-function confirmarExcluirLocal() {
-    const [removido] = lugares.splice(indiceEmEdicao, 1);
-    const salvou = salvarLugares();
+async function confirmarExcluirLocal() {
+    const lugar = lugares[indiceEmEdicao];
+
+    try {
+        await AccessMapApi.excluirPonto(lugar.id);
+    } catch (erro) {
+        // 404: já tinha sido excluído (ex.: em outra aba); some daqui também
+        if (erro.status !== 404) {
+            mostrarErroForm(`Não foi possível excluir: ${erro.message}`);
+            return;
+        }
+    }
+    lugares.splice(lugares.indexOf(lugar), 1);
 
     fecharFormulario();
     renderizarListaAdmin();
-    atualizarBotaoRestaurarLocais();
     aplicarFiltrosCombinados();
 
-    mostrarStatusAdmin(salvou
-        ? `"${removido.nome}" foi excluído.`
-        : `"${removido.nome}" foi excluído, mas o navegador não deixou salvar: ele volta ao recarregar a página.`);
+    mostrarStatusAdmin(`"${lugar.nome}" foi excluído.`);
 }
 
 // ---------- Restaurar a lista original de locais ----------
 function atualizarBotaoRestaurarLocais() {
     const btn = document.getElementById("btn-restaurar-locais");
-    if (btn) btn.hidden = !temLugaresPersonalizados();
+    if (btn) btn.hidden = !lugaresDoServidor;
 }
 
 function pedirRestaurarLocais() {
     abrirConfirmacao(
         "Restaurar locais originais",
-        "Todos os locais adicionados, editados ou excluídos neste navegador voltarão à lista original do projeto. Continuar?",
-        () => {
+        "Todos os locais adicionados, editados ou excluídos voltarão à lista original do projeto, para todos os visitantes. Continuar?",
+        async () => {
+            let originais;
+            try {
+                originais = await AccessMapApi.restaurarPontosOriginais();
+            } catch (erro) {
+                mostrarStatusAdmin(`Não foi possível restaurar os locais: ${erro.message}`);
+                return;
+            }
             if (painelFormAberto()) fecharFormulario();
-            restaurarLugaresOriginais();
+            lugares.splice(0, lugares.length, ...originais);
             renderizarListaAdmin();
-            atualizarBotaoRestaurarLocais();
             aplicarFiltrosCombinados();
             mostrarStatusAdmin("A lista original de locais foi restaurada.");
         },

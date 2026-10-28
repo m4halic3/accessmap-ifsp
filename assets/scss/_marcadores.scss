@@ -188,7 +188,7 @@
     align-items: center;
 
     .selo-lugar.selo-lugar--popup {
-        font-size: 15px;
+        font-size: 18px;
     }
 }
 
@@ -215,19 +215,24 @@
     }
 }
 
+// Salas e áreas: o ÍCONE fica exatamente sobre a posição do local e o nome
+// cresce para a direita (nomes longos não "invadem" as salas da esquerda).
+// --ancora = metade da largura do ícone (+ o recuo da etiqueta destacada).
+// Prédios continuam centralizados no ponto.
 .rotulo-lugar {
+    --ancora: 12px;
     position: absolute;
     left: 0;
     top: 0;
-    transform: translate(-50%, -50%);
+    transform: translate(calc(-1 * var(--ancora)), -50%);
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     white-space: nowrap;
     cursor: pointer;
     font-family: $font-secondary;
     font-weight: 700;
-    font-size: 0.75rem; // 12 px: mínimo legível no celular
+    font-size: 1rem; // 16 px: confortável de ler sobre a planta
     line-height: 1.1;
     color: #1a1a1a;
     // contorno branco: o texto fica legível sobre qualquer parte da planta
@@ -239,12 +244,12 @@
     // ícone pequeno na cor da área
     i {
         flex-shrink: 0;
-        width: 18px;
-        height: 18px;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
         background: var(--cor-lugar, #455a64);
         color: var(--cor-icone, #fff);
-        font-size: 9px;
+        font-size: 12px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -258,9 +263,10 @@
 
     // Prédios: maiores, em "etiqueta" com a cor do bloco
     &.rotulo-lugar--predio {
+        transform: translate(-50%, -50%);
         font-family: $font-primary;
         font-weight: 800;
-        font-size: 0.85rem;
+        font-size: 1.15rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         padding: 4px 10px 4px 4px;
@@ -271,15 +277,15 @@
         text-shadow: none;
 
         i {
-            width: 22px;
-            height: 22px;
-            font-size: 11px;
+            width: 30px;
+            height: 30px;
+            font-size: 15px;
         }
     }
 
     // Áreas principais (estacionamento, quadra, refeitório...)
     &.rotulo-lugar--area {
-        font-size: 0.78rem;
+        font-size: 1.05rem;
     }
 }
 
@@ -289,6 +295,7 @@
 }
 
 .rotulo-wrap.item-mapa-destaque .rotulo-lugar {
+    --ancora: 15px; // 3 px de recuo + metade do ícone
     padding: 3px 9px 3px 3px;
     border-radius: 999px;
     background: #fff;
@@ -341,9 +348,9 @@
     gap: 4px;
 
     i {
-        width: 18px;
-        height: 18px;
-        font-size: 9px;
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
     }
 
     .rotulo-texto {
@@ -354,11 +361,54 @@
     }
 
     .rotulo-predio-palavra {
-        font-size: 0.5rem;
+        font-size: 0.65rem;
         letter-spacing: 0.5px;
     }
 
     .rotulo-predio-letra {
-        font-size: 0.95rem;
+        font-size: 1.3rem;
+    }
+}
+
+// =========================================================================
+// BOTÕES DE ZOOM (+ / −) DO LEAFLET — maiores e na cor do projeto
+// =========================================================================
+#map .leaflet-control-zoom {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+
+    a {
+        width: 48px;
+        height: 48px;
+        line-height: 48px;
+        font-size: 28px;
+        font-weight: 700;
+        color: $color-white;
+        background: $color-purple;
+        border-bottom: 1px solid rgba($color-white, 0.35);
+        transition: background-color 0.15s ease;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &:hover {
+            background: #6b0a8f; // roxo do projeto, um pouco mais claro
+            color: $color-white;
+        }
+
+        &:focus-visible {
+            outline: 3px solid $color-orange;
+            outline-offset: -3px;
+        }
+
+        // Já no zoom máximo/mínimo
+        &.leaflet-disabled {
+            background: #8a7a91;
+            color: rgba($color-white, 0.7);
+            cursor: not-allowed;
+        }
     }
 }

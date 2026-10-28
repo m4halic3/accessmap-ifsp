@@ -1,42 +1,47 @@
 // dashboard.js — painel do admin (AccessMap)
-// Lê e escreve em localStorage (chave 'accessmap_respostas'), a mesma
-// usada pelo formulário de colaboração da página principal (index.html).
-// Quando existir um backend, troque lerRespostas()/salvarRespostas()/
-// removerResposta() pelas chamadas à API correspondente.
+// Lê e modera as colaborações enviadas pelo formulário da página principal,
+// guardadas no banco de dados (API /api/colaboracoes, ver api.js).
+// A lista é carregada uma vez e os filtros/ordenação são aplicados aqui.
 
-const CHAVE_RESPOSTAS = 'accessmap_respostas';
 let categoriaAtual = null;
+let respostas = [];          // colaborações carregadas do servidor
+let carregando = true;
+let erroCarregamento = null;
 
-function lerRespostas() {
+async function carregarRespostas() {
     try {
-        return JSON.parse(localStorage.getItem(CHAVE_RESPOSTAS)) || [];
-    } catch {
-        return [];
+        respostas = await AccessMapApi.listarColaboracoes();
+        erroCarregamento = null;
+    } catch (erro) {
+        erroCarregamento = erro.message;
     }
-}
-
-function salvarRespostas(lista) {
-    localStorage.setItem(CHAVE_RESPOSTAS, JSON.stringify(lista));
+    carregando = false;
+    renderizarRespostas();
 }
 
 // Guarda a última resposta excluída para permitir "Desfazer"
 let ultimaExcluida = null;
 let timerToast = null;
 
-function removerResposta(id) {
-    const lista = lerRespostas();
-    const indice = lista.findIndex(r => r.id === id);
+async function removerResposta(id) {
+    const indice = respostas.findIndex(r => r.id === id);
     if (indice === -1) return null;
-    const [removida] = lista.splice(indice, 1);
-    salvarRespostas(lista);
+    await AccessMapApi.excluirColaboracao(id);
+    const [removida] = respostas.splice(indice, 1);
     return { resposta: removida, indice };
 }
 
-function desfazerExclusao() {
+async function desfazerExclusao() {
     if (!ultimaExcluida) return;
-    const lista = lerRespostas();
-    lista.splice(Math.min(ultimaExcluida.indice, lista.length), 0, ultimaExcluida.resposta);
-    salvarRespostas(lista);
+    const { resposta, indice } = ultimaExcluida;
+    try {
+        await AccessMapApi.restaurarColaboracao(resposta.id);
+    } catch (erro) {
+        anunciar(`Não foi possível desfazer: ${erro.message}`);
+        mostrarToast(`Não foi possível desfazer: ${erro.message}`);
+        return;
+    }
+    respostas.splice(Math.min(indice, respostas.length), 0, resposta);
     ultimaExcluida = null;
     esconderToast();
     renderizarRespostas();
@@ -120,12 +125,20 @@ function criarCard(resposta) {
         </div>
     `;
 
-    article.querySelector('.btn-excluir-resposta').addEventListener('click', () => {
+    article.querySelector('.btn-excluir-resposta').addEventListener('click', async (e) => {
         // Mantém o foco num lugar previsível depois que o card some
         const proximo = article.nextElementSibling?.querySelector('.btn-excluir-resposta')
             || article.previousElementSibling?.querySelector('.btn-excluir-resposta');
 
-        ultimaExcluida = removerResposta(resposta.id);
+        e.currentTarget.disabled = true;
+        try {
+            ultimaExcluida = await removerResposta(resposta.id);
+        } catch (erro) {
+            e.currentTarget.disabled = false;
+            mostrarToast(`Não foi possível excluir: ${erro.message}`);
+            anunciar(`Não foi possível excluir: ${erro.message}`);
+            return;
+        }
         renderizarRespostas();
 
         if (ultimaExcluida) {
@@ -152,8 +165,8 @@ function renderizarRespostas() {
     const termoRelato = normalizarTexto(document.getElementById('filtro-relato')?.value || '');
     const ordenacao = document.getElementById('filtro-ordenacao')?.value || 'recentes';
 
-    const todas = lerRespostas();
-    let respostas = todas.filter(r => {
+    const todas = respostas;
+    let filtradas = todas.filter(r => {
         const bateLocal = !termoLocal || normalizarTexto(r.local).includes(termoLocal);
         const bateRelato = !termoRelato || normalizarTexto(r.relato).includes(termoRelato);
         const bateCategoria = !categoriaAtual || r.categoria === categoriaAtual;
@@ -161,27 +174,33 @@ function renderizarRespostas() {
     });
 
     if (ordenacao === 'antigos') {
-        respostas.sort((a, b) => new Date(a.data) - new Date(b.data));
+        filtradas.sort((a, b) => new Date(a.data) - new Date(b.data));
     } else if (ordenacao === 'local') {
-        respostas.sort((a, b) => a.local.localeCompare(b.local, 'pt-BR'));
+        filtradas.sort((a, b) => a.local.localeCompare(b.local, 'pt-BR'));
     } else {
-        respostas.sort((a, b) => new Date(b.data) - new Date(a.data));
+        filtradas.sort((a, b) => new Date(b.data) - new Date(a.data));
     }
 
     lista.querySelectorAll('.resposta-card').forEach(card => card.remove());
-    respostas.forEach(r => lista.insertBefore(criarCard(r), vazio));
+    filtradas.forEach(r => lista.insertBefore(criarCard(r), vazio));
 
     if (vazio) {
-        vazio.hidden = respostas.length > 0;
-        vazio.textContent = todas.length === 0
-            ? 'Ainda não há respostas. Elas aparecem aqui quando alguém envia o formulário de colaboração da página inicial.'
-            : 'Nenhuma resposta encontrada para os filtros selecionados. Tente limpar os filtros.';
+        vazio.hidden = filtradas.length > 0;
+        if (carregando) {
+            vazio.textContent = 'Carregando respostas...';
+        } else if (erroCarregamento) {
+            vazio.textContent = `Não foi possível carregar as respostas. ${erroCarregamento}`;
+        } else {
+            vazio.textContent = todas.length === 0
+                ? 'Ainda não há respostas. Elas aparecem aqui quando alguém envia o formulário de colaboração da página inicial.'
+                : 'Nenhuma resposta encontrada para os filtros selecionados. Tente limpar os filtros.';
+        }
     }
     if (contador) {
-        const filtrando = respostas.length !== todas.length;
+        const filtrando = filtradas.length !== todas.length;
         contador.textContent = filtrando
-            ? `${respostas.length} de ${todas.length} respostas`
-            : `${respostas.length} resposta${respostas.length === 1 ? '' : 's'}`;
+            ? `${filtradas.length} de ${todas.length} respostas`
+            : `${filtradas.length} resposta${filtradas.length === 1 ? '' : 's'}`;
     }
 }
 
@@ -233,12 +252,13 @@ function iniciarDashboard() {
     document.getElementById('toast-desfazer')?.addEventListener('click', desfazerExclusao);
     document.getElementById('toast-fechar')?.addEventListener('click', esconderToast);
 
-    // Respostas enviadas em outra aba aparecem sem precisar recarregar
-    window.addEventListener('storage', (e) => {
-        if (e.key === CHAVE_RESPOSTAS) renderizarRespostas();
+    // Respostas novas aparecem ao voltar para a aba, sem precisar recarregar
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') carregarRespostas();
     });
 
     renderizarRespostas();
+    carregarRespostas();
 }
 
 window.addEventListener('DOMContentLoaded', iniciarDashboard);

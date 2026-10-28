@@ -15,12 +15,13 @@
 - [Funcionalidades](#funcionalidades)
 - [Tecnologias Utilizadas](#tecnologias-utilizadas)
 - [Estrutura do Projeto](#estrutura-do-projeto)
-- [Arquitetura da Versão Atual (v1 — sem banco de dados)](#arquitetura-da-versão-atual-v1--sem-banco-de-dados)
+- [Arquitetura (v2 — API REST + banco de dados)](#arquitetura-v2--api-rest--banco-de-dados)
+  - [Rotas da API](#rotas-da-api)
 - [Modelo de Dados](#modelo-de-dados)
   - [Visão Geral das Entidades](#visão-geral-das-entidades)
   - [Diagrama Entidade-Relacionamento](#diagrama-entidade-relacionamento)
   - [Dicionário de Dados](#dicionário-de-dados)
-  - [Migração para Banco de Dados Real](#migração-para-banco-de-dados-real)
+  - [Migração da v1 para o Banco de Dados](#migração-da-v1-para-o-banco-de-dados)
 - [Fluxos do Sistema](#fluxos-do-sistema)
 - [Acesso Administrativo (Ambiente de Avaliação)](#acesso-administrativo-ambiente-de-avaliação)
 - [Como Executar Localmente](#como-executar-localmente)
@@ -78,7 +79,7 @@ Os dados coletados pelo AccessMap possuem um papel importante para a comunidade 
   - Categoria de acessibilidade (física ou auditiva, com plano de expansão para outras categorias);
   - Relato ou sugestão em texto livre.
 
-  O formulário valida os campos e mostra a mensagem de erro junto ao campo a corrigir.
+  O formulário valida os campos e mostra a mensagem de erro junto ao campo a corrigir; o servidor repete a validação antes de gravar o relato no banco de dados.
 - Widget de acessibilidade nativo (aumento/diminuição de fonte e alto contraste, com a preferência mantida entre as páginas) e integração com o **VLibras**, tradutor de Libras do Governo Federal.
 
 #### Ícones e legenda do mapa
@@ -108,13 +109,13 @@ Levantada na Fase 1 do cronograma do projeto, a área administrativa deve atende
 
 Nesta versão, os requisitos acima estão implementados da seguinte forma:
 
-- Autenticação de administrador, com proteção de `dashboard.html` e `admin.html` (sem login, o acesso é redirecionado para `login.html`) e botão **Sair** em todas as páginas administrativas.
+- Autenticação de administrador no servidor (senha guardada com hash BCrypt e token de sessão JWT válido por 8 horas), com proteção de `dashboard.html` e `admin.html` (sem login, o acesso é redirecionado para `login.html`) e botão **Sair** em todas as páginas administrativas.
 - Dashboard de respostas coletadas pelo formulário público, com:
   - Filtro por local;
   - Filtro por categoria de acessibilidade;
   - Busca por palavra-chave no relato;
   - Ordenação (mais recentes, mais antigos, ordem alfabética por local);
-  - Exclusão de respostas já tratadas, com opção de **Desfazer**;
+  - Exclusão de respostas já tratadas, com opção de **Desfazer** (a exclusão é lógica: o registro fica no banco, marcado com a data e o administrador que excluiu);
   - Contador de respostas e mensagens distintas para "ainda não há respostas" e "nenhum resultado para os filtros".
 - Edição de pontos do mapa (`admin.html`):
   - inserção de novos locais por clique direto sobre o mapa, com captura automática das coordenadas (X, Y) na planta;
@@ -122,8 +123,8 @@ Nesta versão, os requisitos acima estão implementados da seguinte forma:
   - escolha do tipo do local (ponto de interesse, acessibilidade física, acessibilidade auditiva ou alerta) e do bloco/setor;
   - edição e exclusão de locais existentes, sempre com confirmação;
   - aviso de nome duplicado e mensagens de erro no próprio formulário;
-  - alterações salvas no navegador, refletidas no mapa público e com opção de **restaurar a lista original**.
-- **Atualização da imagem do mapa** (planta), para quando o campus mudar: envio de nova imagem com pré-visualização, aviso de proporção diferente ou de resolução baixa, e opções **Voltar ao mapa anterior** e **Restaurar original**.
+  - alterações gravadas no banco de dados, refletidas no mapa público de todos os visitantes, com opção de **restaurar a lista original**.
+- **Atualização da imagem do mapa** (planta), para quando o campus mudar: envio de nova imagem com pré-visualização, aviso de proporção diferente ou de resolução baixa, e opções **Voltar ao mapa anterior** e **Restaurar original**. As imagens ficam guardadas no banco de dados.
 
 ## Tecnologias Utilizadas
 
@@ -132,14 +133,18 @@ Nesta versão, os requisitos acima estão implementados da seguinte forma:
 | Estrutura | **HTML5** | Marcação semântica e acessível |
 | Estilo | **SASS (SCSS)** | Estilização avançada, arquitetura modular e design responsivo |
 | Interatividade | **JavaScript (Vanilla)** | Carrossel, menus, autenticação, formulário, dashboard, interação com o mapa |
-| Persistência (atual) | **Web Storage API** (`localStorage` / `sessionStorage`) e **IndexedDB** | Simulação de banco de dados no navegador enquanto não há back-end; o IndexedDB guarda as imagens de planta enviadas pelo admin |
+| Back-end | **Java 21** + **Spring Boot 3.5** (Spring Web, Spring Data JPA, Spring Security, Bean Validation) | API REST, regras de negócio, autenticação e entrega das páginas do site |
+| Banco de dados | **MariaDB 11** (compatível com MySQL) + **Flyway** | Persistência de locais, colaborações, administradores e imagens de planta; o Flyway cria e versiona as tabelas |
+| Autenticação | **BCrypt** + **JWT** | Senhas guardadas com hash; token de sessão enviado no cabeçalho `Authorization` |
+| Infraestrutura | **Docker Compose** | Sobe o banco de dados com um comando |
+| Persistência no navegador | **Web Storage API** (`localStorage` / `sessionStorage`) | Só preferências do visitante (fonte e contraste) e o token de sessão do administrador |
 | Ícones | **Font Awesome 6** | Iconografia da interface e ícones dos locais no mapa |
 | Tipografia | **Google Fonts** (Montserrat e Open Sans) | Fontes da identidade visual |
 | Acessibilidade | **VLibras** (Governo Federal) | Tradução de conteúdo para Libras |
 | Mapas | **Leaflet 1.9.4** | Mapa interativo das plantas do campus (`CRS.Simple`) |
 | Imagens | **WebP**, **Real-ESRGAN** e **ImageMagick** | Plantas em alta resolução: ampliação 4x com IA e geração das imagens base e dos pedaços HD |
 
-> A escolha por manter a v1 inteiramente funcional no front-end, sem depender de um back-end ou banco de dados, foi proposital: garante que a aplicação possa ser avaliada, testada e demonstrada em qualquer navegador, sem necessidade de infraestrutura de servidor.
+> A v1 funcionava inteiramente no navegador, sem servidor, o que permitiu validar a proposta rapidamente. A v2 mantém a mesma interface e passa a persistir os dados em um banco de dados real, compartilhado por todos os visitantes. Se o servidor estiver fora do ar, o mapa público continua funcionando com a lista original de locais.
 
 ## Estrutura do Projeto
 
@@ -150,46 +155,116 @@ accessmap-ifsp/
 │   │   ├── style.css          # CSS compilado de scss/style.scss (todas as páginas)
 │   │   └── admin.css          # CSS compilado de scss/admin.scss (só admin.html)
 │   ├── scss/                  # Código-fonte dos estilos (partials _*.scss)
+│   ├── data/
+│   │   └── locais-originais.json # Lista original de locais (popula o banco e serve de reserva)
 │   ├── images/                # Logos, ícones, fotos da equipe, slides
 │   │   ├── planta-*.png       # Desenhos originais das plantas (fonte, 1920x1080)
 │   │   └── plantas/<ala>/     # Plantas usadas no mapa: base.webp + hd/ (alta resolução)
 │   └── js/
+│       ├── api.js             # Chamadas à API (fetch) e sessão do administrador
 │       ├── acessibilidade.js  # A+/A-, alto contraste e VLibras (todas as páginas)
 │       ├── script.js          # Menu, carrossel e formulário público (index.html)
 │       ├── authentication.js  # Login e proteção das páginas do administrador
 │       ├── dashboard.js       # Leitura/filtro/exclusão (com desfazer) de respostas
 │       ├── icones-lugares.js  # Cores, ícones e legenda dos locais do mapa
-│       ├── mapa.js            # Dados dos locais, busca, filtros, navegação e plantas HD
+│       ├── mapa.js            # Carga dos locais, busca, filtros, navegação e plantas HD
 │       ├── sidebar-mapa.js    # Painel deslizante da barra lateral no celular/tablet
 │       ├── admin.js           # Inserir/editar/excluir locais (admin.html)
-│       ├── plantas-storage.js # Imagens de planta no IndexedDB
+│       ├── plantas-storage.js # Imagens de planta enviadas pelo admin (via API)
 │       └── admin-planta.js    # Modal "Atualizar imagem do mapa" (admin.html)
+├── backend/                   # API REST (Spring Boot)
+│   ├── pom.xml / mvnw         # Build Maven (mvnw dispensa instalar o Maven)
+│   └── src/main/
+│       ├── java/br/edu/ifsp/accessmap/
+│       │   ├── config/        # Segurança (JWT, CORS), entrega do site e configurações
+│       │   ├── dominio/       # Entidades JPA (tabelas)
+│       │   ├── repositorio/   # Acesso ao banco (Spring Data)
+│       │   ├── dto/           # Formatos de entrada e saída da API
+│       │   ├── servico/       # Regras de negócio e carga inicial
+│       │   └── web/           # Controllers (rotas /api) e tratamento de erros
+│       └── resources/
+│           ├── application.properties
+│           └── db/migration/  # Scripts SQL do Flyway (criação das tabelas)
 ├── scripts/
 │   └── gerar-plantas-hd.sh    # Gera base.webp e os pedaços HD de uma planta
+├── docker-compose.yml         # Banco de dados MariaDB
 ├── index.html                 # Página institucional / pública
 ├── login.html                 # Login exclusivo do administrador
-├── dashboard.html              # Painel administrativo (protegido)
-├── admin.html                  # Edição de pontos do mapa (protegido)
-├── mapa.html                    # Mapa interativo do campus
+├── dashboard.html             # Painel administrativo (protegido)
+├── admin.html                 # Edição de pontos do mapa (protegido)
+├── mapa.html                  # Mapa interativo do campus
 ├── README.md
 └── LICENSE
 ```
 
-## Arquitetura da Versão Atual (v1 — sem banco de dados)
+## Arquitetura (v2 — API REST + banco de dados)
 
-Como o projeto ainda não possui um back-end, toda a "persistência de dados" da v1 é feita no próprio navegador, através da **Web Storage API** e do **IndexedDB**, o que permite que o sistema funcione de ponta a ponta — captação de relatos, login administrativo, cadastro de pontos no mapa e visualização no dashboard — sem depender de servidor.
+O front-end continua em HTML, SCSS e JavaScript puro. Toda a persistência passou para um back-end em **Spring Boot**, que expõe uma **API REST** em `/api` e grava os dados em um banco **MariaDB**. O mesmo servidor também entrega as páginas do site, então o navegador acessa site e API pelo mesmo endereço (`http://localhost:8080`).
 
-| Mecanismo | Uso no AccessMap | Escopo |
+```mermaid
+flowchart LR
+    subgraph Navegador
+        F[index.html - Formulário]
+        M[mapa.html - Mapa]
+        L[login.html]
+        D[dashboard.html]
+        A[admin.html]
+    end
+
+    subgraph Servidor["Spring Boot (porta 8080)"]
+        API["API REST /api"]
+        SEC["Spring Security (JWT)"]
+    end
+
+    DB[("MariaDB\naccessmap")]
+
+    F -- "POST /colaboracoes" --> API
+    M -- "GET /pontos, GET /plantas" --> API
+    L -- "POST /auth/login → token" --> API
+    D -- "GET / DELETE /colaboracoes (token)" --> SEC
+    A -- "POST / PUT / DELETE /pontos, /plantas (token)" --> SEC
+    SEC --> API
+    API -- "JPA / Flyway" --> DB
+```
+
+- **Camadas do back-end:** `web` (controllers) → `servico` (regras de negócio) → `repositorio` (Spring Data JPA) → banco. Os erros de validação e de regra de negócio voltam em JSON (`{ "mensagem": ... }`) e o front-end mostra a mensagem ao usuário.
+- **Validação nas duas pontas:** o front-end valida para dar retorno imediato e o servidor valida de novo antes de gravar (tamanhos, campos obrigatórios, tipos permitidos, nomes repetidos, formato real das imagens).
+- **Autenticação:** o login confere a senha com o hash BCrypt da tabela `administrador` e devolve um token JWT, que o navegador guarda no `sessionStorage` e envia no cabeçalho `Authorization`. As rotas de escrita (e a leitura das colaborações) exigem o token.
+- **Carga inicial:** na primeira execução, com o banco vazio, o servidor cria a conta de administrador e cadastra os 135 locais de `assets/data/locais-originais.json`.
+- **Reserva:** se a API não responder, o mapa público usa essa mesma lista original, só para leitura.
+
+| Ainda no navegador | Uso |
+|---|---|
+| `sessionStorage` (`accessmap_token`) | Token de sessão do administrador; expira ao fechar o navegador ou após 8 horas |
+| `localStorage` | Preferências de alto contraste (`altoContrasteState`) e tamanho da fonte (`accessmap_nivel_fonte`) |
+
+### Rotas da API
+
+| Método e rota | Acesso | Descrição |
 |---|---|---|
-| `sessionStorage` | Guarda o estado de sessão do administrador logado (`accessmap_admin_logado`) | Expira ao fechar o navegador |
-| `localStorage` | Guarda as colaborações enviadas pelo formulário público (`accessmap_respostas`), os locais do mapa depois que o admin adiciona/edita/exclui algum (`accessmap_lugares`) e as preferências de alto contraste (`altoContrasteState`) e tamanho da fonte (`accessmap_nivel_fonte`) | Persiste entre sessões, no mesmo navegador/dispositivo |
-| IndexedDB | Guarda as imagens de planta enviadas pelo admin (banco `accessmap`, tabela `plantas`), com a versão anterior para desfazer | Persiste entre sessões, no mesmo navegador/dispositivo |
+| `POST /api/auth/login` | Público | Login: `{ usuario, senha }` → `{ token, expiraEm, usuario }` |
+| `GET /api/auth/sessao` | Admin | Confere se o token ainda é válido |
+| `GET /api/pontos` | Público | Lista os locais do mapa |
+| `POST /api/pontos` | Admin | Cadastra um local |
+| `PUT /api/pontos/{id}` | Admin | Atualiza um local |
+| `DELETE /api/pontos/{id}` | Admin | Exclui um local |
+| `POST /api/pontos/restaurar-originais` | Admin | Volta à lista original de locais |
+| `POST /api/colaboracoes` | Público | Envia um relato: `{ local, categoria, relato }` |
+| `GET /api/colaboracoes` | Admin | Lista os relatos (não excluídos) |
+| `DELETE /api/colaboracoes/{id}` | Admin | Exclui um relato (exclusão lógica) |
+| `POST /api/colaboracoes/{id}/restaurar` | Admin | Desfaz a exclusão |
+| `GET /api/categorias` | Público | Categorias de acessibilidade |
+| `GET /api/plantas` | Público | Imagens de planta enviadas que estão em uso |
+| `GET /api/plantas/arquivos/{id}` | Público | Arquivo de uma imagem de planta |
+| `POST /api/plantas/{ala}` | Admin | Publica nova imagem (multipart: `arquivo`, `largura`, `altura`, `alt`) |
+| `POST /api/plantas/{ala}/voltar` | Admin | Volta ao mapa anterior |
+| `DELETE /api/plantas/{ala}` | Admin | Restaura a imagem original |
 
-Essa abordagem tem uma limitação intencional e conhecida: os dados ficam restritos ao navegador/dispositivo em que foram inseridos, não sendo compartilhados entre diferentes usuários ou máquinas. Isso é aceitável para fins de demonstração e avaliação acadêmica da v1, mas será substituído por um back-end real (API + banco de dados) nas próximas versões — ver [Migração para Banco de Dados Real](#migração-para-banco-de-dados-real).
+`{ala}` é `todos` (Mapa Geral), `edificacoes` ou `mecanica`.
 
 ## Modelo de Dados
 
-Mesmo sem um banco de dados implementado na v1, o projeto já foi modelado pensando na estrutura relacional que sustentará as próximas versões, com foco no funcionamento do sistema dentro do campus do IFSP Itapetininga.
+O modelo relacional, planejado desde a v1, está implementado no MariaDB. As tabelas são criadas pelo Flyway a partir de `backend/src/main/resources/db/migration/V1__esquema_inicial.sql`.
 
 ### Visão Geral das Entidades
 
@@ -197,6 +272,7 @@ Mesmo sem um banco de dados implementado na v1, o projeto já foi modelado pensa
 - **PontoAcessibilidade** — um local específico do campus que foi mapeado (ex: "Rampa - Bloco A"), com sua categoria, coordenadas e status.
 - **Colaboracao** — um relato ou sugestão enviado pelo público através do formulário, podendo opcionalmente referenciar um Ponto de Acessibilidade já existente.
 - **CategoriaAcessibilidade** — tabela de apoio que padroniza as categorias disponíveis (física, auditiva, visual, etc.), permitindo adicionar novas categorias sem alterar código.
+- **PlantaVersao** — imagem de planta enviada pelo administrador para uma ala do mapa (a versão em uso e a anterior).
 
 ### Diagrama Entidade-Relacionamento
 
@@ -204,6 +280,7 @@ Mesmo sem um banco de dados implementado na v1, o projeto já foi modelado pensa
 erDiagram
     ADMINISTRADOR ||--o{ PONTO_ACESSIBILIDADE : gerencia
     ADMINISTRADOR ||--o{ COLABORACAO : modera
+    ADMINISTRADOR ||--o{ PLANTA_VERSAO : publica
     CATEGORIA_ACESSIBILIDADE ||--o{ PONTO_ACESSIBILIDADE : classifica
     CATEGORIA_ACESSIBILIDADE ||--o{ COLABORACAO : classifica
     PONTO_ACESSIBILIDADE ||--o{ COLABORACAO : "referenciado por (opcional)"
@@ -220,6 +297,7 @@ erDiagram
 
     CATEGORIA_ACESSIBILIDADE {
         int id PK
+        string codigo
         string nome
         string icone
         string cor_identificacao
@@ -231,8 +309,13 @@ erDiagram
         int administrador_id FK
         string nome
         string descricao
-        decimal latitude
-        decimal longitude
+        string tipo
+        string area
+        string andar
+        string bloco
+        boolean subponto
+        int pos_x
+        int pos_y
         string status
         datetime criado_em
         datetime atualizado_em
@@ -248,46 +331,22 @@ erDiagram
         string status
         string ip_origem
         datetime criado_em
+        datetime excluido_em
     }
-```
 
-### Diagrama de Fluxo de Dados (v1 — sem banco de dados)
-
-Para tornar explícito como a v1 simula esse modelo relacional usando apenas o navegador, o diagrama abaixo mostra o fluxo real de dados hoje:
-
-```mermaid
-flowchart LR
-    subgraph Publico["Área Pública"]
-        F[index.html - Formulário de Colaboração]
-        M[mapa.html - Mapa]
-    end
-
-    subgraph Armazenamento["Armazenamento do Navegador"]
-        LS1[("localStorage:\naccessmap_respostas")]
-        LS3[("localStorage:\naccessmap_lugares")]
-        LS2[("localStorage:\npreferências de fonte\ne contraste")]
-        SS1[("sessionStorage:\naccessmap_admin_logado")]
-        IDB[("IndexedDB:\naccessmap / plantas")]
-    end
-
-    subgraph Admin["Área Administrativa"]
-        L[login.html]
-        D[dashboard.html]
-        A[admin.html - Mapa]
-    end
-
-    F -- "salva relato" --> LS1
-    D -- "lê / filtra / exclui" --> LS1
-    L -- "grava sessão ao autenticar" --> SS1
-    D -- "verifica sessão ativa" --> SS1
-    A -- "verifica sessão ativa" --> SS1
-    A -- "adiciona / edita / exclui locais" --> LS3
-    A -- "publica nova imagem de planta" --> IDB
-    M -- "lê locais" --> LS3
-    M -- "lê planta enviada" --> IDB
-    D -.futuro.-> API[("API + Banco de Dados\n(v2)")]
-    LS1 -.migração futura.-> API
-    LS3 -.migração futura.-> API
+    PLANTA_VERSAO {
+        int id PK
+        string ala
+        int administrador_id FK
+        string nome_arquivo
+        string tipo_mime
+        int tamanho
+        int largura
+        int altura
+        string texto_alternativo
+        blob conteudo
+        datetime criado_em
+    }
 ```
 
 ### Dicionário de Dados
@@ -304,37 +363,42 @@ flowchart LR
 | `criado_em` | DATETIME | Sim | Data de criação da conta |
 | `ultimo_login` | DATETIME | Não | Data/hora do último acesso, para fins de auditoria |
 
-> Na v1 (sem banco de dados), esta tabela é substituída por uma única conta de teste fixa, definida em `authentication.js`, exclusivamente para fins de avaliação acadêmica — ver [Acesso Administrativo](#acesso-administrativo-ambiente-de-avaliação).
+> Na primeira execução, o servidor cria a conta definida em `accessmap.admin.usuario` / `accessmap.admin.senha` (por padrão, a [conta de avaliação](#acesso-administrativo-ambiente-de-avaliação)), com perfil `superadmin`.
 
 #### Tabela `categoria_acessibilidade`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |---|---|---|---|
 | `id` | INT (PK) | Sim | Identificador único da categoria |
+| `codigo` | VARCHAR(30) | Sim | Identificador usado pela API e pelo front-end (ex: `fisica`, `auditiva`) — único |
 | `nome` | VARCHAR(50) | Sim | Nome da categoria (ex: "Física", "Auditiva", "Visual") |
 | `icone` | VARCHAR(50) | Não | Classe do ícone (Font Awesome) usada na interface |
 | `cor_identificacao` | VARCHAR(7) | Não | Cor em hexadecimal usada para identificar a categoria visualmente |
 
 > Modelar a categoria como tabela própria (em vez de um valor fixo no código) é o que permite, futuramente, adicionar novas categorias de acessibilidade sem alterar o front-end.
 >
-> Na v1, os campos `icone` e `cor_identificacao` já são aplicados na interface pelo arquivo `assets/js/icones-lugares.js`, que define a cor de cada área e tipo de acessibilidade e o ícone de cada tipo de local.
+> A tabela começa com as categorias `fisica` e `auditiva`. Na interface, cores e ícones ainda são aplicados por `assets/js/icones-lugares.js`.
 
 #### Tabela `ponto_acessibilidade`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |---|---|---|---|
 | `id` | INT (PK) | Sim | Identificador único do ponto mapeado |
-| `categoria_id` | INT (FK → categoria_acessibilidade.id) | Sim | Categoria de acessibilidade do ponto |
-| `administrador_id` | INT (FK → administrador.id) | Não | Administrador responsável pelo cadastro/edição do ponto |
-| `nome` | VARCHAR(150) | Sim | Nome do ponto (ex: "Rampa de acesso - Bloco A") |
+| `categoria_id` | INT (FK → categoria_acessibilidade.id) | Só se `tipo` = `acessibilidade` | Categoria de acessibilidade do ponto |
+| `administrador_id` | INT (FK → administrador.id) | Não | Último administrador que cadastrou/editou o ponto |
+| `nome` | VARCHAR(150) | Sim | Nome do ponto (ex: "Rampa de acesso - Bloco A") — único, sem diferenciar maiúsculas e acentos |
 | `descricao` | TEXT | Não | Descrição detalhada do ponto e suas condições |
-| `latitude` | DECIMAL(10,7) | Sim | Coordenada geográfica do ponto, capturada automaticamente pelo clique no mapa |
-| `longitude` | DECIMAL(10,7) | Sim | Coordenada geográfica do ponto, capturada automaticamente pelo clique no mapa |
+| `tipo` | VARCHAR(20) | Sim | `geral` (ponto de interesse), `acessibilidade` ou `alerta` |
+| `area` | VARCHAR(40) | Sim | Área/uso do local, que define cor e ícone (ex: `salas_aula`, `rampa`, `informatica`) |
+| `andar` | VARCHAR(10) | Sim | `terreo` ou `subsolo` |
+| `bloco` | VARCHAR(40) | Não | Bloco a que pertence (`informatica`, `mecanica`, `edificacoes`, `administrativo`) |
+| `subponto` | BOOLEAN | Sim | `true` para salas e pontos internos (aparecem com mais zoom) |
+| `pos_x` / `pos_y` | INT | Sim | Posição na planta, capturada pelo clique no mapa |
 | `status` | VARCHAR(20) | Sim | Situação do ponto (`ativo`, `em_manutencao`, `inativo`) |
 | `criado_em` | DATETIME | Sim | Data de cadastro do ponto |
 | `atualizado_em` | DATETIME | Não | Data da última atualização do ponto |
 
-> Na v1, os pontos ficam no array `lugares` (em `mapa.js`) e, depois que o administrador altera algum, em `localStorage` sob a chave `accessmap_lugares`. Cada ponto tem os campos `nome`, `tipo` (`geral`, `fisica`, `auditiva` ou `alerta`), `categoria`, `andar` (`terreo` ou `subsolo`), `bloco_pai`, `subponto` e as coordenadas `x` e `y`. Como o mapa usa as plantas do campus (e não um mapa geográfico), `x`/`y` são posições na planta, que farão o papel de `longitude`/`latitude` no modelo completo.
+> Como o mapa usa as plantas do campus (e não um mapa geográfico), a posição é guardada em coordenadas da planta (`pos_x`/`pos_y`) no lugar de latitude/longitude. Na API, os campos seguem os nomes usados pelo front-end: `tipo` vem como `fisica`/`auditiva` (o código da categoria), `geral` ou `alerta`; `categoria` = `area`; `bloco_pai` = `bloco`; `x`/`y` = `pos_x`/`pos_y`.
 
 #### Tabela `colaboracao`
 
@@ -349,19 +413,36 @@ flowchart LR
 | `status` | VARCHAR(20) | Sim | Situação do relato (`pendente`, `em_analise`, `resolvido`) |
 | `ip_origem` | VARCHAR(45) | Não | Endereço IP de origem, para fins de moderação/antispam |
 | `criado_em` | DATETIME | Sim | Data e hora do envio do relato |
+| `excluido_em` | DATETIME | Não | Preenchido quando o administrador exclui o relato no dashboard (exclusão lógica, permite desfazer) |
 
-> Na v1, esta tabela corresponde exatamente ao objeto salvo em `localStorage` sob a chave `accessmap_respostas`, com os campos `id`, `local`, `categoria`, `relato` e `data` — um subconjunto simplificado do modelo completo, já que ainda não há o conceito de `ponto_acessibilidade` vinculado nem de `administrador_id` de moderação.
+> Quando o local digitado no formulário é o nome de um local do mapa, o servidor já preenche `ponto_id`. Na API, os campos aparecem como na v1: `local`, `categoria`, `relato` e `data`.
 
-### Migração para Banco de Dados Real
+#### Tabela `planta_versao`
 
-Quando o projeto avançar para uma versão com back-end, a proposta é que a transição siga estes passos, sem quebrar a experiência já validada na v1:
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `id` | INT (PK) | Sim | Identificador da versão |
+| `ala` | VARCHAR(20) | Sim | Planta a que se refere: `todos`, `edificacoes` ou `mecanica` |
+| `administrador_id` | INT (FK → administrador.id) | Não | Quem publicou |
+| `nome_arquivo` | VARCHAR(255) | Sim | Nome do arquivo enviado |
+| `tipo_mime` | VARCHAR(30) | Sim | `image/png`, `image/jpeg` ou `image/webp` (identificado pelo conteúdo do arquivo) |
+| `tamanho` / `largura` / `altura` | INT | Sim | Tamanho em bytes e dimensões em pixels |
+| `texto_alternativo` | VARCHAR(300) | Não | Descrição da imagem para leitores de tela |
+| `conteudo` | LONGBLOB | Sim | A imagem (até 25 MB) |
+| `criado_em` | DATETIME | Sim | Data da publicação |
 
-1. Substituir as funções `lerRespostasForm()` / `salvarNovaResposta()` (em `script.js`) e `lerRespostas()` / `salvarRespostas()` (em `dashboard.js`) por chamadas `fetch` a uma API REST (`GET/POST/DELETE /colaboracoes`).
-2. Substituir a autenticação fixa em `authentication.js` por uma rota de login real (`POST /auth/login`), retornando um token de sessão (JWT ou similar) em vez de uma flag no `sessionStorage`.
-3. Substituir `carregarLugaresSalvos()` / `salvarLugares()` (em `mapa.js`), que hoje gravam os locais em `localStorage`, por chamadas a uma API (`GET/POST/PUT/DELETE /pontos`), persistindo coordenadas, tipo e categoria no banco de dados real.
-4. Substituir o armazenamento das imagens de planta no IndexedDB (`plantas-storage.js`) por envio a um servidor de arquivos (`POST/GET/DELETE /plantas/:ala`).
-5. Popular a tabela `categoria_acessibilidade` com as categorias já usadas na v1 (física, auditiva) e abrir espaço para novas categorias (visual, cognitiva, etc.).
-6. Migrar os registros já existentes no `localStorage` (se necessário, via rotina de importação) para as novas tabelas `ponto_acessibilidade` e `colaboracao`.
+> A versão em uso é a de maior `id` da ala; a anterior é guardada para **Voltar ao mapa anterior**. Ao publicar, versões mais antigas que essas duas são apagadas. Sem nenhuma linha para a ala, o mapa usa a imagem original do projeto.
+
+### Migração da v1 para o Banco de Dados
+
+O plano de migração da v1 foi executado assim:
+
+1. ✅ `lerRespostasForm()` / `salvarNovaResposta()` (em `script.js`) e `lerRespostas()` / `salvarRespostas()` (em `dashboard.js`) foram substituídas por chamadas à API `/api/colaboracoes`.
+2. ✅ A conta fixa de `authentication.js` deu lugar à rota `POST /api/auth/login`, que devolve um token JWT.
+3. ✅ `carregarLugaresSalvos()` / `salvarLugares()` (em `mapa.js`) deram lugar a `GET/POST/PUT/DELETE /api/pontos`.
+4. ✅ O IndexedDB de `plantas-storage.js` deu lugar a `/api/plantas/{ala}`, com as imagens guardadas no banco.
+5. ✅ A tabela `categoria_acessibilidade` foi populada com `fisica` e `auditiva`.
+6. ⚠️ Dados que tenham ficado no `localStorage`/IndexedDB de algum navegador durante a v1 **não** são importados automaticamente. A lista original de locais é cadastrada no banco na primeira execução.
 
 ## Fluxos do Sistema
 
@@ -369,7 +450,7 @@ Quando o projeto avançar para uma versão com back-end, a proposta é que a tra
 
 1. O visitante acessa `index.html` e preenche o formulário de colaboração na seção "Contato".
 2. Seleciona a categoria de acessibilidade (física ou auditiva) e descreve o relato.
-3. Ao enviar, o relato é validado (com mensagem de erro junto ao campo que falta) e salvo no armazenamento local do navegador.
+3. Ao enviar, o relato é validado (com mensagem de erro junto ao campo que falta), enviado à API e gravado na tabela `colaboracao`.
 4. Uma mensagem de sucesso é exibida e o formulário é limpo, sem necessidade de recarregar a página.
 
 ### Fluxo do visitante (mapa)
@@ -380,7 +461,7 @@ Quando o projeto avançar para uma versão com back-end, a proposta é que a tra
 
 ### Fluxo do administrador
 
-1. O administrador acessa `login.html` e informa usuário e senha da conta de teste.
+1. O administrador acessa `login.html` e informa usuário e senha; o servidor confere a senha e devolve o token de sessão.
 2. Após autenticação, é redirecionado para `dashboard.html`.
 3. O painel carrega automaticamente todas as colaborações já registradas, permitindo filtrar, ordenar e excluir relatos.
 4. A partir do dashboard, o administrador acessa `admin.html` para editar o mapa, podendo clicar em um ponto do mapa para cadastrar um novo local, editar um local existente ou removê-lo, e também atualizar a imagem de uma planta, retornando ao dashboard ao final.
@@ -397,24 +478,44 @@ Senha:   Avaliacao@2025
 
 Essa conta permite o acesso completo às telas e funcionalidades da área administrativa (backend visual do sistema), incluindo o dashboard de colaborações recebidas pelo formulário público e a edição de pontos do mapa.
 
-> ⚠️ Esta autenticação é implementada inteiramente no front-end (JavaScript), como solução temporária enquanto não há back-end. Não deve ser considerada uma implementação segura para produção.
+A conta é criada pelo servidor na primeira execução, com a senha guardada em hash (BCrypt). Fora do ambiente de avaliação, defina outras credenciais pelas variáveis `ACCESSMAP_ADMIN_USUARIO` e `ACCESSMAP_ADMIN_SENHA` **antes** da primeira execução, e um segredo fixo para os tokens em `ACCESSMAP_JWT_SEGREDO` (mínimo de 32 caracteres; sem ele, um segredo aleatório é gerado e os administradores precisam entrar de novo a cada reinício do servidor).
 
 ## Como Executar Localmente
 
-Por não depender de back-end ou banco de dados, o projeto pode ser executado inteiramente no navegador:
+Requisitos: **Java 21** e **Docker** (para o banco de dados). O Maven não precisa estar instalado, porque o projeto traz o `mvnw`.
 
 1. Clone o repositório:
    ```bash
    git clone https://github.com/m4halic3/accessmap-ifsp.git
    cd accessmap-ifsp
    ```
-2. Sirva a pasta com um servidor local simples (recomendado, pois alguns navegadores restringem `localStorage`/IndexedDB em arquivos abertos via `file://`), por exemplo:
+2. Suba o banco de dados (MariaDB):
    ```bash
-   python3 -m http.server 8000
-   # ou: npx serve .
+   docker compose up -d
    ```
-   e acesse `http://localhost:8000`.
-3. Para acessar a área administrativa, use a [conta de teste](#acesso-administrativo-ambiente-de-avaliação) na tela de login.
+3. Inicie o back-end:
+   ```bash
+   cd backend
+   ./mvnw spring-boot:run
+   ```
+   Na primeira vez, o Flyway cria as tabelas e o servidor cadastra a conta de administrador e os locais originais.
+4. Acesse `http://localhost:8080`. O site e a API são servidos juntos.
+5. Para acessar a área administrativa, use a [conta de teste](#acesso-administrativo-ambiente-de-avaliação) na tela de login.
+
+Configurações (todas opcionais, com valores padrão que batem com o `docker-compose.yml`):
+
+| Variável | Padrão | Para que serve |
+|---|---|---|
+| `ACCESSMAP_DB_URL` | `jdbc:mariadb://localhost:3306/accessmap` | Endereço do banco |
+| `ACCESSMAP_DB_USUARIO` / `ACCESSMAP_DB_SENHA` | `accessmap` / `accessmap` | Usuário do banco |
+| `ACCESSMAP_ADMIN_USUARIO` / `ACCESSMAP_ADMIN_SENHA` | conta de avaliação | Conta criada na primeira execução |
+| `ACCESSMAP_JWT_SEGREDO` | aleatório a cada início | Segredo dos tokens de login (mín. 32 caracteres) |
+| `ACCESSMAP_FRONTEND_DIR` | `..` (raiz do projeto) | Pasta do site servida pelo back-end |
+| `PORT` | `8080` | Porta do servidor |
+
+Para gerar um `.jar` e rodar sem o Maven: `./mvnw package` e `java -jar target/accessmap-2.0.0.jar` (a partir da pasta `backend/`).
+
+> Também é possível servir o front-end separado (ex.: `python3 -m http.server 8000` na raiz). Nesse caso, defina `window.ACCESSMAP_API_URL = "http://localhost:8080/api"` antes de `api.js`. As origens `localhost:8000` já estão liberadas no CORS (`ACCESSMAP_CORS_ORIGENS`). Sem o back-end, o mapa público abre com a lista original de locais, mas formulário, login e edição não funcionam.
 
 ### Editando os estilos (SCSS)
 
@@ -449,17 +550,17 @@ scripts/gerar-plantas-hd.sh mecanica mecanica-x4.png 1200 800
 ### Testando os locais do mapa
 
 1. No admin, clique em qualquer ponto do mapa: o painel **Inserir local** abre ao lado, e o mapa continua clicável para ajustar a posição.
-2. Preencha o nome, escolha o tipo e clique em **Adicionar local**. O local fica salvo neste navegador e aparece também em `mapa.html` (busque pelo nome).
+2. Preencha o nome, escolha o tipo e clique em **Adicionar local**. O local é gravado no banco de dados e aparece em `mapa.html` para qualquer visitante (busque pelo nome).
 3. Para voltar à lista original, use **Restaurar lista original de locais**, no fim da barra lateral.
 
 ### Testando a atualização da imagem do mapa
 
 1. Faça login e clique em **Ir para Edição do Mapa** (`admin.html`).
 2. Clique em **Atualizar imagem do mapa**, escolha qual planta será trocada (Mapa Geral ou um dos subsolos) e selecione uma imagem PNG, JPG ou WEBP (até 25 MB, mínimo 300×300 px). Para os pontos continuarem no lugar, use a mesma proporção e o mesmo enquadramento da planta atual; para ficar nítida no zoom, envie em alta resolução (ideal: 6000 px de largura no Mapa Geral e 4800 px nos subsolos).
-3. Clique em **Publicar novo mapa** e confirme. A nova imagem aparece na hora no admin e também em `mapa.html` (no mesmo navegador).
+3. Clique em **Publicar novo mapa** e confirme. A nova imagem é enviada ao servidor e aparece na hora no admin e em `mapa.html`, para qualquer visitante.
 4. Para desfazer, abra o mesmo modal e use **Voltar ao mapa anterior** ou **Restaurar original**.
 
-> As imagens enviadas ficam guardadas no IndexedDB do navegador (`accessmap` → `plantas`), seguindo a mesma limitação da v1: valem apenas para o navegador/dispositivo onde foram enviadas.
+> As imagens enviadas ficam guardadas no banco de dados (tabela `planta_versao`).
 
 ## Acessibilidade
 
@@ -486,9 +587,11 @@ O AccessMap foi desenvolvido com preocupação constante em ser acessível enqua
 
 ## Roadmap
 
-- [ ] Implementação de back-end com API REST e banco de dados relacional, conforme modelo apresentado em [Modelo de Dados](#modelo-de-dados).
-- [ ] Testes de viabilidade do Leaflet integrado a um banco de dados real, avaliando camadas dinâmicas e performance.
-- [ ] Autenticação administrativa real, com hash de senha e gerenciamento de sessão no servidor.
+- [x] Implementação de back-end com API REST e banco de dados relacional, conforme modelo apresentado em [Modelo de Dados](#modelo-de-dados).
+- [x] Leaflet integrado a um banco de dados real (locais e plantas carregados pela API).
+- [x] Autenticação administrativa real, com hash de senha (BCrypt) e token de sessão (JWT).
+- [ ] Testes automatizados do back-end e limitação de tentativas de login e de envios do formulário.
+- [ ] Rotina de importação dos dados que ficaram no navegador durante a v1.
 - [ ] Relatórios exportáveis (PDF/planilha) das colaborações recebidas, para uso em pedidos de verba e emendas parlamentares.
 - [ ] Expansão das categorias de acessibilidade (visual, cognitiva, etc.).
 - [ ] Sistema de status para colaborações (pendente, em análise, resolvido) com retorno visível à comunidade.

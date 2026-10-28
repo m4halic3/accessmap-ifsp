@@ -5,8 +5,8 @@
    o Mapa Geral ou para um dos subsolos, quando o campus muda
    (ex.: um novo prédio foi construído).
 
-   Depende de (carregados antes): mapa.js, admin.js e
-   plantas-storage.js.
+   Depende de (carregados antes): api.js, mapa.js, admin.js e
+   plantas-storage.js. As imagens são gravadas no servidor.
 
    IMPORTANTE sobre as coordenadas: a nova imagem é encaixada na
    MESMA área de coordenadas da planta atual (plantas[ala].largura /
@@ -36,7 +36,6 @@
     let razaoAtual = null;       // proporção (largura/altura) do desenho em uso
     let focoAnterior = null;
     let sequenciaAtual = 0;      // evita "corrida" entre leituras assíncronas
-    let urlPreviewAnterior = null; // object URL da miniatura do mapa anterior
 
     const el = {};
 
@@ -144,10 +143,6 @@
     }
 
     function limparPreviewAnterior() {
-        if (urlPreviewAnterior) {
-            URL.revokeObjectURL(urlPreviewAnterior);
-            urlPreviewAnterior = null;
-        }
         el.anteriorImg.removeAttribute("src");
         el.anteriorInfo.textContent = "";
         el.anteriorArea.hidden = true;
@@ -173,9 +168,8 @@
         if (anterior.original) {
             el.anteriorImg.src = planta.urlOriginal;
             el.anteriorInfo.textContent = "Imagem original do projeto.";
-        } else if (anterior.blob) {
-            urlPreviewAnterior = URL.createObjectURL(anterior.blob);
-            el.anteriorImg.src = urlPreviewAnterior;
+        } else if (anterior.url) {
+            el.anteriorImg.src = AccessMapApi.urlAbsoluta(anterior.url);
             const data = new Date(anterior.atualizadoEm).toLocaleString("pt-BR");
             el.anteriorInfo.textContent = `${anterior.nome} — enviada em ${data}.`;
         } else {
@@ -328,7 +322,7 @@
         abrirConfirmacao(
             "Publicar novo mapa",
             `Tem certeza que deseja substituir a imagem de "${NOMES_PLANTAS[ala]}" por "${arquivo.name}"? ` +
-            "A nova imagem passa a aparecer no mapa público deste navegador. " +
+            "A nova imagem passa a aparecer no mapa público para todos os visitantes. " +
             "Se for preciso, você poderá voltar ao mapa anterior depois.",
             confirmarPublicar,
             { rotulo: "Publicar" }
@@ -339,6 +333,11 @@
         const ala = el.alvo.value;
         const alt = el.alt.value.trim();
 
+        // O envio de uma imagem grande pode levar alguns segundos
+        const textoBotao = el.btnPublicar.textContent;
+        el.btnPublicar.disabled = true;
+        el.btnPublicar.textContent = "Publicando...";
+
         try {
             await PlantasStorage.publicar({
                 ala,
@@ -348,17 +347,16 @@
                 tamanho: arquivo.size,
                 largura: infoArquivo.largura,
                 altura: infoArquivo.altura,
-                alt,
-                atualizadoEm: Date.now()
+                alt
             });
             await PlantasStorage.aplicarAla(plantas, ala);
         } catch (erro) {
             console.error("AccessMap: falha ao salvar a imagem do mapa.", erro);
-            const cheio = erro && erro.name === "QuotaExceededError";
-            mostrarErro(cheio
-                ? "O navegador está sem espaço para guardar essa imagem. Use uma imagem menor ou libere espaço."
-                : "Não foi possível salvar a imagem neste navegador. Tente novamente.");
+            mostrarErro(`Não foi possível publicar a imagem. ${erro.message}`);
             return;
+        } finally {
+            el.btnPublicar.disabled = !arquivo;
+            el.btnPublicar.textContent = textoBotao;
         }
 
         const nomeMapa = NOMES_PLANTAS[ala];
@@ -391,7 +389,7 @@
             await PlantasStorage.aplicarAla(plantas, ala);
         } catch (erro) {
             console.error("AccessMap: falha ao restaurar a imagem original.", erro);
-            mostrarErro("Não foi possível restaurar a imagem original. Tente novamente.");
+            mostrarErro(`Não foi possível restaurar a imagem original. ${erro.message}`);
             return;
         }
 
@@ -419,7 +417,7 @@
             await PlantasStorage.aplicarAla(plantas, ala);
         } catch (erro) {
             console.error("AccessMap: falha ao voltar ao mapa anterior.", erro);
-            mostrarErro("Não foi possível voltar ao mapa anterior. Tente novamente.");
+            mostrarErro(`Não foi possível voltar ao mapa anterior. ${erro.message}`);
             return;
         }
 
