@@ -152,11 +152,10 @@ function iniciarCarrossel() {
 /* =========================================================
    FORMULÁRIO DE COLABORAÇÃO
    -----------------------------------------------------------
-   Salva as respostas no localStorage (chave 'accessmap_respostas'),
-   a mesma lida pelo dashboard.js na área administrativa.
-   Quando existir back-end, troque por uma chamada de API (fetch/POST).
+   Envia o relato para o servidor (POST /api/colaboracoes), que o
+   grava na tabela `colaboracao`; o dashboard.js lê de lá.
+   O servidor repete as validações abaixo.
    ========================================================= */
-const CHAVE_RESPOSTAS_FORM = "accessmap_respostas";
 const TAMANHO_MINIMO_RELATO = 10;
 let categoriaSelecionada = null;
 let timerFeedback = null;
@@ -172,20 +171,6 @@ function selecionarCategoria(botao) {
 
     const grupo = document.getElementById("grupo-categoria");
     if (grupo) grupo.removeAttribute("aria-invalid");
-}
-
-function lerRespostasForm() {
-    try {
-        return JSON.parse(localStorage.getItem(CHAVE_RESPOSTAS_FORM)) || [];
-    } catch {
-        return [];
-    }
-}
-
-function salvarNovaResposta(resposta) {
-    const lista = lerRespostasForm();
-    lista.push(resposta);
-    localStorage.setItem(CHAVE_RESPOSTAS_FORM, JSON.stringify(lista));
 }
 
 function exibirFeedbackForm(mensagem, tipo) {
@@ -209,7 +194,7 @@ function marcarCampoInvalido(campo, invalido) {
     else campo.removeAttribute("aria-invalid");
 }
 
-function tratarEnvioFormulario(e) {
+async function tratarEnvioFormulario(e) {
     e.preventDefault();
 
     const campoLocal = document.getElementById("local-ocorrencia");
@@ -241,20 +226,24 @@ function tratarEnvioFormulario(e) {
         return;
     }
 
-    const novaResposta = {
-        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
-        local,
-        categoria: categoriaSelecionada,
-        relato,
-        data: new Date().toISOString()
-    };
+    const btnEnviar = e.target.querySelector('button[type="submit"]');
+    const textoBotao = btnEnviar ? btnEnviar.innerHTML : "";
+    if (btnEnviar) {
+        btnEnviar.disabled = true;
+        btnEnviar.textContent = "Enviando...";
+    }
 
     try {
-        salvarNovaResposta(novaResposta);
+        await AccessMapApi.enviarColaboracao({ local, categoria: categoriaSelecionada, relato });
     } catch (erro) {
-        console.error("AccessMap: não foi possível salvar a colaboração.", erro);
-        exibirFeedbackForm("Não foi possível enviar agora (o navegador bloqueou o armazenamento). Tente novamente.", "erro");
+        console.error("AccessMap: não foi possível enviar a colaboração.", erro);
+        exibirFeedbackForm(erro.message, "erro");
         return;
+    } finally {
+        if (btnEnviar) {
+            btnEnviar.disabled = false;
+            btnEnviar.innerHTML = textoBotao;
+        }
     }
 
     exibirFeedbackForm("Colaboração enviada com sucesso! Obrigado por ajudar o AccessMap.", "sucesso");

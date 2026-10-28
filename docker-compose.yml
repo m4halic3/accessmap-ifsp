@@ -1,0 +1,27 @@
+# Banco de dados do AccessMap (MariaDB, compatível com MySQL).
+# Subir:  docker compose up -d
+# Os dados ficam no volume "accessmap-dados" e sobrevivem a reinícios.
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: accessmap-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: accessmap
+      MARIADB_USER: accessmap
+      MARIADB_PASSWORD: accessmap
+      MARIADB_ROOT_PASSWORD: accessmap-root
+    # Imagens de planta de até 25 MB são gravadas no banco
+    command: --max-allowed-packet=64M --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - accessmap-dados:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  accessmap-dados:

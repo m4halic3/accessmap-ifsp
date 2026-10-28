@@ -1,21 +1,12 @@
 /* =========================================================
-   AUTENTICAÇÃO - ACCESSMAP (versão sem banco de dados)
+   AUTENTICAÇÃO - ACCESSMAP
    -----------------------------------------------------------
-   Este script simula um login de administrador usando uma
-   conta de teste fixa, apenas para fins de avaliação
-   acadêmica. Quando o projeto tiver um back-end/banco de
-   dados, esta lógica deve ser substituída por uma chamada
-   de API real (fetch/axios) que valide o usuário no servidor.
+   O login é conferido pelo servidor (POST /api/auth/login), que
+   guarda as contas na tabela `administrador` com a senha em hash
+   (BCrypt) e devolve um token de sessão (JWT). O token fica no
+   sessionStorage (ver api.js) e vale por algumas horas.
+   Depende de api.js (carregado antes).
    ========================================================= */
-
-// Conta de teste do administrador (uso exclusivo para avaliação)
-const ADMIN_TESTE = {
-    usuario: 'admin.teste',
-    senha: 'Avaliacao@2025'
-};
-
-// Chave usada para guardar a sessão no navegador
-const CHAVE_SESSAO = 'accessmap_admin_logado';
 
 // Páginas que exigem login (com e sem ".html", pois servidores como o
 // `npx serve` removem a extensão da URL)
@@ -26,11 +17,7 @@ function paginaAtual() {
 }
 
 function estaLogado() {
-    try {
-        return sessionStorage.getItem(CHAVE_SESSAO) === 'true';
-    } catch (_) {
-        return false;
-    }
+    return AccessMapApi.lerSessao() !== null;
 }
 
 // Roda já no carregamento do script (no <head>), antes de a página
@@ -49,6 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     formLogin.addEventListener('submit', tratarLogin);
 
+    // Veio de uma página do admin porque o token venceu
+    if (new URLSearchParams(window.location.search).get('expirou') === '1') {
+        exibirErro(document.getElementById('msg-erro'), 'Sua sessão expirou. Faça login novamente.');
+    }
+
     // Ao digitar de novo, some a mensagem de erro
     ['user-login', 'pass-login'].forEach(id => {
         document.getElementById(id).addEventListener('input', limparErro);
@@ -63,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /**
  * Trata o envio do formulário de login.
  */
-function tratarLogin(e) {
+async function tratarLogin(e) {
     e.preventDefault();
 
     const campoUsuario = document.getElementById('user-login');
@@ -80,19 +72,25 @@ function tratarLogin(e) {
         return;
     }
 
-    const credenciaisValidas =
-        usuarioDigitado === ADMIN_TESTE.usuario &&
-        senhaDigitada === ADMIN_TESTE.senha;
+    const btnEntrar = e.target.querySelector('button[type="submit"]');
+    btnEntrar.disabled = true;
+    btnEntrar.textContent = 'Entrando...';
 
-    if (credenciaisValidas) {
-        sessionStorage.setItem(CHAVE_SESSAO, 'true');
+    try {
+        const resposta = await AccessMapApi.login(usuarioDigitado, senhaDigitada);
+        AccessMapApi.salvarSessao(resposta);
         window.location.href = 'dashboard.html';
-    } else {
-        exibirErro(msgErro, 'Usuário ou senha incorretos. Confira e tente novamente.');
-        campoUsuario.setAttribute('aria-invalid', 'true');
-        campoSenha.setAttribute('aria-invalid', 'true');
-        campoSenha.select();
+        return;
+    } catch (erro) {
+        exibirErro(msgErro, erro.message);
+        if (erro.status === 401) {
+            campoUsuario.setAttribute('aria-invalid', 'true');
+            campoSenha.setAttribute('aria-invalid', 'true');
+            campoSenha.select();
+        }
     }
+    btnEntrar.disabled = false;
+    btnEntrar.textContent = 'Entrar';
 }
 
 /**
@@ -142,8 +140,6 @@ function protegerPaginaAdmin() {
  * Encerra a sessão do administrador (botão "Sair").
  */
 function fazerLogout() {
-    try {
-        sessionStorage.removeItem(CHAVE_SESSAO);
-    } catch (_) { /* nada a limpar */ }
+    AccessMapApi.encerrarSessao();
     window.location.href = 'login.html';
 }
