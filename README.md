@@ -68,7 +68,7 @@ Os dados coletados pelo AccessMap possuem um papel importante para a comunidade 
 
 - Página inicial institucional com carrossel informativo (com botão de pausar), seção de estatísticas e apresentação do projeto.
 - **Mapa interativo do campus** (`mapa.html`), com:
-  - três plantas: Mapa Geral, Subsolo Edificações (Bloco C) e Subsolo Mecânica (Bloco B);
+  - uma ou mais plantas por espaço — no IFSP, três: Mapa Geral, Subsolo Edificações (Bloco C) e Subsolo Mecânica (Bloco B); em outro espaço, as plantas definidas no pacote dele (ver [Adaptando para Outro Espaço Público](#adaptando-para-outro-espaço-público));
   - busca por nome ao digitar (ignora acentos e hífens) e Enter para ir direto ao local, trocando de planta se necessário;
   - filtros por acessibilidade física e auditiva e o botão "Ver todos";
   - **locais exibidos pelo nome**, com um ícone por área, e **pinos apenas para pontos de acessibilidade e alertas** (ver [Ícones e legenda do mapa](#ícones-e-legenda-do-mapa));
@@ -139,7 +139,7 @@ Nesta versão, os requisitos acima estão implementados da seguinte forma:
 | Banco de dados | **MariaDB 11** (compatível com MySQL) + **Flyway** | Persistência de locais, colaborações, administradores e imagens de planta; o Flyway cria e versiona as tabelas |
 | Autenticação | **BCrypt** + **JWT** | Senhas guardadas com hash; token de sessão enviado no cabeçalho `Authorization` |
 | Infraestrutura | **Docker Compose** | Sobe o banco de dados com um comando |
-| Persistência no navegador | **Web Storage API** (`localStorage` / `sessionStorage`) | Só preferências do visitante (fonte e contraste) e o token de sessão do administrador |
+| Persistência no navegador | **Web Storage API** (`localStorage` / `sessionStorage`) | Só preferências do visitante (fonte e contraste), o espaço escolhido e o token de sessão do administrador |
 | Ícones | **Font Awesome 6** | Iconografia da interface e ícones dos locais no mapa |
 | Tipografia | **Google Fonts** (Montserrat e Open Sans) | Fontes da identidade visual |
 | Acessibilidade | **VLibras** (Governo Federal) | Tradução de conteúdo para Libras |
@@ -159,7 +159,7 @@ accessmap-ifsp/
 │   ├── scss/                  # Código-fonte dos estilos (partials _*.scss)
 │   ├── images/                # Logos, ícones, fotos da equipe, slides
 │   │   ├── planta-*.png       # Desenhos originais das plantas (fonte, 1920x1080)
-│   │   └── plantas/<ala>/     # Plantas usadas no mapa: base.webp + hd/ (alta resolução)
+│   │   └── plantas/<ala>/     # Plantas do IFSP usadas no mapa: base.webp + hd/ (alta resolução)
 │   └── js/
 │       ├── api.js             # Chamadas à API (fetch), sessão do administrador e espaço atual
 │       ├── espaco.js          # Configuração do espaço (plantas, áreas, textos) e textos das páginas
@@ -658,6 +658,15 @@ scripts/gerar-plantas-hd.sh todos campus-x4.png 1500 1056
 scripts/gerar-plantas-hd.sh edificacoes edificacoes-x4.png 1200 800
 scripts/gerar-plantas-hd.sh mecanica mecanica-x4.png 1200 800
 ```
+
+Para um **outro espaço**, passe como primeiro argumento uma pasta (com `/`) dentro do pacote dele e aponte o `espaco.json` para os arquivos gerados. A largura e a altura da planta precisam ser divisíveis pela grade (6 e 4):
+
+```bash
+scripts/gerar-plantas-hd.sh espacos/prefeitura-centro/plantas/terreo terreo-x4.png 1200 800
+# no espaco.json: "imagem": "plantas/terreo/base.webp", "hd": "plantas/terreo/hd"
+```
+
+O HD é opcional: uma planta pode ter só `"imagem"` (PNG, JPG, WEBP ou SVG), como as do modelo em `espacos/_modelo/`.
 
 > Imagens enviadas pelo admin em "Atualizar imagem do mapa" são exibidas inteiras (sem os pedaços HD); para ficarem nítidas no zoom, envie-as em alta resolução — o próprio formulário avisa quando a resolução é baixa.
 
