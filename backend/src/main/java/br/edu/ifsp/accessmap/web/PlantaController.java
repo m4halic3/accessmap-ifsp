@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import br.edu.ifsp.accessmap.dominio.PlantaVersao;
 import br.edu.ifsp.accessmap.dto.PlantaDto;
+import br.edu.ifsp.accessmap.servico.EspacoServico;
 import br.edu.ifsp.accessmap.servico.PlantaServico;
 
 /** Imagens de planta enviadas pelo administrador ("Atualizar imagem do mapa"). */
@@ -29,20 +30,22 @@ import br.edu.ifsp.accessmap.servico.PlantaServico;
 public class PlantaController {
 
     private final PlantaServico plantaServico;
+    private final EspacoServico espacoServico;
 
-    public PlantaController(PlantaServico plantaServico) {
+    public PlantaController(PlantaServico plantaServico, EspacoServico espacoServico) {
         this.plantaServico = plantaServico;
+        this.espacoServico = espacoServico;
     }
 
-    /** Plantas personalizadas em uso (alas sem item usam a imagem original). */
+    /** Plantas personalizadas em uso no espaço (plantas sem item usam a imagem original). */
     @GetMapping
-    public List<PlantaDto> listar() {
-        return plantaServico.listar();
+    public List<PlantaDto> listar(@RequestParam(name = "espaco", required = false) String espaco) {
+        return plantaServico.listar(espacoServico.resolver(espaco));
     }
 
     @GetMapping("/{ala}")
-    public PlantaDto buscar(@PathVariable String ala) {
-        return plantaServico.buscar(ala);
+    public PlantaDto buscar(@PathVariable String ala, @RequestParam(name = "espaco", required = false) String espaco) {
+        return plantaServico.buscar(espacoServico.resolver(espaco), ala);
     }
 
     /** O arquivo da imagem. Cada versão tem id próprio, então pode ficar em cache. */
@@ -62,21 +65,23 @@ public class PlantaController {
                               @RequestParam int largura,
                               @RequestParam int altura,
                               @RequestParam(required = false) String alt,
-                              @AuthenticationPrincipal Jwt jwt) {
-        return plantaServico.publicar(ala, arquivo, largura, altura, alt, UsuarioLogado.id(jwt));
+                              @AuthenticationPrincipal Jwt jwt,
+                              @RequestParam(name = "espaco", required = false) String espaco) {
+        return plantaServico.publicar(espacoServico.resolver(espaco), ala, arquivo, largura, altura, alt,
+                UsuarioLogado.id(jwt));
     }
 
     /** Volta ao mapa anterior. Sem corpo (204) quando volta a imagem original. */
     @PostMapping("/{ala}/voltar")
-    public ResponseEntity<PlantaDto> voltar(@PathVariable String ala) {
-        return plantaServico.voltarAnterior(ala)
+    public ResponseEntity<PlantaDto> voltar(@PathVariable String ala, @RequestParam(name = "espaco", required = false) String espaco) {
+        return plantaServico.voltarAnterior(espacoServico.resolver(espaco), ala)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @DeleteMapping("/{ala}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void restaurarOriginal(@PathVariable String ala) {
-        plantaServico.restaurarOriginal(ala);
+    public void restaurarOriginal(@PathVariable String ala, @RequestParam(name = "espaco", required = false) String espaco) {
+        plantaServico.restaurarOriginal(espacoServico.resolver(espaco), ala);
     }
 }

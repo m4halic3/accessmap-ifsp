@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-/** Dados enviados pelo admin ao inserir ou editar um local. */
+/** Dados enviados pelo admin ao inserir ou editar um local (e formato de espacos/&lt;slug&gt;/locais.json). */
 public record PontoRequisicao(
         @NotBlank(message = "Digite um nome para o local.")
         @Size(max = 150, message = "O nome pode ter no máximo 150 caracteres.")
@@ -21,11 +21,13 @@ public record PontoRequisicao(
         @Pattern(regexp = "[a-z_]{1,40}", message = "Categoria inválida.")
         String categoria,
 
-        @Pattern(regexp = "terreo|subsolo", message = "Andar inválido.")
-        String andar,
+        // Código da planta em que o local aparece (vazio = planta principal do espaço)
+        @Pattern(regexp = "[a-z0-9_-]{1,40}", message = "Planta inválida.")
+        String planta,
 
+        // Código de uma área do espaço (o PontoServico confere se ela existe)
         @JsonProperty("bloco_pai")
-        @Pattern(regexp = "informatica|mecanica|edificacoes|administrativo", message = "Bloco inválido.")
+        @Pattern(regexp = "[a-z0-9_]{1,40}", message = "Bloco inválido.")
         String blocoPai,
 
         @NotNull(message = "Clique no mapa para marcar a posição do local.")

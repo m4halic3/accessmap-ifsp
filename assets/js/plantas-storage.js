@@ -35,7 +35,7 @@
     /** Planta enviada pelo admin em uso na ala, ou null se é a original. */
     async function obter(ala) {
         try {
-            return await AccessMapApi.requisitar(`/plantas/${ala}`);
+            return await AccessMapApi.requisitar(`/plantas/${ala}`, { espaco: true });
         } catch (erro) {
             if (erro.status === 404) return null;
             throw erro;

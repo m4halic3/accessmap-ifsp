@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.ifsp.accessmap.dto.PontoDto;
 import br.edu.ifsp.accessmap.dto.PontoRequisicao;
+import br.edu.ifsp.accessmap.servico.EspacoServico;
 import br.edu.ifsp.accessmap.servico.PontoServico;
 import jakarta.validation.Valid;
 
@@ -26,36 +28,39 @@ import jakarta.validation.Valid;
 public class PontoController {
 
     private final PontoServico pontoServico;
+    private final EspacoServico espacoServico;
 
-    public PontoController(PontoServico pontoServico) {
+    public PontoController(PontoServico pontoServico, EspacoServico espacoServico) {
         this.pontoServico = pontoServico;
+        this.espacoServico = espacoServico;
     }
 
     @GetMapping
-    public List<PontoDto> listar() {
-        return pontoServico.listar();
+    public List<PontoDto> listar(@RequestParam(name = "espaco", required = false) String espaco) {
+        return pontoServico.listar(espacoServico.resolver(espaco));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PontoDto criar(@Valid @RequestBody PontoRequisicao req, @AuthenticationPrincipal Jwt jwt) {
-        return pontoServico.criar(req, UsuarioLogado.id(jwt));
+    public PontoDto criar(@Valid @RequestBody PontoRequisicao req, @AuthenticationPrincipal Jwt jwt,
+                          @RequestParam(name = "espaco", required = false) String espaco) {
+        return pontoServico.criar(espacoServico.resolver(espaco), req, UsuarioLogado.id(jwt));
     }
 
     @PutMapping("/{id}")
     public PontoDto atualizar(@PathVariable Integer id, @Valid @RequestBody PontoRequisicao req,
-                              @AuthenticationPrincipal Jwt jwt) {
-        return pontoServico.atualizar(id, req, UsuarioLogado.id(jwt));
+                              @AuthenticationPrincipal Jwt jwt, @RequestParam(name = "espaco", required = false) String espaco) {
+        return pontoServico.atualizar(espacoServico.resolver(espaco), id, req, UsuarioLogado.id(jwt));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void excluir(@PathVariable Integer id) {
-        pontoServico.excluir(id);
+    public void excluir(@PathVariable Integer id, @RequestParam(name = "espaco", required = false) String espaco) {
+        pontoServico.excluir(espacoServico.resolver(espaco), id);
     }
 
     @PostMapping("/restaurar-originais")
-    public List<PontoDto> restaurarOriginais() {
-        return pontoServico.restaurarOriginais();
+    public List<PontoDto> restaurarOriginais(@RequestParam(name = "espaco", required = false) String espaco) {
+        return pontoServico.restaurarOriginais(espacoServico.resolver(espaco));
     }
 }

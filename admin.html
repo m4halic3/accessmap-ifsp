@@ -7,6 +7,7 @@
     <title>Admin - Locais do Mapa - AccessMap</title>
     <!-- Protege a página: sem login, redireciona para login.html antes de exibir -->
     <script src="assets/js/api.js"></script>
+    <script src="assets/js/espaco.js"></script>
     <script src="assets/js/authentication.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,18 +50,15 @@
             <h2 id="titulo-resultados">Resultados (Mapa Geral)</h2>
 
             <div class="search-container">
-                <label for="search-input" class="sr-only">Pesquisar local no campus</label>
+                <label for="search-input" class="sr-only" data-espaco-texto="Pesquisar local {no} {tipo}">Pesquisar local no campus</label>
                 <i class="fas fa-search search-icon" aria-hidden="true"></i>
                 <input type="search" id="search-input" placeholder="Buscar local (ex.: biblioteca)" autocomplete="off" enterkeyhint="search" onkeydown="handleBuscaKeydown(event)">
             </div>
 
             <div class="fieldset-reset" role="group" aria-labelledby="titulo-filtro-ala">
                 <span id="titulo-filtro-ala">Mapa exibido</span>
-                <div class="type-buttons" id="seletor-alas">
-                    <button type="button" class="btn-type active" data-ala="todos" aria-pressed="true" onclick="filtrarAla('todos')">Mapa Geral</button>
-                    <button type="button" class="btn-type" data-ala="edificacoes" aria-pressed="false" onclick="filtrarAla('edificacoes')">Subsolo Edif.</button>
-                    <button type="button" class="btn-type" data-ala="mecanica" aria-pressed="false" onclick="filtrarAla('mecanica')">Subsolo Mec.</button>
-                </div>
+                <!-- Um botão por planta do espaço (espacos/<slug>/espaco.json), criado por mapa.js -->
+                <div class="type-buttons" id="seletor-alas"></div>
 
                 <button type="button" class="btn-limpar-mapa" onclick="resetarMapaCompleto()">
                     <i class="fas fa-eraser" aria-hidden="true"></i> Limpar mapa e filtros
@@ -104,7 +102,7 @@
         </div>
 
         <div class="mapa-e-painel">
-            <div id="map" role="application" aria-label="Mapa do campus em modo de edição. Clique em um ponto para cadastrar um local."></div>
+            <div id="map" role="application" aria-label="Mapa do campus em modo de edição. Clique em um ponto para cadastrar um local." data-espaco-aria="Mapa {do} {tipo} em modo de edição. Clique em um ponto para cadastrar um local."></div>
 
             <!-- Painel "Inserir / Atualizar Local" (ao lado do mapa, que continua clicável) -->
             <aside id="painel-form" class="painel-lateral oculto" aria-labelledby="form-titulo">
@@ -116,7 +114,7 @@
                     </div>
                     <form id="form-local" class="form-local-body" novalidate>
                         <label for="form-nome">Nome do local</label>
-                        <input type="text" id="form-nome" maxlength="120" required autocomplete="off" placeholder="Ex: Bloco A - Biblioteca">
+                        <input type="text" id="form-nome" maxlength="120" required autocomplete="off" placeholder="Ex: Bloco A - Biblioteca" data-espaco-placeholder="{exemploNomeLocal}">
 
                         <span class="rotulo-campo" id="rotulo-coords">Posição no mapa</span>
                         <div class="coord-row sem-coords">
@@ -158,11 +156,8 @@
                 </div>
                 <div class="form-local-body">
                     <label for="planta-alvo">Qual mapa será atualizado?</label>
-                    <select id="planta-alvo">
-                        <option value="todos">Mapa Geral (campus)</option>
-                        <option value="edificacoes">Subsolo Edificações (Bloco C)</option>
-                        <option value="mecanica">Subsolo Mecânica (Bloco B)</option>
-                    </select>
+                    <!-- Uma opção por planta do espaço, criada por admin-planta.js -->
+                    <select id="planta-alvo"></select>
                     <p id="planta-origem" class="dica-coords"></p>
 
                     <div id="planta-anterior-area" class="planta-anterior" hidden>
@@ -187,7 +182,7 @@
                     <p id="planta-erro" class="planta-erro" role="alert" hidden></p>
 
                     <label for="planta-alt">Descrição da imagem (texto alternativo)</label>
-                    <input type="text" id="planta-alt" maxlength="250" placeholder="Ex: Mapa do campus com o novo Bloco E">
+                    <input type="text" id="planta-alt" maxlength="250" placeholder="Ex: Mapa do campus com o novo Bloco E" data-espaco-placeholder="{exemploAltPlanta}">
                     <p class="dica-coords">Opcional, mas recomendado: descreve o mapa para quem usa leitor de tela.</p>
 
                     <div class="form-local-actions planta-actions">

@@ -1,0 +1,21 @@
+[
+    { "nome": "Prédio Principal",      "tipo": "geral",    "categoria": "geral",          "planta": "terreo", "bloco_pai": null,          "x": 600,  "y": 560, "subponto": false },
+    { "nome": "Anexo de Atendimento",  "tipo": "geral",    "categoria": "geral",          "planta": "terreo", "bloco_pai": null,          "x": 1000, "y": 540, "subponto": false },
+    { "nome": "Estacionamento",        "tipo": "geral",    "categoria": "estacionamento", "planta": "terreo", "bloco_pai": null,          "x": 190,  "y": 235, "subponto": false },
+    { "nome": "Praça Central",         "tipo": "geral",    "categoria": "praca",          "planta": "terreo", "bloco_pai": null,          "x": 250,  "y": 550, "subponto": false },
+    { "nome": "Vaga PCD",              "tipo": "fisica",   "categoria": "vaga_pcd",       "planta": "terreo", "bloco_pai": null,          "x": 307,  "y": 180, "subponto": true },
+    { "nome": "Rampa da entrada",      "tipo": "fisica",   "categoria": "rampa",          "planta": "terreo", "bloco_pai": "principal",   "x": 600,  "y": 405, "subponto": true },
+    { "nome": "Recepção",              "tipo": "geral",    "categoria": "principal",      "planta": "terreo", "bloco_pai": "principal",   "x": 600,  "y": 480, "subponto": true },
+    { "nome": "Protocolo",             "tipo": "geral",    "categoria": "atendimento",    "planta": "terreo", "bloco_pai": "atendimento", "x": 935,  "y": 590, "subponto": true },
+    { "nome": "Intérprete de Libras",  "tipo": "auditiva", "categoria": "atendimento",    "planta": "terreo", "bloco_pai": "atendimento", "x": 1065, "y": 590, "subponto": true },
+    { "nome": "Banheiro acessível",    "tipo": "fisica",   "categoria": "banheiro_acessivel", "planta": "terreo", "bloco_pai": "atendimento", "x": 1000, "y": 490, "subponto": true },
+    { "nome": "Calçada irregular",     "tipo": "alerta",   "categoria": "geral",          "planta": "terreo", "bloco_pai": null,          "x": 900,  "y": 110, "subponto": true },
+
+    { "nome": "1º andar - Sala de reuniões",      "tipo": "geral",  "categoria": "principal",          "planta": "primeiro_andar", "bloco_pai": "principal", "x": 210, "y": 580, "subponto": true },
+    { "nome": "1º andar - Gabinete",              "tipo": "geral",  "categoria": "principal",          "planta": "primeiro_andar", "bloco_pai": "principal", "x": 470, "y": 580, "subponto": true },
+    { "nome": "1º andar - Secretaria",            "tipo": "geral",  "categoria": "secretaria",         "planta": "primeiro_andar", "bloco_pai": "principal", "x": 730, "y": 580, "subponto": true },
+    { "nome": "1º andar - Arquivo",               "tipo": "geral",  "categoria": "principal",          "planta": "primeiro_andar", "bloco_pai": "principal", "x": 990, "y": 580, "subponto": true },
+    { "nome": "1º andar - Escada",                "tipo": "geral",  "categoria": "escada",             "planta": "primeiro_andar", "bloco_pai": "principal", "x": 720, "y": 260, "subponto": true },
+    { "nome": "1º andar - Elevador",              "tipo": "fisica", "categoria": "elevador",           "planta": "primeiro_andar", "bloco_pai": "principal", "x": 720, "y": 135, "subponto": true },
+    { "nome": "1º andar - Banheiro acessível",    "tipo": "fisica", "categoria": "banheiro_acessivel", "planta": "primeiro_andar", "bloco_pai": "principal", "x": 250, "y": 215, "subponto": true }
+]

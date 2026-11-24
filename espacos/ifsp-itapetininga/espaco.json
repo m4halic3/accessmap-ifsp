@@ -1,0 +1,82 @@
+{
+    "slug": "ifsp-itapetininga",
+    "nome": "IFSP — Campus Itapetininga",
+    "tipo": "campus",
+    "cidade": "Itapetininga - SP",
+    "padrao": true,
+
+    "textos": {
+        "localizacao": "Instituto Federal - Campus Itapetininga",
+        "exemploLocal": "Ex: Bloco A, Biblioteca, Rampa central...",
+        "exemploFiltroLocal": "Ex: Bloco A, Biblioteca...",
+        "exemploNomeLocal": "Ex: Bloco A - Biblioteca",
+        "exemploAltPlanta": "Ex: Mapa do campus com o novo Bloco E",
+        "tituloMapaLocalizacao": "Mapa de localização e acessibilidade do Campus Principal do Instituto Federal"
+    },
+
+    "mapaLocalizacao": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3653.447543818324!2d-48.0191295!3d-23.6061803!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c5d336967733f3%3A0x67396a848c823f66!2sIFSP%20Campus%20Itapetininga!5e0!3m2!1spt-BR!2sbr!4v1700000000000",
+
+    "destaques": [
+        "Bloco A", "Bloco B", "Bloco C", "Bloco D",
+        "Estacionamento interno A", "Estacionamento interno B", "Estacionamento externo"
+    ],
+
+    "plantas": [
+        {
+            "codigo": "todos",
+            "nome": "Mapa Geral",
+            "rotuloCurto": "Mapa Geral",
+            "descricao": "Mapa Geral (campus)",
+            "principal": true,
+            "largura": 1500,
+            "altura": 1056,
+            "imagem": "assets/images/plantas/todos/base.webp",
+            "hd": "assets/images/plantas/todos/hd",
+            "proporcaoArte": 1.77778,
+            "alt": "Mapa do Campus Geral com distribuição dos blocos e caminhos."
+        },
+        {
+            "codigo": "edificacoes",
+            "nome": "Subsolo Edificações",
+            "rotuloCurto": "Subsolo Edif.",
+            "descricao": "Subsolo Edificações (Bloco C)",
+            "andar": "subsolo",
+            "bloco": "edificacoes",
+            "prefixoNome": "Subsolo C",
+            "largura": 1200,
+            "altura": 800,
+            "imagem": "assets/images/plantas/edificacoes/base.webp",
+            "hd": "assets/images/plantas/edificacoes/hd",
+            "proporcaoArte": 1.77778,
+            "alt": "Planta baixa detalhada do Subsolo do Bloco C (Edificações)."
+        },
+        {
+            "codigo": "mecanica",
+            "nome": "Subsolo Mecânica",
+            "rotuloCurto": "Subsolo Mec.",
+            "descricao": "Subsolo Mecânica (Bloco B)",
+            "andar": "subsolo",
+            "bloco": "mecanica",
+            "prefixoNome": "Subsolo B",
+            "largura": 1200,
+            "altura": 800,
+            "imagem": "assets/images/plantas/mecanica/base.webp",
+            "hd": "assets/images/plantas/mecanica/hd",
+            "proporcaoArte": 1.77778,
+            "alt": "Planta baixa detalhada do Subsolo do Bloco B (Mecânica)."
+        }
+    ],
+
+    "areas": [
+        { "codigo": "informatica",    "rotulo": "Bloco A — Informática", "cor": "#8e1b1b", "icone": "fa-computer",          "predio": "Bloco A", "oQue": "Informática" },
+        { "codigo": "mecanica",       "rotulo": "Bloco B — Mecânica",    "cor": "#0d3b78", "icone": "fa-gears",             "predio": "Bloco B", "oQue": "Mecânica" },
+        { "codigo": "edificacoes",    "rotulo": "Bloco C — Edificações", "cor": "#1b6b3a", "icone": "fa-helmet-safety",     "predio": "Bloco C", "oQue": "Edificações" },
+        { "codigo": "administrativo", "rotulo": "Bloco D",               "cor": "#5a1f86", "icone": "fa-building-columns",  "predio": "Bloco D" },
+        { "codigo": "estacionamento", "rotulo": "Estacionamento",        "cor": "#455a64", "icone": "fa-square-parking" },
+        { "codigo": "quadra",         "rotulo": "Quadra e lazer",        "cor": "#d35400", "icone": "fa-basketball" },
+        { "codigo": "refeitorio",     "rotulo": "Refeitório e cantina",  "cor": "#6d4c41", "icone": "fa-utensils" },
+        { "codigo": "biblioteca",     "rotulo": "Biblioteca",            "cor": "#5d4037", "icone": "fa-book", "naLegenda": false },
+        { "codigo": "canteiro",       "rotulo": "Canteiro / horta",      "cor": "#558b2f", "icone": "fa-seedling" },
+        { "codigo": "externa",        "rotulo": "Área externa",          "cor": "#607d8b", "icone": "fa-location-dot" }
+    ]
+}

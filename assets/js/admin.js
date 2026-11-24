@@ -11,13 +11,9 @@ const modoAdmin =
     document.body.dataset.admin === "sempre" ||
     new URLSearchParams(window.location.search).get("admin") === "1";
 
-const OPCOES_BLOCO = [
-    { valor: "", texto: "Nenhum (área externa)" },
-    { valor: "informatica", texto: "Bloco A" },
-    { valor: "mecanica", texto: "Bloco B" },
-    { valor: "edificacoes", texto: "Bloco C" },
-    { valor: "administrativo", texto: "Bloco D" }
-];
+// Opções do campo "Bloco / Setor": os prédios do espaço (áreas com "predio"
+// no espaco.json). Preenchido em popularSelectBlocos().
+let OPCOES_BLOCO = [];
 
 let indiceEmEdicao = null;
 let coordsClicadas = null;
@@ -78,6 +74,13 @@ function aoClicarNoMapa(e) {
 }
 
 function popularSelectBlocos() {
+    OPCOES_BLOCO = [
+        { valor: "", texto: "Nenhum (área externa)" },
+        ...Object.entries(AREAS_CAMPUS)
+            .filter(([, area]) => area.predio)
+            .map(([codigo, area]) => ({ valor: codigo, texto: area.predio }))
+    ];
+
     const select = document.getElementById("form-bloco");
     if (!select) return;
     select.innerHTML = "";
@@ -89,9 +92,9 @@ function popularSelectBlocos() {
     });
 }
 
-// Planta em que o local aparece (subsolos têm planta própria)
+// Planta em que o local aparece
 function alaDoLugarAdmin(lugar) {
-    return lugar.andar === "subsolo" && plantas[lugar.bloco_pai] ? lugar.bloco_pai : "todos";
+    return plantaDoLugar(lugar);
 }
 
 // Troca para a planta certa (se precisar) e foca o local
@@ -161,9 +164,9 @@ function renderizarListaAdmin() {
 }
 
 // -----------------------------------------------------------------------
-// Rótulo do campo "Bloco / Setor". Ao inserir um local direto num
-// subsolo, o campo fica travado no bloco daquela ala — senão o local
-// nasce com bloco_pai e andar inconsistentes e não aparece em nenhuma aba.
+// Rótulo do campo "Bloco / Setor". Ao inserir um local direto numa planta
+// que pertence a um prédio (ex.: o subsolo de um bloco), o campo fica
+// travado no bloco daquela planta, para o local nascer consistente.
 // -----------------------------------------------------------------------
 function atualizarLabelBloco(travado, nomeBlocoTravado) {
     const label = document.querySelector('label[for="form-bloco"]');
@@ -198,11 +201,12 @@ function abrirFormulario(lugar = null, indice = null, coordsForcadas = null) {
 
     const selectBloco = document.getElementById("form-bloco");
 
-    if (!lugar && alaAtual !== "todos") {
-        selectBloco.value = alaAtual;
+    const blocoFixo = plantas[alaAtual] && plantas[alaAtual].bloco;
+    if (!lugar && blocoFixo) {
+        selectBloco.value = blocoFixo;
         selectBloco.disabled = true;
-        const opcaoAtual = OPCOES_BLOCO.find(op => op.valor === alaAtual);
-        atualizarLabelBloco(true, opcaoAtual ? opcaoAtual.texto : alaAtual);
+        const opcaoAtual = OPCOES_BLOCO.find(op => op.valor === blocoFixo);
+        atualizarLabelBloco(true, opcaoAtual ? opcaoAtual.texto : blocoFixo);
     } else {
         selectBloco.value = lugar ? (lugar.bloco_pai || "") : "";
         selectBloco.disabled = false;
@@ -395,7 +399,7 @@ function dadosParaApi(lugar) {
         nome: lugar.nome,
         tipo: lugar.tipo,
         categoria: lugar.categoria,
-        andar: lugar.andar,
+        planta: lugar.planta,
         bloco_pai: lugar.bloco_pai || null,
         x: lugar.x,
         y: lugar.y,
@@ -431,7 +435,7 @@ async function confirmarSalvarLocal() {
             nome,
             tipo,
             categoria: blocoPai || "geral",
-            andar: getAndarDaAla(),
+            planta: alaAtual,
             y: coordsClicadas.y,
             x: coordsClicadas.x,
             subponto: !!blocoPai,

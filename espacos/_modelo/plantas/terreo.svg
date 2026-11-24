@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1600" viewBox="0 0 1200 800">
+  <!-- Planta de EXEMPLO (térreo) do pacote modelo. Substitua pela planta do seu espaço. -->
+  <defs>
+    <pattern id="grama" width="24" height="24" patternUnits="userSpaceOnUse">
+      <rect width="24" height="24" fill="#8cc06a"/>
+      <circle cx="6" cy="7" r="1.4" fill="#7ab359"/><circle cx="18" cy="16" r="1.2" fill="#9ccb7b"/>
+    </pattern>
+    <filter id="sombra" x="-5%" y="-5%" width="115%" height="120%">
+      <feDropShadow dx="4" dy="6" stdDeviation="4" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="800" fill="url(#grama)"/>
+
+  <!-- Rua e calçadas -->
+  <rect x="0" y="700" width="1200" height="100" fill="#55595e"/>
+  <g stroke="#f4f4f4" stroke-width="4" stroke-dasharray="28 22"><line x1="0" y1="750" x2="1200" y2="750"/></g>
+  <rect x="0" y="680" width="1200" height="20" fill="#d9d4c7"/>
+
+  <!-- Caminhos internos -->
+  <path d="M600 680 V430 H250 M600 430 H960" fill="none" stroke="#e6dfcf" stroke-width="34" stroke-linecap="round"/>
+
+  <!-- Estacionamento -->
+  <g filter="url(#sombra)"><rect x="40" y="470" width="300" height="190" rx="10" fill="#6b7177"/></g>
+  <g stroke="#f4f4f4" stroke-width="3">
+    <line x1="80" y1="480" x2="80" y2="540"/><line x1="130" y1="480" x2="130" y2="540"/><line x1="180" y1="480" x2="180" y2="540"/>
+    <line x1="230" y1="480" x2="230" y2="540"/><line x1="280" y1="480" x2="280" y2="540"/>
+    <line x1="80" y1="590" x2="80" y2="650"/><line x1="130" y1="590" x2="130" y2="650"/><line x1="180" y1="590" x2="180" y2="650"/>
+    <line x1="230" y1="590" x2="230" y2="650"/><line x1="280" y1="590" x2="280" y2="650"/>
+  </g>
+  <rect x="285" y="590" width="45" height="60" fill="#1f5fbf"/>
+  <rect x="94" y="490" width="26" height="40" rx="6" fill="#d64545"/><rect x="194" y="600" width="26" height="40" rx="6" fill="#f2f2f2"/>
+
+  <!-- Prédio principal -->
+  <g filter="url(#sombra)"><rect x="380" y="90" width="440" height="300" rx="8" fill="#e9b5a4"/></g>
+  <rect x="380" y="90" width="440" height="300" rx="8" fill="none" stroke="#b9786a" stroke-width="4"/>
+  <g fill="#f6d6cb"><rect x="400" y="110" width="190" height="120"/><rect x="610" y="110" width="190" height="120"/>
+    <rect x="400" y="250" width="120" height="120"/><rect x="680" y="250" width="120" height="120"/></g>
+  <rect x="540" y="250" width="120" height="140" fill="#fbe9e3"/>
+
+  <!-- Anexo (atendimento) -->
+  <g filter="url(#sombra)"><rect x="860" y="150" width="280" height="220" rx="8" fill="#a9c7e8"/></g>
+  <rect x="860" y="150" width="280" height="220" rx="8" fill="none" stroke="#5f86b3" stroke-width="4"/>
+  <g fill="#d3e3f5"><rect x="880" y="170" width="110" height="80"/><rect x="1010" y="170" width="110" height="80"/><rect x="880" y="270" width="240" height="80"/></g>
+
+  <!-- Praça -->
+  <circle cx="250" cy="250" r="110" fill="#e6dfcf"/>
+  <circle cx="250" cy="250" r="55" fill="#7fb6d9" stroke="#5c94b8" stroke-width="4"/>
+  <g fill="#3f7d3a"><circle cx="160" cy="150" r="22"/><circle cx="340" cy="150" r="22"/><circle cx="160" cy="350" r="22"/><circle cx="340" cy="350" r="22"/></g>
+  <g fill="#4c8f45"><circle cx="1000" cy="520" r="26"/><circle cx="1080" cy="580" r="22"/><circle cx="920" cy="600" r="24"/><circle cx="60" cy="80" r="24"/></g>
+</svg>

@@ -6,22 +6,19 @@
        para pontos de acessibilidade e alertas, de que tipo ele é;
      • o ÍCONE diz O QUE é o local (laboratório, banheiro, biblioteca...).
    Os ícones são do Font Awesome 6 (já carregado nas páginas).
-   Para mudar um ícone ou uma cor, altere só este arquivo.
+
+   As ÁREAS (cores e ícones de cada bloco/setor) e os PRÉDIOS são
+   próprios de cada espaço e vêm de espacos/<slug>/espaco.json
+   (campo "areas"), carregados em prepararAreas(). Aqui ficam só as
+   regras gerais, que valem para qualquer espaço (banheiro, rampa,
+   elevador...).
    ========================================================= */
 
-// Áreas do campus: cor + ícone padrão de quem pertence a ela
-const AREAS_CAMPUS = {
-    informatica:    { rotulo: "Bloco A — Informática",   cor: "#8e1b1b", icone: "fa-computer" },
-    mecanica:       { rotulo: "Bloco B — Mecânica",      cor: "#0d3b78", icone: "fa-gears" },
-    edificacoes:    { rotulo: "Bloco C — Edificações",   cor: "#1b6b3a", icone: "fa-helmet-safety" },
-    administrativo: { rotulo: "Bloco D",                 cor: "#5a1f86", icone: "fa-building-columns" },
-    estacionamento: { rotulo: "Estacionamento",          cor: "#455a64", icone: "fa-square-parking" },
-    quadra:         { rotulo: "Quadra e lazer",          cor: "#d35400", icone: "fa-basketball" },
-    refeitorio:     { rotulo: "Refeitório e cantina",    cor: "#6d4c41", icone: "fa-utensils" },
-    biblioteca:     { rotulo: "Biblioteca",              cor: "#5d4037", icone: "fa-book" },
-    canteiro:       { rotulo: "Canteiro / horta",        cor: "#558b2f", icone: "fa-seedling" },
-    externa:        { rotulo: "Área externa",            cor: "#607d8b", icone: "fa-location-dot" }
-};
+// Áreas do espaço: cor + ícone padrão de quem pertence a ela (preenchido em prepararAreas)
+const AREAS_CAMPUS = {};
+
+// Usada quando o local não pertence a nenhuma área do espaço
+const AREA_EXTERNA_PADRAO = { rotulo: "Área externa", cor: "#607d8b", icone: "fa-location-dot", naLegenda: true };
 
 // Tipos que mudam a cor do pino, independente do bloco.
 // Física usa o azul do Símbolo Internacional de Acessibilidade; o alerta
@@ -32,12 +29,9 @@ const TIPOS_DESTAQUE = {
     alerta:   { rotulo: "Alerta: barreira de acessibilidade", cor: "#f9c80e", corIcone: "#1a1a1a", icone: "fa-triangle-exclamation" }
 };
 
-// Ícone padrão por categoria (quando o nome não diz nada mais específico)
+// Ícone padrão por categoria (quando o nome não diz nada mais específico).
+// Categorias que são áreas do espaço usam o ícone da área.
 const ICONE_POR_CATEGORIA = {
-    informatica: "fa-computer",
-    mecanica: "fa-gears",
-    edificacoes: "fa-helmet-safety",
-    administrativo: "fa-building-columns",
     secretaria: "fa-briefcase",
     servidores: "fa-id-badge",
     salas_aula: "fa-chalkboard",
@@ -99,23 +93,35 @@ const REGRAS_NOME = [
 ];
 
 // O que cada área "é" quando o nome não é específico
+// (as áreas do espaço com "oQue" no espaco.json entram aqui em prepararAreas)
 const O_QUE_POR_CATEGORIA = {
-    informatica: "Informática",
-    mecanica: "Mecânica",
-    edificacoes: "Edificações",
     secretaria: "Secretaria e coordenações",
     servidores: "Setor de servidores",
     salas_aula: "Sala de aula",
     canteiro: "Canteiro / horta"
 };
 
-// Blocos principais (o próprio prédio)
-const AREA_DOS_BLOCOS = {
-    "Bloco A": "informatica",
-    "Bloco B": "mecanica",
-    "Bloco C": "edificacoes",
-    "Bloco D": "administrativo"
-};
+// Prédios: nome do local que representa o próprio prédio -> área (ex.: "Bloco A" -> "informatica")
+const AREA_DOS_BLOCOS = {};
+
+/** Carrega as áreas e prédios do espaço (config de espaco.js) e monta a legenda. */
+function prepararAreas(config) {
+    [AREAS_CAMPUS, AREA_DOS_BLOCOS].forEach(obj => Object.keys(obj).forEach(k => delete obj[k]));
+    config.areas.forEach(a => {
+        AREAS_CAMPUS[a.codigo] = {
+            rotulo: a.rotulo,
+            cor: a.cor,
+            icone: a.icone,
+            naLegenda: a.naLegenda !== false,
+            predio: a.predio || null,
+            oQue: a.oQue || null
+        };
+        if (a.predio) AREA_DOS_BLOCOS[a.predio] = a.codigo;
+        if (a.oQue) O_QUE_POR_CATEGORIA[a.codigo] = a.oQue;
+    });
+    if (!AREAS_CAMPUS.externa) AREAS_CAMPUS.externa = AREA_EXTERNA_PADRAO;
+    montarLegenda();
+}
 
 function semAcento(txt) {
     return String(txt).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -126,7 +132,7 @@ function areaDoLugar(lugar) {
     if (AREA_DOS_BLOCOS[lugar.nome]) return AREA_DOS_BLOCOS[lugar.nome];
     if (lugar.bloco_pai && AREAS_CAMPUS[lugar.bloco_pai]) return lugar.bloco_pai;
     if (AREAS_CAMPUS[lugar.categoria]) return lugar.categoria;
-    if (lugar.categoria === "vaga_pcd") return "estacionamento";
+    if (lugar.categoria === "vaga_pcd" && AREAS_CAMPUS.estacionamento) return "estacionamento";
     return "externa";
 }
 
@@ -153,7 +159,8 @@ function estiloDoLugar(lugar) {
         }
     }
 
-    icone = icone || ICONE_POR_CATEGORIA[lugar.categoria] || area.icone;
+    const areaDaCategoria = AREAS_CAMPUS[lugar.categoria];
+    icone = icone || ICONE_POR_CATEGORIA[lugar.categoria] || (areaDaCategoria && areaDaCategoria.icone) || area.icone;
     oQue = oQue || O_QUE_POR_CATEGORIA[lugar.categoria] || "Ponto de interesse";
 
     let cor = area.cor;
@@ -203,15 +210,19 @@ function montarLegenda() {
     if (!alvo) return;
 
     const cores = [
-        ...["informatica", "mecanica", "edificacoes", "administrativo"].map(k => AREAS_CAMPUS[k]),
-        ...["estacionamento", "quadra", "refeitorio", "canteiro", "externa"].map(k => AREAS_CAMPUS[k]),
+        ...Object.values(AREAS_CAMPUS).filter(a => a.naLegenda),
         TIPOS_DESTAQUE.fisica,
         TIPOS_DESTAQUE.auditiva,
         TIPOS_DESTAQUE.alerta
     ];
 
+    // Ícones dos prédios do espaço (os que dizem "o que" são) e depois os gerais
+    const iconesDosPredios = Object.values(AREAS_CAMPUS)
+        .filter(a => a.predio && a.oQue)
+        .map(a => [a.icone, a.oQue]);
+
     const icones = [
-        ["fa-computer", "Informática"], ["fa-gears", "Mecânica"], ["fa-helmet-safety", "Edificações"],
+        ...iconesDosPredios,
         ["fa-chalkboard", "Sala de aula"], ["fa-flask", "Lab. de ciências"], ["fa-book", "Biblioteca"],
         ["fa-utensils", "Refeitório / cantina"], ["fa-briefcase", "Secretaria / coordenação"],
         ["fa-chalkboard-user", "Sala dos professores"], ["fa-microphone-lines", "Auditório"],
@@ -237,4 +248,4 @@ function montarLegenda() {
         </ul>`;
 }
 
-document.addEventListener("DOMContentLoaded", montarLegenda);
+// A legenda é montada por prepararAreas(), quando a configuração do espaço chega

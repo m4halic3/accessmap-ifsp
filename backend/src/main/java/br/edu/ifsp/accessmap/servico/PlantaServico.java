@@ -7,61 +7,63 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.edu.ifsp.accessmap.dominio.Espaco;
+import br.edu.ifsp.accessmap.dominio.Planta;
 import br.edu.ifsp.accessmap.dominio.PlantaVersao;
 import br.edu.ifsp.accessmap.dto.PlantaDto;
 import br.edu.ifsp.accessmap.repositorio.AdministradorRepositorio;
-import br.edu.ifsp.accessmap.repositorio.PlantaRepositorio;
+import br.edu.ifsp.accessmap.repositorio.PlantaVersaoRepositorio;
 
 /**
- * Imagens de planta enviadas pelo administrador. Para cada ala ficam guardadas
- * no máximo duas versões: a que está em uso e a anterior (para desfazer),
- * como na v1. Sem versões, o mapa usa a imagem original do projeto.
+ * Imagens de planta enviadas pelo administrador. Para cada planta ficam
+ * guardadas no máximo duas versões: a que está em uso e a anterior (para
+ * desfazer), como na v1. Sem versões, o mapa usa a imagem original do pacote
+ * do espaço (espacos/<slug>/espaco.json).
  */
 @Service
 public class PlantaServico {
-
-    public static final Set<String> ALAS = Set.of("todos", "edificacoes", "mecanica");
-    private static final List<String> ORDEM_ALAS = List.of("todos", "edificacoes", "mecanica");
 
     public static final long TAMANHO_MAXIMO = 25L * 1024 * 1024;
     private static final int LADO_MINIMO = 300;
     private static final int LADO_MAXIMO = 30000;
 
-    private final PlantaRepositorio plantas;
+    private final PlantaVersaoRepositorio versoes;
     private final AdministradorRepositorio administradores;
+    private final EspacoServico espacoServico;
 
-    public PlantaServico(PlantaRepositorio plantas, AdministradorRepositorio administradores) {
-        this.plantas = plantas;
+    public PlantaServico(PlantaVersaoRepositorio versoes, AdministradorRepositorio administradores,
+                         EspacoServico espacoServico) {
+        this.versoes = versoes;
         this.administradores = administradores;
+        this.espacoServico = espacoServico;
     }
 
     @Transactional(readOnly = true)
-    public List<PlantaDto> listar() {
-        return ORDEM_ALAS.stream().map(this::montar).flatMap(Optional::stream).toList();
+    public List<PlantaDto> listar(Espaco espaco) {
+        return espacoServico.plantas(espaco).stream().map(this::montar).flatMap(Optional::stream).toList();
     }
 
     @Transactional(readOnly = true)
-    public PlantaDto buscar(String ala) {
-        validarAla(ala);
-        return montar(ala).orElseThrow(() ->
+    public PlantaDto buscar(Espaco espaco, String codigo) {
+        return montar(planta(espaco, codigo)).orElseThrow(() ->
                 RegraNegocioException.naoEncontrado("Esta planta está com a imagem original do projeto."));
     }
 
     @Transactional(readOnly = true)
     public PlantaVersao arquivo(Integer id) {
-        return plantas.findById(id).orElseThrow(() -> RegraNegocioException.naoEncontrado("Imagem não encontrada."));
+        return versoes.findById(id).orElseThrow(() -> RegraNegocioException.naoEncontrado("Imagem não encontrada."));
     }
 
     @Transactional
-    public PlantaDto publicar(String ala, MultipartFile arquivo, int largura, int altura, String alt, Integer adminId) {
-        validarAla(ala);
+    public PlantaDto publicar(Espaco espaco, String codigo, MultipartFile arquivo, int largura, int altura,
+                              String alt, Integer adminId) {
+        Planta planta = planta(espaco, codigo);
         if (arquivo == null || arquivo.isEmpty()) {
             throw RegraNegocioException.invalido("Escolha uma imagem antes de publicar.");
         }
@@ -92,48 +94,54 @@ public class PlantaServico {
         String nome = Objects.requireNonNullElse(arquivo.getOriginalFilename(), "planta").trim();
         if (nome.length() > 255) nome = nome.substring(nome.length() - 255);
 
-        PlantaVersao nova = plantas.save(new PlantaVersao(ala, administradores.getReferenceById(adminId),
+        versoes.save(new PlantaVersao(planta, administradores.getReferenceById(adminId),
                 nome, tipoMime, conteudo, largura, altura, textoAlt));
-        plantas.flush();
+        versoes.flush();
 
         // Mantém só a nova e a imediatamente anterior
-        List<PlantaRepositorio.Resumo> versoes = plantas.findByAlaOrderByIdDesc(ala);
-        if (versoes.size() > 2) {
-            plantas.excluirAnterioresA(ala, versoes.get(1).getId());
+        List<PlantaVersaoRepositorio.Resumo> lista = versoes.findByPlantaIdOrderByIdDesc(planta.getId());
+        if (lista.size() > 2) {
+            versoes.excluirAnterioresA(planta.getId(), lista.get(1).getId());
         }
-        return montar(ala).orElseThrow();
+        return montar(planta).orElseThrow();
     }
 
     /** Descarta a imagem em uso; volta a anterior (ou a original do projeto). */
     @Transactional
-    public Optional<PlantaDto> voltarAnterior(String ala) {
-        validarAla(ala);
-        List<PlantaRepositorio.Resumo> versoes = plantas.findByAlaOrderByIdDesc(ala);
-        if (versoes.isEmpty()) {
+    public Optional<PlantaDto> voltarAnterior(Espaco espaco, String codigo) {
+        Planta planta = planta(espaco, codigo);
+        List<PlantaVersaoRepositorio.Resumo> lista = versoes.findByPlantaIdOrderByIdDesc(planta.getId());
+        if (lista.isEmpty()) {
             throw RegraNegocioException.conflito("Não há versão anterior guardada para este mapa.");
         }
-        plantas.excluirPorId(versoes.get(0).getId());
-        return montar(ala);
+        versoes.excluirPorId(lista.get(0).getId());
+        return montar(planta);
     }
 
     /** Remove as imagens enviadas e o histórico: volta a imagem original do projeto. */
     @Transactional
-    public void restaurarOriginal(String ala) {
-        validarAla(ala);
-        plantas.excluirPorAla(ala);
+    public void restaurarOriginal(Espaco espaco, String codigo) {
+        versoes.excluirPorPlanta(planta(espaco, codigo).getId());
     }
 
-    private Optional<PlantaDto> montar(String ala) {
-        List<PlantaRepositorio.Resumo> versoes = plantas.findByAlaOrderByIdDesc(ala);
-        if (versoes.isEmpty()) return Optional.empty();
+    private Planta planta(Espaco espaco, String codigo) {
+        if (codigo == null || codigo.isBlank()) {
+            throw RegraNegocioException.naoEncontrado("Informe a planta.");
+        }
+        return espacoServico.planta(espaco, codigo);
+    }
 
-        PlantaRepositorio.Resumo atual = versoes.get(0);
-        PlantaDto.Anterior anterior = versoes.size() > 1
-                ? new PlantaDto.Anterior(null, versoes.get(1).getNomeArquivo(),
-                        comFuso(versoes.get(1).getCriadoEm()), urlArquivo(versoes.get(1).getId()))
+    private Optional<PlantaDto> montar(Planta planta) {
+        List<PlantaVersaoRepositorio.Resumo> lista = versoes.findByPlantaIdOrderByIdDesc(planta.getId());
+        if (lista.isEmpty()) return Optional.empty();
+
+        PlantaVersaoRepositorio.Resumo atual = lista.get(0);
+        PlantaDto.Anterior anterior = lista.size() > 1
+                ? new PlantaDto.Anterior(null, lista.get(1).getNomeArquivo(),
+                        comFuso(lista.get(1).getCriadoEm()), urlArquivo(lista.get(1).getId()))
                 : PlantaDto.Anterior.imagemOriginal();
 
-        return Optional.of(new PlantaDto(ala, atual.getId(), atual.getNomeArquivo(), atual.getLargura(),
+        return Optional.of(new PlantaDto(planta.getCodigo(), atual.getId(), atual.getNomeArquivo(), atual.getLargura(),
                 atual.getAltura(), atual.getTextoAlternativo(), comFuso(atual.getCriadoEm()),
                 urlArquivo(atual.getId()), anterior));
     }
@@ -144,12 +152,6 @@ public class PlantaServico {
 
     private static OffsetDateTime comFuso(LocalDateTime data) {
         return data.atZone(ZoneId.systemDefault()).toOffsetDateTime();
-    }
-
-    private static void validarAla(String ala) {
-        if (!ALAS.contains(ala)) {
-            throw RegraNegocioException.naoEncontrado("Planta desconhecida: " + ala + ".");
-        }
     }
 
     /** Reconhece PNG, JPEG e WEBP pelos primeiros bytes do arquivo. */

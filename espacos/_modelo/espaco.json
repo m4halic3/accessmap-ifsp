@@ -1,0 +1,55 @@
+{
+    "nome": "Prefeitura Municipal (exemplo)",
+    "tipo": "prefeitura",
+    "genero": "f",
+    "cidade": "Cidade Exemplo - SP",
+    "padrao": false,
+
+    "textos": {
+        "localizacao": "Prefeitura Municipal - Centro",
+        "exemploLocal": "Ex: Recepção, Protocolo, Rampa da entrada...",
+        "exemploFiltroLocal": "Ex: Recepção, Protocolo...",
+        "exemploNomeLocal": "Ex: Recepção",
+        "exemploAltPlanta": "Ex: Planta da prefeitura com o novo anexo",
+        "tituloMapaLocalizacao": "Mapa de localização da Prefeitura Municipal"
+    },
+
+    "destaques": ["Prédio Principal", "Anexo de Atendimento", "Estacionamento", "Praça Central"],
+
+    "plantas": [
+        {
+            "codigo": "terreo",
+            "nome": "Térreo",
+            "rotuloCurto": "Térreo",
+            "descricao": "Térreo (área externa e prédios)",
+            "principal": true,
+            "largura": 1200,
+            "altura": 800,
+            "imagem": "plantas/terreo.svg",
+            "proporcaoArte": 1.5,
+            "alt": "Planta do térreo com o prédio principal, o anexo de atendimento, a praça e o estacionamento."
+        },
+        {
+            "codigo": "primeiro_andar",
+            "nome": "1º andar do Prédio Principal",
+            "rotuloCurto": "1º andar",
+            "descricao": "1º andar (Prédio Principal)",
+            "andar": "1º andar",
+            "bloco": "principal",
+            "prefixoNome": "1º andar",
+            "largura": 1200,
+            "altura": 800,
+            "imagem": "plantas/primeiro_andar.svg",
+            "proporcaoArte": 1.5,
+            "alt": "Planta do 1º andar do prédio principal, com salas, escada e elevador."
+        }
+    ],
+
+    "areas": [
+        { "codigo": "principal",      "rotulo": "Prédio Principal",      "cor": "#a14a35", "icone": "fa-building-columns", "predio": "Prédio Principal",     "oQue": "Administração" },
+        { "codigo": "atendimento",    "rotulo": "Anexo de Atendimento",  "cor": "#2f6aa3", "icone": "fa-users",            "predio": "Anexo de Atendimento", "oQue": "Atendimento ao público" },
+        { "codigo": "estacionamento", "rotulo": "Estacionamento",        "cor": "#455a64", "icone": "fa-square-parking" },
+        { "codigo": "praca",          "rotulo": "Praça",                 "cor": "#3f7d3a", "icone": "fa-tree" },
+        { "codigo": "externa",        "rotulo": "Área externa",          "cor": "#607d8b", "icone": "fa-location-dot" }
+    ]
+}

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#44025c">
-    <title>Mapa do Campus - AccessMap</title>
+    <title data-espaco-texto="Mapa {do} {Tipo} - AccessMap">Mapa do Campus - AccessMap</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap">
@@ -35,23 +35,20 @@
                 <span class="alca-barra" aria-hidden="true"></span>
                 <span class="alca-texto">Ver locais e filtros</span>
             </button>
-            <h1 class="sr-only">Mapa de acessibilidade do campus</h1>
+            <h1 class="sr-only" data-espaco-texto="Mapa de acessibilidade {do} {tipo}">Mapa de acessibilidade do campus</h1>
             <h2 id="titulo-resultados">Resultados (Mapa Geral)</h2>
             <p id="contador-resultados" class="contador-resultados" aria-live="polite"></p>
 
             <div class="search-container">
-                <label for="search-input" class="sr-only">Pesquisar local no campus</label>
+                <label for="search-input" class="sr-only" data-espaco-texto="Pesquisar local {no} {tipo}">Pesquisar local no campus</label>
                 <i class="fas fa-search search-icon" aria-hidden="true"></i>
                 <input type="search" id="search-input" placeholder="Buscar local (ex.: biblioteca)" autocomplete="off" enterkeyhint="search" onkeydown="handleBuscaKeydown(event)">
             </div>
 
             <div class="fieldset-reset" role="group" aria-labelledby="titulo-filtro-ala">
                 <span id="titulo-filtro-ala">Mapa exibido</span>
-                <div class="type-buttons" id="seletor-alas">
-                    <button type="button" class="btn-type active" data-ala="todos" aria-pressed="true" onclick="filtrarAla('todos')">Mapa Geral</button>
-                    <button type="button" class="btn-type" data-ala="edificacoes" aria-pressed="false" onclick="filtrarAla('edificacoes')">Subsolo Edif.</button>
-                    <button type="button" class="btn-type" data-ala="mecanica" aria-pressed="false" onclick="filtrarAla('mecanica')">Subsolo Mec.</button>
-                </div>
+                <!-- Um botão por planta do espaço (espacos/<slug>/espaco.json), criado por mapa.js -->
+                <div class="type-buttons" id="seletor-alas"></div>
 
                 <button type="button" class="btn-limpar-mapa" onclick="resetarMapaCompleto()">
                     <i class="fas fa-eraser" aria-hidden="true"></i> Limpar mapa e filtros
@@ -80,7 +77,7 @@
             <div id="lista-lugares" role="region" aria-label="Lista de locais encontrados"></div>
         </div>
 
-        <div id="map" role="region" aria-label="Mapa interativo do campus"></div>
+        <div id="map" role="region" aria-label="Mapa interativo do campus" data-espaco-aria="Mapa interativo {do} {tipo}"></div>
     </main>
 
     <div vw class="enabled">
@@ -102,6 +99,7 @@
     <script src="assets/js/acessibilidade.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="assets/js/api.js"></script>
+    <script src="assets/js/espaco.js"></script>
     <script src="assets/js/plantas-storage.js"></script>
     <script src="assets/js/icones-lugares.js"></script>
     <script src="assets/js/mapa.js"></script>

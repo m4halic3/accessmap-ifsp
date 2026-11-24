@@ -25,6 +25,8 @@
 - [Fluxos do Sistema](#fluxos-do-sistema)
 - [Acesso Administrativo (Ambiente de Avaliação)](#acesso-administrativo-ambiente-de-avaliação)
 - [Como Executar Localmente](#como-executar-localmente)
+- [Adaptando para Outro Espaço Público](#adaptando-para-outro-espaço-público)
+- [Implantação no Servidor](#implantação-no-servidor)
 - [Acessibilidade](#acessibilidade)
 - [Roadmap](#roadmap)
 - [Autoria e Desenvolvimento](#autoria-e-desenvolvimento)
@@ -40,7 +42,7 @@ Esta iniciativa surge da necessidade de oferecer suporte e orientação a alunos
 
 O objetivo central vai além de facilitar a locomoção física: o AccessMap também contempla o suporte a dificuldades auditivas e visuais, unindo mapeamento geográfico, categorização de barreiras e um canal aberto de comunicação com a comunidade.
 
-Embora o foco atual do projeto seja exclusivamente o campus do IFSP Itapetininga, pretende-se futuramente avaliar uma versão adaptável do AccessMap para outros espaços públicos, conforme detalhado no [Roadmap](#roadmap).
+O projeto nasceu no campus do IFSP Itapetininga e já pode ser adaptado para outros espaços públicos (prefeituras, escolas, parques...) sem mexer no código: cada lugar é um pacote de configuração com as suas plantas, cores e textos — ver [Adaptando para Outro Espaço Público](#adaptando-para-outro-espaço-público).
 
 ## Motivação
 
@@ -155,13 +157,12 @@ accessmap-ifsp/
 │   │   ├── style.css          # CSS compilado de scss/style.scss (todas as páginas)
 │   │   └── admin.css          # CSS compilado de scss/admin.scss (só admin.html)
 │   ├── scss/                  # Código-fonte dos estilos (partials _*.scss)
-│   ├── data/
-│   │   └── locais-originais.json # Lista original de locais (popula o banco e serve de reserva)
 │   ├── images/                # Logos, ícones, fotos da equipe, slides
 │   │   ├── planta-*.png       # Desenhos originais das plantas (fonte, 1920x1080)
 │   │   └── plantas/<ala>/     # Plantas usadas no mapa: base.webp + hd/ (alta resolução)
 │   └── js/
-│       ├── api.js             # Chamadas à API (fetch) e sessão do administrador
+│       ├── api.js             # Chamadas à API (fetch), sessão do administrador e espaço atual
+│       ├── espaco.js          # Configuração do espaço (plantas, áreas, textos) e textos das páginas
 │       ├── acessibilidade.js  # A+/A-, alto contraste e VLibras (todas as páginas)
 │       ├── script.js          # Menu, carrossel e formulário público (index.html)
 │       ├── authentication.js  # Login e proteção das páginas do administrador
@@ -185,6 +186,12 @@ accessmap-ifsp/
 │       └── resources/
 │           ├── application.properties
 │           └── db/migration/  # Scripts SQL do Flyway (criação das tabelas)
+├── espacos/                   # Um "pacote" por espaço público atendido
+│   ├── index.json             # Espaço padrão (usado quando o site roda sem o back-end)
+│   ├── ifsp-itapetininga/     # IFSP Campus Itapetininga
+│   │   ├── espaco.json        # Nome, plantas, áreas (cores/ícones), destaques e textos
+│   │   └── locais.json        # Lista original de locais (popula o banco e serve de reserva)
+│   └── _modelo/               # Modelo para criar um espaço novo (ignorado pelo servidor)
 ├── scripts/
 │   └── gerar-plantas-hd.sh    # Gera base.webp e os pedaços HD de uma planta
 ├── docker-compose.yml         # Banco de dados MariaDB
@@ -192,7 +199,7 @@ accessmap-ifsp/
 ├── login.html                 # Login exclusivo do administrador
 ├── dashboard.html             # Painel administrativo (protegido)
 ├── admin.html                 # Edição de pontos do mapa (protegido)
-├── mapa.html                  # Mapa interativo do campus
+├── mapa.html                  # Mapa interativo do espaço
 ├── README.md
 └── LICENSE
 ```
@@ -219,7 +226,7 @@ flowchart LR
     DB[("MariaDB\naccessmap")]
 
     F -- "POST /colaboracoes" --> API
-    M -- "GET /pontos, GET /plantas" --> API
+    M -- "GET /espacos, /pontos, /plantas" --> API
     L -- "POST /auth/login → token" --> API
     D -- "GET / DELETE /colaboracoes (token)" --> SEC
     A -- "POST / PUT / DELETE /pontos, /plantas (token)" --> SEC
@@ -230,13 +237,14 @@ flowchart LR
 - **Camadas do back-end:** `web` (controllers) → `servico` (regras de negócio) → `repositorio` (Spring Data JPA) → banco. Os erros de validação e de regra de negócio voltam em JSON (`{ "mensagem": ... }`) e o front-end mostra a mensagem ao usuário.
 - **Validação nas duas pontas:** o front-end valida para dar retorno imediato e o servidor valida de novo antes de gravar (tamanhos, campos obrigatórios, tipos permitidos, nomes repetidos, formato real das imagens).
 - **Autenticação:** o login confere a senha com o hash BCrypt da tabela `administrador` e devolve um token JWT, que o navegador guarda no `sessionStorage` e envia no cabeçalho `Authorization`. As rotas de escrita (e a leitura das colaborações) exigem o token.
-- **Carga inicial:** na primeira execução, com o banco vazio, o servidor cria a conta de administrador e cadastra os 135 locais de `assets/data/locais-originais.json`.
-- **Reserva:** se a API não responder, o mapa público usa essa mesma lista original, só para leitura.
+- **Vários espaços públicos:** cada espaço (um campus, uma prefeitura, um parque...) é um pacote em `espacos/<slug>/` com as suas plantas, áreas, textos e lista inicial de locais. Locais, relatos e imagens de planta ficam separados por espaço no banco. A página escolhe o espaço com `?espaco=<slug>` na URL (fica lembrado no navegador); sem isso, vale o espaço padrão. Ver [Adaptando para Outro Espaço Público](#adaptando-para-outro-espaço-público).
+- **Carga inicial:** a cada inicialização, o servidor cria a conta de administrador (se não houver nenhuma), sincroniza os pacotes de `espacos/` com o banco e cadastra a lista original (`locais.json`) dos espaços que ainda não têm locais — no IFSP, os 135 locais originais.
+- **Reserva:** se a API não responder (servidor fora do ar, ou o site publicado sem o back-end, como no GitHub Pages), o mapa público lê o pacote do espaço direto dos arquivos, só para leitura.
 
 | Ainda no navegador | Uso |
 |---|---|
 | `sessionStorage` (`accessmap_token`) | Token de sessão do administrador; expira ao fechar o navegador ou após 8 horas |
-| `localStorage` | Preferências de alto contraste (`altoContrasteState`) e tamanho da fonte (`accessmap_nivel_fonte`) |
+| `localStorage` | Preferências de alto contraste (`altoContrasteState`) e tamanho da fonte (`accessmap_nivel_fonte`), e o espaço escolhido (`accessmap_espaco`) |
 
 ### Rotas da API
 
@@ -244,6 +252,9 @@ flowchart LR
 |---|---|---|
 | `POST /api/auth/login` | Público | Login: `{ usuario, senha }` → `{ token, expiraEm, usuario }` |
 | `GET /api/auth/sessao` | Admin | Confere se o token ainda é válido |
+| `GET /api/espacos` | Público | Lista os espaços públicos atendidos |
+| `GET /api/espacos/padrao` | Público | Configuração do espaço padrão |
+| `GET /api/espacos/{slug}` | Público | Configuração de um espaço (plantas, áreas, textos — mesmo formato do `espaco.json`) |
 | `GET /api/pontos` | Público | Lista os locais do mapa |
 | `POST /api/pontos` | Admin | Cadastra um local |
 | `PUT /api/pontos/{id}` | Admin | Atualiza um local |
@@ -260,11 +271,14 @@ flowchart LR
 | `POST /api/plantas/{ala}/voltar` | Admin | Volta ao mapa anterior |
 | `DELETE /api/plantas/{ala}` | Admin | Restaura a imagem original |
 
-`{ala}` é `todos` (Mapa Geral), `edificacoes` ou `mecanica`.
+Todas as rotas de locais, relatos e plantas aceitam `?espaco=<slug>`; sem ele, valem para o espaço padrão. `{ala}` é o código de uma planta do espaço (no IFSP: `todos` para o Mapa Geral, `edificacoes` ou `mecanica`). Um local, relato ou planta de outro espaço responde como inexistente (404).
 
 ## Modelo de Dados
 
-O modelo relacional, planejado desde a v1, está implementado no MariaDB. As tabelas são criadas pelo Flyway a partir de `backend/src/main/resources/db/migration/V1__esquema_inicial.sql`.
+O modelo relacional, planejado desde a v1, está implementado no MariaDB. As tabelas são criadas e atualizadas pelo Flyway a partir dos scripts em `backend/src/main/resources/db/migration/`:
+
+- `V1__esquema_inicial.sql` — administrador, categorias, locais, relatos e imagens de planta;
+- `V2__multiplos_espacos.sql` — espaços, plantas e áreas. Liga todos os dados que já existiam ao IFSP (espaço nº 1) sem perder nada e retira do esquema as regras fixas do campus (alas, andares e blocos).
 
 ### Visão Geral das Entidades
 
@@ -272,7 +286,10 @@ O modelo relacional, planejado desde a v1, está implementado no MariaDB. As tab
 - **PontoAcessibilidade** — um local específico do campus que foi mapeado (ex: "Rampa - Bloco A"), com sua categoria, coordenadas e status.
 - **Colaboracao** — um relato ou sugestão enviado pelo público através do formulário, podendo opcionalmente referenciar um Ponto de Acessibilidade já existente.
 - **CategoriaAcessibilidade** — tabela de apoio que padroniza as categorias disponíveis (física, auditiva, visual, etc.), permitindo adicionar novas categorias sem alterar código.
-- **PlantaVersao** — imagem de planta enviada pelo administrador para uma ala do mapa (a versão em uso e a anterior).
+- **PlantaVersao** — imagem de planta enviada pelo administrador para substituir a imagem original de uma planta (a versão em uso e a anterior).
+- **Espaco** — espaço público atendido (ex.: um campus, uma prefeitura). Todo local e todo relato pertence a um espaço.
+- **Planta** — imagem de fundo do mapa de um espaço (ex.: mapa geral, subsolo, 1º andar), com a sua área de coordenadas.
+- **Area** — bloco, setor ou ala de um espaço; define a cor (onde fica) e o ícone padrão dos locais dela.
 
 ### Diagrama Entidade-Relacionamento
 
@@ -281,6 +298,12 @@ erDiagram
     ADMINISTRADOR ||--o{ PONTO_ACESSIBILIDADE : gerencia
     ADMINISTRADOR ||--o{ COLABORACAO : modera
     ADMINISTRADOR ||--o{ PLANTA_VERSAO : publica
+    ESPACO ||--o{ PLANTA : tem
+    ESPACO ||--o{ AREA : tem
+    ESPACO ||--o{ PONTO_ACESSIBILIDADE : contem
+    ESPACO ||--o{ COLABORACAO : recebe
+    PLANTA ||--o{ PONTO_ACESSIBILIDADE : "aparece em"
+    PLANTA ||--o{ PLANTA_VERSAO : "imagem substituida por"
     CATEGORIA_ACESSIBILIDADE ||--o{ PONTO_ACESSIBILIDADE : classifica
     CATEGORIA_ACESSIBILIDADE ||--o{ COLABORACAO : classifica
     PONTO_ACESSIBILIDADE ||--o{ COLABORACAO : "referenciado por (opcional)"
@@ -303,15 +326,54 @@ erDiagram
         string cor_identificacao
     }
 
+    ESPACO {
+        int id PK
+        string slug
+        string nome
+        string tipo
+        string cidade
+        boolean padrao
+        boolean ativo
+        text configuracao
+        datetime criado_em
+    }
+
+    PLANTA {
+        int id PK
+        int espaco_id FK
+        string codigo
+        string nome
+        string rotulo_curto
+        boolean principal
+        string andar_rotulo
+        string bloco
+        int largura
+        int altura
+        string imagem_url
+        int ordem
+    }
+
+    AREA {
+        int id PK
+        int espaco_id FK
+        string codigo
+        string rotulo
+        string cor
+        string icone
+        string predio
+        int ordem
+    }
+
     PONTO_ACESSIBILIDADE {
         int id PK
+        int espaco_id FK
+        int planta_id FK
         int categoria_id FK
         int administrador_id FK
         string nome
         string descricao
         string tipo
         string area
-        string andar
         string bloco
         boolean subponto
         int pos_x
@@ -323,6 +385,7 @@ erDiagram
 
     COLABORACAO {
         int id PK
+        int espaco_id FK
         int categoria_id FK
         int ponto_id FK
         int administrador_id FK
@@ -336,7 +399,7 @@ erDiagram
 
     PLANTA_VERSAO {
         int id PK
-        string ala
+        int planta_id FK
         int administrador_id FK
         string nome_arquivo
         string tipo_mime
@@ -384,27 +447,29 @@ erDiagram
 | Campo | Tipo | Obrigatório | Descrição |
 |---|---|---|---|
 | `id` | INT (PK) | Sim | Identificador único do ponto mapeado |
+| `espaco_id` | INT (FK → espaco.id) | Sim | Espaço a que o local pertence |
+| `planta_id` | INT (FK → planta.id) | Sim | Planta em que o local aparece no mapa |
 | `categoria_id` | INT (FK → categoria_acessibilidade.id) | Só se `tipo` = `acessibilidade` | Categoria de acessibilidade do ponto |
 | `administrador_id` | INT (FK → administrador.id) | Não | Último administrador que cadastrou/editou o ponto |
-| `nome` | VARCHAR(150) | Sim | Nome do ponto (ex: "Rampa de acesso - Bloco A") — único, sem diferenciar maiúsculas e acentos |
+| `nome` | VARCHAR(150) | Sim | Nome do ponto (ex: "Rampa de acesso - Bloco A") — único dentro do espaço, sem diferenciar maiúsculas e acentos |
 | `descricao` | TEXT | Não | Descrição detalhada do ponto e suas condições |
 | `tipo` | VARCHAR(20) | Sim | `geral` (ponto de interesse), `acessibilidade` ou `alerta` |
 | `area` | VARCHAR(40) | Sim | Área/uso do local, que define cor e ícone (ex: `salas_aula`, `rampa`, `informatica`) |
-| `andar` | VARCHAR(10) | Sim | `terreo` ou `subsolo` |
-| `bloco` | VARCHAR(40) | Não | Bloco a que pertence (`informatica`, `mecanica`, `edificacoes`, `administrativo`) |
+| `bloco` | VARCHAR(40) | Não | Área (bloco/setor) a que pertence — um código da tabela `area` do mesmo espaço (no IFSP: `informatica`, `mecanica`, `edificacoes`, `administrativo`) |
 | `subponto` | BOOLEAN | Sim | `true` para salas e pontos internos (aparecem com mais zoom) |
 | `pos_x` / `pos_y` | INT | Sim | Posição na planta, capturada pelo clique no mapa |
 | `status` | VARCHAR(20) | Sim | Situação do ponto (`ativo`, `em_manutencao`, `inativo`) |
 | `criado_em` | DATETIME | Sim | Data de cadastro do ponto |
 | `atualizado_em` | DATETIME | Não | Data da última atualização do ponto |
 
-> Como o mapa usa as plantas do campus (e não um mapa geográfico), a posição é guardada em coordenadas da planta (`pos_x`/`pos_y`) no lugar de latitude/longitude. Na API, os campos seguem os nomes usados pelo front-end: `tipo` vem como `fisica`/`auditiva` (o código da categoria), `geral` ou `alerta`; `categoria` = `area`; `bloco_pai` = `bloco`; `x`/`y` = `pos_x`/`pos_y`.
+> Como o mapa usa as plantas do campus (e não um mapa geográfico), a posição é guardada em coordenadas da planta (`pos_x`/`pos_y`) no lugar de latitude/longitude. Na API, os campos seguem os nomes usados pelo front-end: `tipo` vem como `fisica`/`auditiva` (o código da categoria), `geral` ou `alerta`; `categoria` = `area`; `bloco_pai` = `bloco`; `planta` = código da planta; `x`/`y` = `pos_x`/`pos_y`.
 
 #### Tabela `colaboracao`
 
 | Campo | Tipo | Obrigatório | Descrição |
 |---|---|---|---|
 | `id` | INT (PK) | Sim | Identificador único da colaboração/relato |
+| `espaco_id` | INT (FK → espaco.id) | Sim | Espaço sobre o qual o relato foi enviado |
 | `categoria_id` | INT (FK → categoria_acessibilidade.id) | Sim | Categoria de acessibilidade relatada |
 | `ponto_id` | INT (FK → ponto_acessibilidade.id) | Não | Ponto de acessibilidade relacionado, se já cadastrado |
 | `administrador_id` | INT (FK → administrador.id) | Não | Administrador responsável pela moderação/exclusão do relato |
@@ -422,7 +487,7 @@ erDiagram
 | Campo | Tipo | Obrigatório | Descrição |
 |---|---|---|---|
 | `id` | INT (PK) | Sim | Identificador da versão |
-| `ala` | VARCHAR(20) | Sim | Planta a que se refere: `todos`, `edificacoes` ou `mecanica` |
+| `planta_id` | INT (FK → planta.id) | Sim | Planta cuja imagem foi substituída |
 | `administrador_id` | INT (FK → administrador.id) | Não | Quem publicou |
 | `nome_arquivo` | VARCHAR(255) | Sim | Nome do arquivo enviado |
 | `tipo_mime` | VARCHAR(30) | Sim | `image/png`, `image/jpeg` ou `image/webp` (identificado pelo conteúdo do arquivo) |
@@ -431,7 +496,56 @@ erDiagram
 | `conteudo` | LONGBLOB | Sim | A imagem (até 25 MB) |
 | `criado_em` | DATETIME | Sim | Data da publicação |
 
-> A versão em uso é a de maior `id` da ala; a anterior é guardada para **Voltar ao mapa anterior**. Ao publicar, versões mais antigas que essas duas são apagadas. Sem nenhuma linha para a ala, o mapa usa a imagem original do projeto.
+> A versão em uso é a de maior `id` da planta; a anterior é guardada para **Voltar ao mapa anterior**. Ao publicar, versões mais antigas que essas duas são apagadas. Sem nenhuma linha para a planta, o mapa usa a imagem original do pacote do espaço.
+
+#### Tabela `espaco`
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `id` | INT (PK) | Sim | Identificador do espaço |
+| `slug` | VARCHAR(60) | Sim | Nome da pasta do pacote (ex: `ifsp-itapetininga`) — único; usado em `?espaco=` |
+| `nome` | VARCHAR(150) | Sim | Nome exibido (ex: "IFSP — Campus Itapetininga") |
+| `tipo` | VARCHAR(40) | Sim | Tipo de lugar, usado nos textos das páginas (ex: `campus`, `prefeitura`) |
+| `cidade` | VARCHAR(100) | Não | Cidade |
+| `padrao` | BOOLEAN | Sim | Espaço aberto quando a página não informa `?espaco=` (sempre exatamente um) |
+| `ativo` | BOOLEAN | Sim | Espaço disponível no site |
+| `configuracao` | TEXT | Não | Textos da interface, mapa de localização e destaques, em JSON |
+| `criado_em` | DATETIME | Sim | Data de cadastro |
+
+#### Tabela `planta`
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `id` | INT (PK) | Sim | Identificador da planta |
+| `espaco_id` | INT (FK → espaco.id) | Sim | Espaço a que pertence |
+| `codigo` | VARCHAR(40) | Sim | Código usado na API e nos locais (único no espaço) |
+| `nome` / `rotulo_curto` / `descricao` | VARCHAR | Sim/Sim/Não | Nome completo, texto do botão e nome no modal de imagem |
+| `principal` | BOOLEAN | Sim | Planta aberta primeiro (a busca nela procura em todas as plantas) |
+| `andar_rotulo` | VARCHAR(40) | Não | Texto mostrado ao lado dos locais desta planta (ex: "subsolo") |
+| `prefixo_nome` | VARCHAR(100) | Não | Prefixo omitido nos nomes do mapa (ex: "Subsolo B") |
+| `bloco` | VARCHAR(40) | Não | Área fixa dos locais cadastrados nesta planta (ex: o subsolo de um bloco) |
+| `largura` / `altura` | INT | Sim | Área de coordenadas em que os locais são posicionados |
+| `imagem_url` / `hd_url` | VARCHAR(300) | Sim/Não | Imagem base e pasta dos pedaços em alta resolução |
+| `proporcao_arte` | DOUBLE | Não | Proporção do desenho original (para avisar quando a imagem nova é diferente) |
+| `texto_alternativo` | VARCHAR(300) | Não | Descrição para leitores de tela |
+| `ordem` | INT | Sim | Ordem dos botões no mapa |
+
+#### Tabela `area`
+
+| Campo | Tipo | Obrigatório | Descrição |
+|---|---|---|---|
+| `id` | INT (PK) | Sim | Identificador da área |
+| `espaco_id` | INT (FK → espaco.id) | Sim | Espaço a que pertence |
+| `codigo` | VARCHAR(40) | Sim | Código usado nos locais (`categoria`/`bloco_pai`) — único no espaço |
+| `rotulo` | VARCHAR(100) | Sim | Nome na legenda e nas descrições (ex: "Bloco A — Informática") |
+| `cor` | VARCHAR(7) | Sim | Cor da área em hexadecimal |
+| `icone` | VARCHAR(50) | Sim | Ícone padrão (Font Awesome, ex: `fa-computer`) |
+| `predio` | VARCHAR(150) | Não | Nome do local que representa o próprio prédio (ex: "Bloco A") |
+| `o_que` | VARCHAR(100) | Não | O que os locais da área são, quando o nome não diz (ex: "Informática") |
+| `na_legenda` | BOOLEAN | Sim | Se aparece na legenda de cores |
+| `ordem` | INT | Sim | Ordem na legenda e no formulário |
+
+> Espaços, plantas e áreas vêm dos arquivos `espacos/<slug>/espaco.json` e são sincronizados a cada inicialização do servidor. Plantas que saem do arquivo não são apagadas do banco, porque podem ter locais ligados a elas.
 
 ### Migração da v1 para o Banco de Dados
 
@@ -539,7 +653,7 @@ As versões em alta resolução foram obtidas ampliando os desenhos originais (`
 # 1. Ampliar 4x com IA (binário realesrgan-ncnn-vulkan, da página de releases do projeto)
 realesrgan-ncnn-vulkan -i assets/images/planta-campus.png -o campus-x4.png -n realesrgan-x4plus -t 64
 
-# 2. Gerar base + pedaços HD (a área de coordenadas é a de plantas[ala] no mapa.js)
+# 2. Gerar base + pedaços HD (a área de coordenadas é a "largura"/"altura" da planta no espaco.json)
 scripts/gerar-plantas-hd.sh todos campus-x4.png 1500 1056
 scripts/gerar-plantas-hd.sh edificacoes edificacoes-x4.png 1200 800
 scripts/gerar-plantas-hd.sh mecanica mecanica-x4.png 1200 800
@@ -556,11 +670,73 @@ scripts/gerar-plantas-hd.sh mecanica mecanica-x4.png 1200 800
 ### Testando a atualização da imagem do mapa
 
 1. Faça login e clique em **Ir para Edição do Mapa** (`admin.html`).
-2. Clique em **Atualizar imagem do mapa**, escolha qual planta será trocada (Mapa Geral ou um dos subsolos) e selecione uma imagem PNG, JPG ou WEBP (até 25 MB, mínimo 300×300 px). Para os pontos continuarem no lugar, use a mesma proporção e o mesmo enquadramento da planta atual; para ficar nítida no zoom, envie em alta resolução (ideal: 6000 px de largura no Mapa Geral e 4800 px nos subsolos).
+2. Clique em **Atualizar imagem do mapa**, escolha qual planta será trocada e selecione uma imagem PNG, JPG ou WEBP (até 25 MB, mínimo 300×300 px). Para os pontos continuarem no lugar, use a mesma proporção e o mesmo enquadramento da planta atual; para ficar nítida no zoom, envie em alta resolução — o modal mostra a largura ideal da planta escolhida (no IFSP: 6000 px no Mapa Geral e 4800 px nos subsolos).
 3. Clique em **Publicar novo mapa** e confirme. A nova imagem é enviada ao servidor e aparece na hora no admin e em `mapa.html`, para qualquer visitante.
 4. Para desfazer, abra o mesmo modal e use **Voltar ao mapa anterior** ou **Restaurar original**.
 
 > As imagens enviadas ficam guardadas no banco de dados (tabela `planta_versao`).
+
+## Adaptando para Outro Espaço Público
+
+O AccessMap não está preso ao IFSP: tudo o que é próprio de um lugar fica num **pacote** dentro de `espacos/`, sem mexer no código. O visual, a responsividade e as funcionalidades são os mesmos para qualquer espaço.
+
+```
+espacos/<slug>/
+├── espaco.json      # nome, tipo, plantas, áreas (cores e ícones), destaques e textos
+├── locais.json      # lista inicial de locais (opcional)
+└── plantas/         # imagens das plantas (opcional: podem ficar em outro lugar)
+```
+
+### Passo a passo
+
+1. **Copie o modelo**, dando à pasta o identificador do espaço (letras minúsculas, números e hífens):
+   ```bash
+   cp -r espacos/_modelo espacos/prefeitura-centro
+   ```
+2. **Troque as plantas** em `espacos/prefeitura-centro/plantas/` pelas do seu espaço (PNG, JPG, WEBP ou SVG). Uma planta pode ser o mapa geral, um andar, um subsolo, um anexo...
+3. **Edite o `espaco.json`:**
+   - `nome`, `tipo` (ex.: `prefeitura`, usado em frases como "Mapa da Prefeitura") e, se o tipo for feminino e não estiver na lista do `espaco.js`, `"genero": "f"`;
+   - `plantas`: para cada planta, `codigo`, `nome`, `rotuloCurto` (texto do botão), `largura`/`altura` (a área de coordenadas — use a proporção da imagem, ex.: 1200×800 para uma imagem 3:2) e `imagem`. Marque uma com `"principal": true`. Plantas de um andar ou subsolo podem ter `"andar"` (texto exibido ao lado dos locais) e `"bloco"` (área fixa de quem é cadastrado nelas);
+   - `areas`: os blocos/setores, cada um com `codigo`, `rotulo`, `cor` (ex.: `#2f6aa3`) e `icone` ([Font Awesome 6](https://fontawesome.com/search?ic=free), ex.: `fa-book`). Use `"predio"` com o nome do local que representa o prédio;
+   - `textos`: exemplos dos formulários e o endereço exibido na página inicial; `mapaLocalizacao`: link de incorporação do Google Maps (opcional — sem ele, o mapa busca pelo nome e pela cidade);
+   - `destaques`: locais que aparecem primeiro na lista lateral.
+4. **Opcional — `locais.json`:** a lista inicial de locais, cadastrada no banco na primeira vez que o servidor encontra o espaço. Cada local tem `nome`, `tipo` (`geral`, `fisica`, `auditiva` ou `alerta`), `categoria`, `planta`, `bloco_pai`, `x`, `y` e `subponto`. Também dá para começar vazio e cadastrar tudo pelo admin, clicando no mapa.
+5. **Reinicie o servidor.** No log aparece `Novo espaço encontrado: prefeitura-centro`. Se algo estiver errado no `espaco.json`, o servidor não sobe e o log diz exatamente o quê (ex.: cor fora do formato, planta sem imagem).
+6. **Acesse** `http://<servidor>/mapa.html?espaco=prefeitura-centro`. O espaço fica lembrado no navegador, então os links entre as páginas (inicial, mapa, login, admin, dashboard) continuam nele.
+
+Para que um espaço abra **sem** `?espaco=`, marque `"padrao": true` no `espaco.json` dele (e `false` nos outros). Se o site também for publicado sem o back-end (ex.: GitHub Pages), atualize `espacos/index.json` com o espaço padrão.
+
+> **Coordenadas:** no mapa, `y` cresce de baixo para cima (o canto inferior esquerdo da planta é `x: 0, y: 0`). O jeito mais fácil de acertar as posições é cadastrar os locais pelo admin, clicando no mapa.
+>
+> **Dados separados:** cada espaço tem os seus próprios locais, relatos e imagens de planta. O mesmo nome de local pode existir em espaços diferentes, e um espaço nunca enxerga nem altera os dados de outro. A conta de administrador vale para todos os espaços.
+
+## Implantação no Servidor
+
+O servidor precisa de **Java 21** e de um **MariaDB** (ou MySQL). O back-end entrega o site e a API juntos, numa única porta.
+
+1. **Gere o `.jar`** (na pasta `backend/`): `./mvnw package`. Copie para o servidor o `target/accessmap-2.0.0.jar` junto com as páginas (`*.html`), `assets/` e `espacos/` — o `.jar` serve o site a partir de `ACCESSMAP_FRONTEND_DIR`.
+2. **Configure as variáveis de ambiente** antes da primeira execução:
+
+   | Variável | Em produção |
+   |---|---|
+   | `ACCESSMAP_DB_URL` / `ACCESSMAP_DB_USUARIO` / `ACCESSMAP_DB_SENHA` | Banco e usuário próprios (não use as senhas do `docker-compose.yml`) |
+   | `ACCESSMAP_ADMIN_USUARIO` / `ACCESSMAP_ADMIN_SENHA` | Conta de administrador criada na primeira execução |
+   | `ACCESSMAP_JWT_SEGREDO` | Segredo fixo de pelo menos 32 caracteres (ex.: `openssl rand -base64 48`). Sem ele, os logins caem a cada reinício |
+   | `ACCESSMAP_FRONTEND_DIR` | Pasta onde ficam as páginas, `assets/` e `espacos/` |
+   | `PORT` | Porta do servidor (padrão 8080) |
+
+3. **Use HTTPS** na frente do servidor (ex.: Nginx ou Caddy como proxy reverso). Sem HTTPS, a senha do login e o token trafegam sem criptografia na rede.
+4. **Banco já existente:** na inicialização, o Flyway aplica sozinho as migrações que faltam (ex.: a `V2`, de vários espaços) sem perder dados. Faça um backup antes de atualizar: `mariadb-dump -u <usuario> -p accessmap > backup.sql`.
+
+**O que é protegido e como:**
+
+| O quê | Como |
+|---|---|
+| Senha do administrador | Hash **BCrypt** (custo 10, com sal) na tabela `administrador` — nunca em texto puro |
+| Sessão do administrador | Token **JWT** assinado com **HMAC-SHA256 (HS256)** usando `ACCESSMAP_JWT_SEGREDO`, válido por 8 horas. Token alterado, sem assinatura ou com `alg: none` é recusado (401) |
+| Rotas de escrita e leitura dos relatos | Exigem o token no cabeçalho `Authorization: Bearer ...` |
+| Dados em trânsito | Criptografados pelo HTTPS do proxy reverso |
+| Imagens enviadas | O tipo é conferido pelo conteúdo do arquivo (PNG, JPEG ou WEBP), e não pelo nome |
 
 ## Acessibilidade
 
@@ -595,7 +771,7 @@ O AccessMap foi desenvolvido com preocupação constante em ser acessível enqua
 - [ ] Relatórios exportáveis (PDF/planilha) das colaborações recebidas, para uso em pedidos de verba e emendas parlamentares.
 - [ ] Expansão das categorias de acessibilidade (visual, cognitiva, etc.).
 - [ ] Sistema de status para colaborações (pendente, em análise, resolvido) com retorno visível à comunidade.
-- [ ] Avaliação de uma versão adaptável do AccessMap para uso em outros espaços públicos além do campus do IFSP Itapetininga, incluindo eventuais ajustes no modelo de dados para suportar múltiplos locais.
+- [x] Versão adaptável do AccessMap para outros espaços públicos além do campus do IFSP Itapetininga: modelo de dados com vários espaços e pacotes de configuração em `espacos/` (ver [Adaptando para Outro Espaço Público](#adaptando-para-outro-espaço-público)).
 
 ## Autoria e Desenvolvimento
 

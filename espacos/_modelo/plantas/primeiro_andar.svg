@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1600" viewBox="0 0 1200 800">
+  <!-- Planta de EXEMPLO (1º andar do prédio principal) do pacote modelo. Substitua pela planta do seu espaço. -->
+  <defs>
+    <filter id="sombra" x="-5%" y="-5%" width="115%" height="120%">
+      <feDropShadow dx="3" dy="4" stdDeviation="3" flood-color="#000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="800" fill="#eef1f4"/>
+  <g filter="url(#sombra)"><rect x="80" y="80" width="1040" height="640" rx="10" fill="#fdfaf6"/></g>
+  <rect x="80" y="80" width="1040" height="640" rx="10" fill="none" stroke="#7a6f66" stroke-width="8"/>
+
+  <!-- Corredor central -->
+  <rect x="80" y="360" width="1040" height="90" fill="#efe6da"/>
+
+  <!-- Salas de cima -->
+  <g fill="#f4d9cf" stroke="#7a6f66" stroke-width="5">
+    <rect x="80" y="80" width="260" height="280"/><rect x="340" y="80" width="260" height="280"/>
+    <rect x="600" y="80" width="260" height="280"/><rect x="860" y="80" width="260" height="280"/>
+  </g>
+  <!-- Salas de baixo -->
+  <g fill="#d6e6f4" stroke="#7a6f66" stroke-width="5">
+    <rect x="80" y="450" width="340" height="270"/><rect x="420" y="450" width="200" height="270"/>
+  </g>
+  <rect x="620" y="450" width="200" height="270" fill="#e3efd9" stroke="#7a6f66" stroke-width="5"/>
+  <rect x="820" y="450" width="300" height="270" fill="#f6ecc9" stroke="#7a6f66" stroke-width="5"/>
+
+  <!-- Portas -->
+  <g fill="#efe6da"><rect x="190" y="355" width="50" height="10"/><rect x="450" y="355" width="50" height="10"/>
+    <rect x="710" y="355" width="50" height="10"/><rect x="970" y="355" width="50" height="10"/>
+    <rect x="220" y="445" width="50" height="10"/><rect x="500" y="445" width="50" height="10"/>
+    <rect x="700" y="445" width="50" height="10"/><rect x="940" y="445" width="50" height="10"/></g>
+
+  <!-- Escada e elevador -->
+  <g stroke="#7a6f66" stroke-width="3">
+    <line x1="640" y1="480" x2="800" y2="480"/><line x1="640" y1="510" x2="800" y2="510"/><line x1="640" y1="540" x2="800" y2="540"/>
+    <line x1="640" y1="570" x2="800" y2="570"/><line x1="640" y1="600" x2="800" y2="600"/>
+  </g>
+  <rect x="660" y="630" width="120" height="70" fill="#c9d3dc" stroke="#7a6f66" stroke-width="4"/>
+</svg>

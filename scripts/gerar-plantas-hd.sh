@@ -3,14 +3,18 @@
 # Gera as versões em alta resolução das plantas do mapa (assets/images/plantas)
 #
 # Uso:
-#   scripts/gerar-plantas-hd.sh <ala> <imagem-fonte> <largura> <altura>
+#   scripts/gerar-plantas-hd.sh <ala|pasta> <imagem-fonte> <largura> <altura>
 #
-#   <ala>          todos | edificacoes | mecanica  (mesmo nome usado em mapa.js)
+#   <ala|pasta>    um nome simples (ex.: todos, edificacoes, mecanica) grava em
+#                  assets/images/plantas/<ala>/; um caminho com "/" (ex.:
+#                  espacos/prefeitura-centro/plantas/terreo) grava nessa pasta,
+#                  relativa à raiz do projeto. Use no espaco.json:
+#                  "imagem": "<pasta>/base.webp" e "hd": "<pasta>/hd"
 #   <imagem-fonte> imagem da planta em alta resolução (de preferência ampliada
 #                  4x com IA, ex.: Real-ESRGAN — ver README)
-#   <largura> <altura>  área de coordenadas da planta em mapa.js
-#                  (plantas[ala].largura / .altura) — NÃO mude esses valores,
-#                  senão os pontos cadastrados saem do lugar.
+#   <largura> <altura>  área de coordenadas da planta ("largura"/"altura" no
+#                  espaco.json do espaço) — NÃO mude esses valores, senão os
+#                  pontos cadastrados saem do lugar.
 #
 # Exemplo:
 #   scripts/gerar-plantas-hd.sh todos campus-x4.png 1500 1056
@@ -46,11 +50,16 @@ if (( LARGURA % GRADE_COLS != 0 || ALTURA % GRADE_LINHAS != 0 )); then
 fi
 
 RAIZ="$(cd "$(dirname "$0")/.." && pwd)"
-DESTINO="$RAIZ/assets/images/plantas/$ALA"
+if [[ "$ALA" == */* ]]; then
+    [[ "$ALA" == /* ]] && DESTINO="$ALA" || DESTINO="$RAIZ/$ALA"
+else
+    DESTINO="$RAIZ/assets/images/plantas/$ALA"
+fi
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-rm -rf "$DESTINO"
+# Apaga só o que este script gera (a pasta pode ter outros arquivos, como a imagem fonte)
+rm -rf "$DESTINO/hd" "$DESTINO/base.webp"
 mkdir -p "$DESTINO/hd"
 
 W=$(( LARGURA * ESCALA_HD )); H=$(( ALTURA * ESCALA_HD ))

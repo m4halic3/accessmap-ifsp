@@ -57,7 +57,8 @@ public class SegurancaConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/colaboracoes").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/pontos", "/api/plantas", "/api/plantas/**", "/api/categorias").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/pontos", "/api/plantas", "/api/plantas/**", "/api/categorias",
+                        "/api/espacos", "/api/espacos/**").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll())
             .oauth2ResourceServer(o -> o

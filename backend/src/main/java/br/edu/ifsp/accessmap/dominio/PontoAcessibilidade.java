@@ -16,7 +16,8 @@ import jakarta.persistence.Table;
 
 /**
  * Local do mapa. Os campos seguem o que o front-end usa em `lugares`
- * (mapa.js): area = "categoria", bloco = "bloco_pai", posX/posY = x/y.
+ * (mapa.js): area = "categoria", bloco = "bloco_pai", posX/posY = x/y e
+ * planta = código da planta em que o local aparece.
  */
 @Entity
 @Table(name = "ponto_acessibilidade")
@@ -29,6 +30,14 @@ public class PontoAcessibilidade {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "espaco_id", nullable = false)
+    private Espaco espaco;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "planta_id", nullable = false)
+    private Planta planta;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_id")
@@ -49,9 +58,6 @@ public class PontoAcessibilidade {
 
     @Column(nullable = false, length = 40)
     private String area;
-
-    @Column(nullable = false, length = 10)
-    private String andar;
 
     @Column(length = 40)
     private String bloco;
@@ -90,6 +96,10 @@ public class PontoAcessibilidade {
     }
 
     public Integer getId() { return id; }
+    public Espaco getEspaco() { return espaco; }
+    public void setEspaco(Espaco espaco) { this.espaco = espaco; }
+    public Planta getPlanta() { return planta; }
+    public void setPlanta(Planta planta) { this.planta = planta; }
     public CategoriaAcessibilidade getCategoria() { return categoria; }
     public void setCategoria(CategoriaAcessibilidade categoria) { this.categoria = categoria; }
     public Administrador getAdministrador() { return administrador; }
@@ -102,8 +112,6 @@ public class PontoAcessibilidade {
     public void setTipo(String tipo) { this.tipo = tipo; }
     public String getArea() { return area; }
     public void setArea(String area) { this.area = area; }
-    public String getAndar() { return andar; }
-    public void setAndar(String andar) { this.andar = andar; }
     public String getBloco() { return bloco; }
     public void setBloco(String bloco) { this.bloco = bloco; }
     public boolean isSubponto() { return subponto; }

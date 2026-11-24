@@ -10,12 +10,18 @@
    O login do administrador devolve um token (JWT), guardado no
    sessionStorage e enviado no cabeçalho Authorization das rotas
    restritas. Fechar o navegador encerra a sessão.
+
+   Espaço: locais, colaborações e plantas pertencem a um espaço
+   público (ver espaco.js). A página escolhe o espaço com
+   ?espaco=<slug> na URL (fica lembrado neste navegador); sem isso,
+   vale o espaço padrão do servidor.
    ========================================================= */
 (function () {
     "use strict";
 
     const BASE = (window.ACCESSMAP_API_URL || "/api").replace(/\/$/, "");
     const CHAVE_TOKEN = "accessmap_token";
+    const CHAVE_ESPACO = "accessmap_espaco";
 
     /** Erro de uma chamada à API; `mensagem` já pode ser mostrada ao usuário. */
     class ErroApi extends Error {
@@ -58,13 +64,48 @@
         }
     }
 
+    // ---------------- Espaço atual ----------------
+    // ?espaco=<slug> na URL tem prioridade e fica lembrado; "" = espaço padrão
+    function espacoAtual() {
+        const daUrl = new URLSearchParams(window.location.search).get("espaco");
+        if (daUrl !== null) {
+            definirEspaco(daUrl);
+            return daUrl.trim();
+        }
+        try {
+            return localStorage.getItem(CHAVE_ESPACO) || "";
+        } catch (_) {
+            return "";
+        }
+    }
+
+    function definirEspaco(slug) {
+        try {
+            if (slug) localStorage.setItem(CHAVE_ESPACO, slug.trim());
+            else localStorage.removeItem(CHAVE_ESPACO);
+        } catch (_) { /* sem armazenamento: usa o padrão */ }
+    }
+
+    // Acrescenta ?espaco=<slug> às rotas que dependem do espaço. Espera a
+    // configuração do espaço (espaco.js) para não usar um slug inválido.
+    async function comEspaco(caminho) {
+        if (window.AccessMapEspaco) {
+            try { await window.AccessMapEspaco.pronto; } catch (_) { /* segue com o que houver */ }
+        }
+        const slug = espacoAtual();
+        if (!slug) return caminho;
+        return caminho + (caminho.includes("?") ? "&" : "?") + "espaco=" + encodeURIComponent(slug);
+    }
+
     // ---------------- Requisições ----------------
     /**
      * Faz uma chamada à API e devolve o JSON da resposta (ou null se vazia).
-     * opcoes: { metodo, corpo (objeto ou FormData), autenticado (envia o token) }
+     * opcoes: { metodo, corpo (objeto ou FormData), autenticado (envia o token),
+     *           espaco (acrescenta o espaço atual à rota) }
      */
     async function requisitar(caminho, opcoes = {}) {
-        const { metodo = "GET", corpo, autenticado = false } = opcoes;
+        const { metodo = "GET", corpo, autenticado = false, espaco = false } = opcoes;
+        if (espaco) caminho = await comEspaco(caminho);
         const headers = { Accept: "application/json" };
 
         if (autenticado) {
@@ -118,26 +159,32 @@
         lerSessao,
         salvarSessao,
         encerrarSessao,
+        espacoAtual,
+        definirEspaco,
 
         login: (usuario, senha) => requisitar("/auth/login", { metodo: "POST", corpo: { usuario, senha } }),
 
+        // Espaços públicos (configuração: plantas, áreas e textos)
+        obterEspaco: (slug) => requisitar(slug ? `/espacos/${encodeURIComponent(slug)}` : "/espacos/padrao"),
+        listarEspacos: () => requisitar("/espacos"),
+
         // Locais do mapa
-        listarPontos: () => requisitar("/pontos"),
-        criarPonto: (ponto) => requisitar("/pontos", { metodo: "POST", corpo: ponto, autenticado: true }),
-        atualizarPonto: (id, ponto) => requisitar(`/pontos/${id}`, { metodo: "PUT", corpo: ponto, autenticado: true }),
-        excluirPonto: (id) => requisitar(`/pontos/${id}`, { metodo: "DELETE", autenticado: true }),
-        restaurarPontosOriginais: () => requisitar("/pontos/restaurar-originais", { metodo: "POST", autenticado: true }),
+        listarPontos: () => requisitar("/pontos", { espaco: true }),
+        criarPonto: (ponto) => requisitar("/pontos", { metodo: "POST", corpo: ponto, autenticado: true, espaco: true }),
+        atualizarPonto: (id, ponto) => requisitar(`/pontos/${id}`, { metodo: "PUT", corpo: ponto, autenticado: true, espaco: true }),
+        excluirPonto: (id) => requisitar(`/pontos/${id}`, { metodo: "DELETE", autenticado: true, espaco: true }),
+        restaurarPontosOriginais: () => requisitar("/pontos/restaurar-originais", { metodo: "POST", autenticado: true, espaco: true }),
 
         // Colaborações do formulário público
-        enviarColaboracao: (colaboracao) => requisitar("/colaboracoes", { metodo: "POST", corpo: colaboracao }),
-        listarColaboracoes: () => requisitar("/colaboracoes", { autenticado: true }),
-        excluirColaboracao: (id) => requisitar(`/colaboracoes/${id}`, { metodo: "DELETE", autenticado: true }),
-        restaurarColaboracao: (id) => requisitar(`/colaboracoes/${id}/restaurar`, { metodo: "POST", autenticado: true }),
+        enviarColaboracao: (colaboracao) => requisitar("/colaboracoes", { metodo: "POST", corpo: colaboracao, espaco: true }),
+        listarColaboracoes: () => requisitar("/colaboracoes", { autenticado: true, espaco: true }),
+        excluirColaboracao: (id) => requisitar(`/colaboracoes/${id}`, { metodo: "DELETE", autenticado: true, espaco: true }),
+        restaurarColaboracao: (id) => requisitar(`/colaboracoes/${id}/restaurar`, { metodo: "POST", autenticado: true, espaco: true }),
 
         // Imagens de planta
-        listarPlantas: () => requisitar("/plantas"),
-        publicarPlanta: (ala, formData) => requisitar(`/plantas/${ala}`, { metodo: "POST", corpo: formData, autenticado: true }),
-        voltarPlantaAnterior: (ala) => requisitar(`/plantas/${ala}/voltar`, { metodo: "POST", autenticado: true }),
-        restaurarPlantaOriginal: (ala) => requisitar(`/plantas/${ala}`, { metodo: "DELETE", autenticado: true })
+        listarPlantas: () => requisitar("/plantas", { espaco: true }),
+        publicarPlanta: (ala, formData) => requisitar(`/plantas/${ala}`, { metodo: "POST", corpo: formData, autenticado: true, espaco: true }),
+        voltarPlantaAnterior: (ala) => requisitar(`/plantas/${ala}/voltar`, { metodo: "POST", autenticado: true, espaco: true }),
+        restaurarPlantaOriginal: (ala) => requisitar(`/plantas/${ala}`, { metodo: "DELETE", autenticado: true, espaco: true })
     };
 })();

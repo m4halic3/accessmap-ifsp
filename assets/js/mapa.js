@@ -1,32 +1,21 @@
-// largura/altura = área de coordenadas da planta (os pontos de `lugares`
-// usam essas coordenadas — não altere, senão os pontos saem do lugar).
-// url = imagem base (2 px por coordenada); hd = pasta com os pedaços em
-// alta resolução, gerados por scripts/gerar-plantas-hd.sh.
-// proporcaoArte = proporção do desenho original (1920x1080), que é esticado
-// para caber na área de coordenadas; uma imagem nova deve ter a mesma.
-const plantas = {
-    todos: {
-        largura: 1500,
-        altura: 1056,
-        url: 'assets/images/plantas/todos/base.webp',
-        hd: 'assets/images/plantas/todos/hd',
-        proporcaoArte: 16 / 9
-    },
-    edificacoes: {
-        largura: 1200,
-        altura: 800,
-        url: 'assets/images/plantas/edificacoes/base.webp',
-        hd: 'assets/images/plantas/edificacoes/hd',
-        proporcaoArte: 16 / 9
-    },
-    mecanica: {
-        largura: 1200,
-        altura: 800,
-        url: 'assets/images/plantas/mecanica/base.webp',
-        hd: 'assets/images/plantas/mecanica/hd',
-        proporcaoArte: 16 / 9
-    }
-};
+/* =========================================================
+   PLANTAS DO ESPAÇO
+   -----------------------------------------------------------
+   Vêm da configuração do espaço (espacos/<slug>/espaco.json, ver
+   espaco.js) e são preenchidas em prepararEspaco(), indexadas pelo
+   código da planta. Campos de cada planta:
+     largura/altura = área de coordenadas (os pontos de `lugares` usam
+       essas coordenadas — não altere, senão os pontos saem do lugar);
+     url = imagem base (2 px por coordenada); hd = pasta com os pedaços
+       em alta resolução, gerados por scripts/gerar-plantas-hd.sh;
+     proporcaoArte = proporção do desenho original, que é esticado para
+       caber na área de coordenadas; uma imagem nova deve ter a mesma.
+   ========================================================= */
+const plantas = {};
+let PLANTA_PRINCIPAL = null;     // código da planta principal (ex.: o mapa geral)
+let NOMES_ALAS = {};             // código -> nome exibido ("Mapa Geral")
+let ORDEM_PRINCIPAIS = [];       // locais que aparecem primeiro na lista lateral
+let PREFIXOS_NOME = null;        // "Bloco A - ", "Subsolo B - "... omitidos no nome curto
 
 // Precisa bater com as variáveis de scripts/gerar-plantas-hd.sh
 const PLANTA_HD = {
@@ -41,15 +30,18 @@ const PLANTA_HD = {
    -----------------------------------------------------------
    Vêm do banco de dados (GET /api/pontos), onde o admin insere,
    edita e exclui locais. Cada local tem: id, nome, tipo (geral,
-   fisica, auditiva ou alerta), categoria, andar (terreo/subsolo),
-   bloco_pai, subponto e as coordenadas x/y na planta.
+   fisica, auditiva ou alerta), categoria, planta (código da planta
+   em que aparece), bloco_pai, subponto e as coordenadas x/y.
    Se o servidor estiver fora do ar, o mapa público mostra a lista
-   original do projeto (assets/data/locais-originais.json), a mesma
-   usada para popular o banco na primeira execução.
+   original do espaço (espacos/<slug>/locais.json), a mesma usada
+   para popular o banco na primeira execução.
    ========================================================= */
 const lugares = [];
-const URL_LOCAIS_ORIGINAIS = "assets/data/locais-originais.json";
 let lugaresDoServidor = false;   // false = servidor fora do ar (lista original, só leitura)
+
+function urlLocaisOriginais() {
+    return `espacos/${encodeURIComponent(AccessMapEspaco.config.slug)}/locais.json`;
+}
 
 async function carregarLugares() {
     let lista = null;
@@ -59,7 +51,7 @@ async function carregarLugares() {
     } catch (erro) {
         console.warn("AccessMap: servidor indisponível, usando a lista original de locais.", erro);
         try {
-            const resposta = await fetch(URL_LOCAIS_ORIGINAIS);
+            const resposta = await fetch(urlLocaisOriginais());
             if (resposta.ok) lista = await resposta.json();
         } catch (_) { /* sem locais */ }
     }
@@ -73,28 +65,64 @@ let mapa;
 let camadaImagem = null;
 let pedacosHD = [];      // [{ limites, camada, url }] da planta aberta
 let filtroAtual = null;
-let alaAtual = "todos";
+let alaAtual = null;             // código da planta aberta
 let primeiraInicializacao = true;
 
+/**
+ * Lê a configuração do espaço (espaco.js) e monta as plantas, os nomes
+ * das alas, a ordem dos destaques e os botões "Mapa exibido".
+ */
+function prepararEspaco(config) {
+    Object.keys(plantas).forEach(k => delete plantas[k]);
+    NOMES_ALAS = {};
+    config.plantas.forEach(p => {
+        plantas[p.codigo] = {
+            codigo: p.codigo,
+            nome: p.nome,
+            rotuloCurto: p.rotuloCurto,
+            descricao: p.descricao,
+            principal: !!p.principal,
+            andar: p.andar || null,        // ex.: "subsolo", mostrado ao lado dos locais
+            bloco: p.bloco || null,        // área fixa dos locais cadastrados nesta planta
+            prefixoNome: p.prefixoNome || null,
+            largura: p.largura,
+            altura: p.altura,
+            url: p.imagem,
+            hd: p.hd || null,
+            proporcaoArte: p.proporcaoArte || null,
+            altOriginal: p.alt || ""
+        };
+        NOMES_ALAS[p.codigo] = p.nome;
+    });
+    PLANTA_PRINCIPAL = (config.plantas.find(p => p.principal) || config.plantas[0]).codigo;
+    alaAtual = PLANTA_PRINCIPAL;
+    ORDEM_PRINCIPAIS = config.destaques.slice();
 
-const NOMES_ALAS = {
-    todos: "Mapa Geral",
-    edificacoes: "Subsolo Edificações",
-    mecanica: "Subsolo Mecânica"
-};
+    prepararAreas(config);   // cores e ícones (icones-lugares.js)
 
-const BLOCOS_RAIZ = {
-    "Bloco A": "informatica",
-    "Bloco B": "mecanica",
-    "Bloco C": "edificacoes",
-    "Bloco D": "administrativo"
-};
+    const prefixos = [...Object.keys(AREA_DOS_BLOCOS), ...config.plantas.map(p => p.prefixoNome).filter(Boolean)]
+        .map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    PREFIXOS_NOME = prefixos.length ? new RegExp(`^(${prefixos.join("|")}) - `) : null;
 
-const ORDEM_PRINCIPAIS = ["Bloco A", "Bloco B", "Bloco C", "Bloco D",
-    "Estacionamento interno A", "Estacionamento interno B", "Estacionamento externo"];
+    montarBotoesAlas();
+}
 
-function getAndarDaAla() {
-    return (alaAtual === "todos") ? "terreo" : "subsolo";
+// Botões "Mapa exibido": um por planta do espaço
+function montarBotoesAlas() {
+    const grupo = document.getElementById("seletor-alas");
+    if (!grupo) return;
+    grupo.innerHTML = "";
+    Object.values(plantas).forEach(planta => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn-type";
+        btn.dataset.ala = planta.codigo;
+        btn.textContent = planta.rotuloCurto;
+        if (planta.rotuloCurto !== planta.nome) btn.title = planta.nome;
+        btn.addEventListener("click", () => filtrarAla(planta.codigo));
+        grupo.appendChild(btn);
+    });
+    marcarBotaoAla(alaAtual);
 }
 
 
@@ -186,9 +214,7 @@ function atualizarPlantaDeFundo() {
     const dadosPlanta = plantas[alaAtual];
     const limites = [[0, 0], [dadosPlanta.altura, dadosPlanta.largura]];
 
-    let textAltPlanta = "Mapa do Campus Geral com distribuição dos blocos e caminhos.";
-    if (alaAtual === "edificacoes") textAltPlanta = "Planta baixa detalhada do Subsolo do Bloco C (Edificações).";
-    if (alaAtual === "mecanica") textAltPlanta = "Planta baixa detalhada do Subsolo do Bloco B (Mecânica).";
+    let textAltPlanta = dadosPlanta.altOriginal || `Planta: ${dadosPlanta.nome}.`;
 
     // Se o admin enviou uma imagem nova com descrição, usa a descrição dele
     if (dadosPlanta.alt) textAltPlanta = dadosPlanta.alt;
@@ -321,19 +347,17 @@ function aplicarFiltrosCombinados() {
     let filtrados;
 
     if (termo) {
-        // Dentro de um subsolo, a busca fica restrita aos locais daquele
-        // subsolo — não faz sentido achar uma sala de outra planta.
-        const candidatos = (alaAtual === "todos")
-            ? lugares
-            : lugares.filter(l => l.bloco_pai === alaAtual && l.andar === "subsolo");
+        // Na planta principal a busca procura em todas as plantas; dentro de
+        // outra planta (ex.: um subsolo), fica restrita aos locais dela.
+        const candidatos = naPlantaPrincipal() ? lugares : lugaresDaPlanta();
 
         filtrados = candidatos.filter(l => normalizarBusca(l.nome).includes(termo));
-    } else if (alaAtual === "todos") {
+    } else if (naPlantaPrincipal()) {
         filtrados = filtroAtual
             ? [...lugares]
-            : lugares.filter(l => l.subponto === true && l.andar === "terreo");
+            : lugares.filter(l => l.subponto === true && l.planta === alaAtual);
     } else {
-        filtrados = lugares.filter(l => l.bloco_pai === alaAtual && l.andar === "subsolo");
+        filtrados = lugaresDaPlanta();
     }
 
     // Filtro por tipo de acessibilidade
@@ -347,9 +371,9 @@ function aplicarFiltrosCombinados() {
             filtrados = filtrados.filter(l => l.tipo === filtroAtual);
         }
 
-        // No mapa geral, oculta itens que pertencem ao subsolo
-        if (alaAtual === "todos") {
-            filtrados = filtrados.filter(l => l.andar !== "subsolo");
+        // Na planta principal, oculta itens que pertencem a outras plantas
+        if (naPlantaPrincipal()) {
+            filtrados = filtrados.filter(l => l.planta === alaAtual);
         }
     }
 
@@ -357,9 +381,9 @@ function aplicarFiltrosCombinados() {
     destaquesMapa = termo ? new Set(filtrados) : new Set();
     atualizarVisibilidadeMapa();
 
-    if (alaAtual === "todos" && !termo && !filtroAtual) {
-        // Estado padrão do Mapa Geral: lateral só com os blocos/locais principais
-        const blocosPrincipais = lugares.filter(l => l.subponto === false && l.andar === "terreo");
+    if (naPlantaPrincipal() && !termo && !filtroAtual) {
+        // Estado padrão da planta principal: lateral só com os blocos/locais principais
+        const blocosPrincipais = lugares.filter(l => l.subponto === false && l.planta === alaAtual);
         atualizarListaLateral(blocosPrincipais);
     } else {
         atualizarListaLateral(filtrados, { mostrarTodos: true });
@@ -371,7 +395,8 @@ function descricaoDoTipo(lugar) {
     if (lugar.tipo === "alerta") return "<span class='tag-alerta'>⚠️ Barreira física (necessita de melhorias)</span>";
 
     const estilo = estiloDoLugar(lugar);
-    const andar = lugar.andar === "subsolo" ? " (subsolo)" : "";
+    const rotuloAndar = plantas[lugar.planta] && plantas[lugar.planta].andar;
+    const andar = rotuloAndar ? ` (${escaparHtml(rotuloAndar)})` : "";
     if (TIPOS_DESTAQUE[lugar.tipo]) {
         return `${TIPOS_DESTAQUE[lugar.tipo].rotulo} · ${escaparHtml(estilo.oQue)}${andar}`;
     }
@@ -407,23 +432,32 @@ function ePontoDeAcessibilidade(lugar) {
     return lugar.tipo === "fisica" || lugar.tipo === "auditiva" || lugar.tipo === "alerta";
 }
 
+function naPlantaPrincipal() {
+    return alaAtual === PLANTA_PRINCIPAL;
+}
+
+// Locais da planta aberta
 function lugaresDaPlanta() {
-    return alaAtual === "todos"
-        ? lugares.filter(l => l.andar !== "subsolo")
-        : lugares.filter(l => l.bloco_pai === alaAtual && l.andar === "subsolo");
+    return lugares.filter(l => l.planta === alaAtual);
 }
 
-// "Bloco A - Lab A (A206)" -> "Lab A (A206)": no mapa o bloco já é visível
+// Planta em que o local aparece (planta desconhecida = planta principal)
+function plantaDoLugar(lugar) {
+    return plantas[lugar.planta] ? lugar.planta : PLANTA_PRINCIPAL;
+}
+
+// "Bloco A - Lab A (A206)" -> "Lab A (A206)": no mapa o prédio já é visível.
+// Os prefixos são os nomes dos prédios e os prefixos das plantas do espaço.
 function nomeCurto(lugar) {
-    return lugar.nome.replace(/^(Bloco [A-D]|Subsolo [A-D]) - /, "");
+    return PREFIXOS_NOME ? lugar.nome.replace(PREFIXOS_NOME, "") : lugar.nome;
 }
 
-// Prédios ("Bloco A") viram "Bloco" + letra, para a etiqueta poder ficar
-// compacta (em duas linhas) quando o zoom está afastado
+// Prédios curtos ("Bloco A") viram palavra + letra, para a etiqueta poder
+// ficar compacta (em duas linhas) quando o zoom está afastado
 function textoDoRotulo(lugar) {
-    const predio = /^Bloco ([A-D])$/.exec(lugar.nome);
+    const predio = AREA_DOS_BLOCOS[lugar.nome] && /^(.*\S)\s+(\S{1,3})$/.exec(lugar.nome);
     if (predio) {
-        return `<span class="rotulo-texto"><span class="rotulo-predio-palavra">Bloco</span> <span class="rotulo-predio-letra">${predio[1]}</span></span>`;
+        return `<span class="rotulo-texto"><span class="rotulo-predio-palavra">${escaparHtml(predio[1])}</span> <span class="rotulo-predio-letra">${escaparHtml(predio[2])}</span></span>`;
     }
     return `<span class="rotulo-texto">${escaparHtml(nomeCurto(lugar))}</span>`;
 }
@@ -461,7 +495,7 @@ function prioridadeDoItem(lugar, ePino) {
 }
 
 function zoomMinimoDoItem(lugar, ePino) {
-    if (ePino || alaAtual !== "todos" || !lugar.subponto) return -Infinity;
+    if (ePino || !naPlantaPrincipal() || !lugar.subponto) return -Infinity;
     return ZOOM_SALAS;
 }
 
@@ -515,7 +549,7 @@ function criarItemMapa(lugar) {
 // Recria os itens só quando a planta ou os dados mudam
 function garantirItensMapa() {
     const assinatura = alaAtual + "|" + JSON.stringify(lugaresDaPlanta().map(l =>
-        [l.nome, l.x, l.y, l.tipo, l.categoria, l.bloco_pai, l.andar, l.subponto]));
+        [l.nome, l.x, l.y, l.tipo, l.categoria, l.bloco_pai, l.planta, l.subponto]));
     if (assinatura === assinaturaItens) return;
     assinaturaItens = assinatura;
 
@@ -739,9 +773,7 @@ function buscarEIrParaLocal() {
 
     if (encontrado) {
         // Local de outra planta: troca para a planta certa antes de focar
-        const alaDoLugar = encontrado.andar === "subsolo" && plantas[encontrado.bloco_pai]
-            ? encontrado.bloco_pai
-            : "todos";
+        const alaDoLugar = plantaDoLugar(encontrado);
         if (alaDoLugar !== alaAtual) filtrarAla(alaDoLugar);
         focarNoLugar(encontrado);
     } else {
@@ -771,7 +803,7 @@ function mostrarTodos() {
 
 function resetarMapaCompleto() {
     filtroAtual = null;
-    alaAtual = "todos";
+    alaAtual = PLANTA_PRINCIPAL;
     primeiraInicializacao = true;
 
     const searchInput = document.getElementById("search-input");
@@ -785,16 +817,18 @@ function resetarMapaCompleto() {
     if (mapa) mapa.closePopup();
 
     marcarBotoesFiltro();
-    marcarBotaoAla("todos");
+    marcarBotaoAla(PLANTA_PRINCIPAL);
     atualizarPlantaDeFundo();
 }
 
 // Promise resolvida quando o mapa já foi criado. Antes de criar o mapa,
-// carrega os locais e as imagens de planta enviadas pelo admin (do
-// servidor), para não exibir a planta antiga e depois trocar. Os scripts
-// do admin (admin.js / admin-planta.js) esperam por ela antes de usar `mapa`.
+// carrega a configuração do espaço, os locais e as imagens de planta
+// enviadas pelo admin (do servidor), para não exibir a planta antiga e
+// depois trocar. Os scripts do admin (admin.js / admin-planta.js) esperam
+// por ela antes de usar `mapa`.
 const mapaPronto = new Promise((resolve) => {
     window.addEventListener("load", async () => {
+        prepararEspaco(await AccessMapEspaco.pronto);
         await Promise.all([
             carregarLugares(),
             window.PlantasStorage ? PlantasStorage.aplicarEm(plantas) : null // nunca lança erro

@@ -6,7 +6,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Serve o front-end (as páginas .html da raiz e a pasta assets/) na mesma
+ * Serve o front-end (as páginas .html da raiz e as pastas assets/ e espacos/) na mesma
  * origem da API, para o navegador chamar /api sem precisar de CORS.
  * Só esses caminhos ficam expostos: backend/, scripts/ e .git/ não.
  */
@@ -25,6 +25,8 @@ public class WebConfig implements WebMvcConfigurer {
         if (!raiz.endsWith("/")) raiz += "/";
 
         registry.addResourceHandler("/assets/**").addResourceLocations(raiz + "assets/");
+        // Pacotes dos espaços (espaco.json, locais.json e imagens próprias de cada espaço)
+        registry.addResourceHandler("/espacos/**").addResourceLocations(raiz + "espacos/");
         registry.addResourceHandler("/*.html").addResourceLocations(raiz);
     }
 

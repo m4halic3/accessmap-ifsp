@@ -23,6 +23,10 @@ public class Colaboracao {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "espaco_id", nullable = false)
+    private Espaco espaco;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "categoria_id", nullable = false)
     private CategoriaAcessibilidade categoria;
 
@@ -58,6 +62,8 @@ public class Colaboracao {
     }
 
     public Integer getId() { return id; }
+    public Espaco getEspaco() { return espaco; }
+    public void setEspaco(Espaco espaco) { this.espaco = espaco; }
     public CategoriaAcessibilidade getCategoria() { return categoria; }
     public void setCategoria(CategoriaAcessibilidade categoria) { this.categoria = categoria; }
     public PontoAcessibilidade getPonto() { return ponto; }

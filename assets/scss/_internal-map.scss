@@ -145,24 +145,25 @@
                 outline-offset: 2px;
             }
 
-            // Configuração customizada para o estado ativo de cada botão
+            // Estado ativo: cada botão de planta tem uma cor, pela posição.
+            // As cores se repetem a cada 3 botões, para espaços com mais plantas.
             &.active {
                 color: #ffffff; // Texto branco padrão para contraste
 
-                // Botão 1: "Ver Tudo" -> Roxo
-                &:nth-child(1) {
+                // 1º, 4º, 7º... (ex.: "Mapa Geral") -> Laranja
+                &:nth-child(3n + 1) {
                     background-color: $color-orange;
                     border-color: $color-orange;
                 }
 
-                // Botão 2: "Ala Edif." -> Rosa
-                &:nth-child(2) {
+                // 2º, 5º, 8º... -> Rosa
+                &:nth-child(3n + 2) {
                     background-color: $color-pink;
                     border-color: $color-pink;
                 }
 
-                // Botão 3: "Ala Mec." -> Laranja (Modificado aqui!)
-                &:nth-child(3) {
+                // 3º, 6º, 9º... -> Azul
+                &:nth-child(3n + 3) {
                     background-color: $color-blue;
                     border-color: $color-blue;
                 }

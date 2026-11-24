@@ -1,9 +1,9 @@
 /* =========================================================
    ADMIN - ATUALIZAR IMAGEM DO MAPA
    -----------------------------------------------------------
-   Permite ao administrador enviar uma nova imagem (planta) para
-   o Mapa Geral ou para um dos subsolos, quando o campus muda
-   (ex.: um novo prédio foi construído).
+   Permite ao administrador enviar uma nova imagem para uma das
+   plantas do espaço (ex.: o mapa geral ou um subsolo), quando o
+   lugar muda (ex.: um novo prédio foi construído).
 
    Depende de (carregados antes): api.js, mapa.js, admin.js e
    plantas-storage.js. As imagens são gravadas no servidor.
@@ -17,11 +17,10 @@
 (function () {
     "use strict";
 
-    const NOMES_PLANTAS = {
-        todos: "Mapa Geral (campus)",
-        edificacoes: "Subsolo Edificações (Bloco C)",
-        mecanica: "Subsolo Mecânica (Bloco B)"
-    };
+    // Nome da planta no modal (campo "descricao" do espaco.json)
+    function nomePlanta(ala) {
+        return plantas[ala] ? plantas[ala].descricao : ala;
+    }
 
     const LIMITE_PROPORCAO = 0.02;   // tolerância de 2% na proporção
     const LADO_MINIMO_PX = 300;
@@ -64,6 +63,16 @@
         el.btnRestaurar = $("btn-restaurar-planta");
         el.btnPublicar = $("btn-publicar-planta");
         el.status = $("admin-status");
+        el.dica = $("planta-dica");
+
+        // Uma opção por planta do espaço
+        el.alvo.innerHTML = "";
+        Object.values(plantas).forEach((planta) => {
+            const opcao = document.createElement("option");
+            opcao.value = planta.codigo;
+            opcao.textContent = planta.descricao;
+            el.alvo.appendChild(opcao);
+        });
 
         el.btnAbrir.addEventListener("click", abrirModal);
         el.btnFechar.addEventListener("click", fecharModal);
@@ -90,7 +99,7 @@
     function abrirModal() {
         focoAnterior = document.activeElement;
 
-        el.alvo.value = (typeof alaAtual !== "undefined" && NOMES_PLANTAS[alaAtual]) ? alaAtual : "todos";
+        el.alvo.value = plantas[alaAtual] ? alaAtual : PLANTA_PRINCIPAL;
         limparSelecao();
         mostrarErro("");
         atualizarEstadoDoMapaAlvo();
@@ -190,6 +199,7 @@
         }
         el.btnRestaurar.hidden = !planta.personalizada;
         el.alt.value = planta.alt || "";
+        atualizarDica(planta);
 
         const minhaSequencia = ++sequenciaAtual;
         atualizarMapaAnterior(ala, minhaSequencia);
@@ -200,6 +210,15 @@
             ? planta.meta.largura / planta.meta.altura
             : (planta.proporcaoArte || null);
         if (arquivo && infoArquivo) avaliarProporcao();
+    }
+
+    // Resolução recomendada para a planta escolhida
+    function atualizarDica(planta) {
+        if (!el.dica) return;
+        el.dica.textContent =
+            "PNG, JPG ou WEBP, até 25 MB. Use a mesma proporção e o mesmo enquadramento do mapa atual, " +
+            "para que os pontos já cadastrados continuem no lugar certo. Para ficar nítida no zoom, envie em " +
+            `alta resolução (ideal: ${planta.largura * PX_POR_COORDENADA_IDEAL} px de largura para este mapa).`;
     }
 
     // ---------------------------------------------------------------
@@ -321,7 +340,7 @@
         const ala = el.alvo.value;
         abrirConfirmacao(
             "Publicar novo mapa",
-            `Tem certeza que deseja substituir a imagem de "${NOMES_PLANTAS[ala]}" por "${arquivo.name}"? ` +
+            `Tem certeza que deseja substituir a imagem de "${nomePlanta(ala)}" por "${arquivo.name}"? ` +
             "A nova imagem passa a aparecer no mapa público para todos os visitantes. " +
             "Se for preciso, você poderá voltar ao mapa anterior depois.",
             confirmarPublicar,
@@ -359,7 +378,7 @@
             el.btnPublicar.textContent = textoBotao;
         }
 
-        const nomeMapa = NOMES_PLANTAS[ala];
+        const nomeMapa = nomePlanta(ala);
         const estaNaTela = ala === alaAtual;
         if (estaNaTela) atualizarPlantaDeFundo();
 
@@ -375,7 +394,7 @@
         const ala = el.alvo.value;
         abrirConfirmacao(
             "Restaurar mapa original",
-            `Tem certeza que deseja voltar "${NOMES_PLANTAS[ala]}" para a imagem original do projeto? A imagem enviada e o histórico dela serão removidos.`,
+            `Tem certeza que deseja voltar "${nomePlanta(ala)}" para a imagem original do projeto? A imagem enviada e o histórico dela serão removidos.`,
             confirmarRestaurar,
             { rotulo: "Restaurar", perigo: true }
         );
@@ -396,14 +415,14 @@
         if (ala === alaAtual) atualizarPlantaDeFundo();
 
         fecharModal();
-        mostrarStatus(`"${NOMES_PLANTAS[ala]}" voltou para a imagem original.`);
+        mostrarStatus(`"${nomePlanta(ala)}" voltou para a imagem original.`);
     }
 
     function pedirConfirmacaoVoltar() {
         const ala = el.alvo.value;
         abrirConfirmacao(
             "Voltar ao mapa anterior",
-            `Tem certeza que deseja voltar "${NOMES_PLANTAS[ala]}" para o mapa anterior? A imagem que está em uso agora será descartada.`,
+            `Tem certeza que deseja voltar "${nomePlanta(ala)}" para o mapa anterior? A imagem que está em uso agora será descartada.`,
             confirmarVoltar,
             { rotulo: "Voltar ao anterior", perigo: true }
         );
@@ -424,7 +443,7 @@
         if (ala === alaAtual) atualizarPlantaDeFundo();
 
         fecharModal();
-        mostrarStatus(`"${NOMES_PLANTAS[ala]}" voltou para o mapa anterior.`);
+        mostrarStatus(`"${nomePlanta(ala)}" voltou para o mapa anterior.`);
     }
 
     // Mensagem fora do modal (leitores de tela anunciam por causa do aria-live)

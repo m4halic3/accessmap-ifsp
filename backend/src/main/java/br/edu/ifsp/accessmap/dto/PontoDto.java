@@ -10,7 +10,7 @@ public record PontoDto(
         String nome,
         String tipo,
         String categoria,
-        String andar,
+        String planta,
         @JsonProperty("bloco_pai") String blocoPai,
         int x,
         int y,
@@ -19,7 +19,7 @@ public record PontoDto(
         String status) {
 
     public static PontoDto de(PontoAcessibilidade p) {
-        return new PontoDto(p.getId(), p.getNome(), p.getTipoFrontend(), p.getArea(), p.getAndar(),
+        return new PontoDto(p.getId(), p.getNome(), p.getTipoFrontend(), p.getArea(), p.getPlanta().getCodigo(),
                 p.getBloco(), p.getPosX(), p.getPosY(), p.isSubponto(), p.getDescricao(), p.getStatus());
     }
 }

@@ -13,7 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
-/** Imagem de planta enviada pelo administrador para uma ala do mapa. */
+/** Imagem de planta enviada pelo administrador para substituir a imagem original de uma planta. */
 @Entity
 @Table(name = "planta_versao")
 public class PlantaVersao {
@@ -22,8 +22,9 @@ public class PlantaVersao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, length = 20)
-    private String ala;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "planta_id", nullable = false)
+    private Planta planta;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "administrador_id")
@@ -55,9 +56,9 @@ public class PlantaVersao {
 
     protected PlantaVersao() {}
 
-    public PlantaVersao(String ala, Administrador administrador, String nomeArquivo, String tipoMime,
+    public PlantaVersao(Planta planta, Administrador administrador, String nomeArquivo, String tipoMime,
                         byte[] conteudo, int largura, int altura, String textoAlternativo) {
-        this.ala = ala;
+        this.planta = planta;
         this.administrador = administrador;
         this.nomeArquivo = nomeArquivo;
         this.tipoMime = tipoMime;
@@ -74,7 +75,7 @@ public class PlantaVersao {
     }
 
     public Integer getId() { return id; }
-    public String getAla() { return ala; }
+    public Planta getPlanta() { return planta; }
     public String getNomeArquivo() { return nomeArquivo; }
     public String getTipoMime() { return tipoMime; }
     public int getTamanho() { return tamanho; }

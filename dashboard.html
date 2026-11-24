@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <title>AccessMap - Painel do Administrador</title>
     <script src="assets/js/api.js"></script>
+    <script src="assets/js/espaco.js"></script>
     <script src="assets/js/authentication.js"></script>
 
     <link rel="icon" type="image/png" href="assets/images/logo-roxa.png">
@@ -49,7 +50,7 @@
                 <label for="filtro-local">Local da Ocorrência</label>
                 <div class="input-wrapper">
                     <i class="fas fa-map-pin" aria-hidden="true"></i>
-                    <input type="search" id="filtro-local" enterkeyhint="search" autocomplete="off" placeholder="Ex: Bloco A, Biblioteca...">
+                    <input type="search" id="filtro-local" enterkeyhint="search" autocomplete="off" placeholder="Ex: Bloco A, Biblioteca..." data-espaco-placeholder="{exemploFiltroLocal}">
                 </div>
             </div>
 

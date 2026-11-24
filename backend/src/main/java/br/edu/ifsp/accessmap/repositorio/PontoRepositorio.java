@@ -4,21 +4,31 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import br.edu.ifsp.accessmap.dominio.PontoAcessibilidade;
 
 public interface PontoRepositorio extends JpaRepository<PontoAcessibilidade, Integer> {
 
-    /** Todos os locais, na ordem de cadastro, já com a categoria (evita uma consulta por local). */
-    @Query("select p from PontoAcessibilidade p left join fetch p.categoria order by p.id")
-    List<PontoAcessibilidade> listarTodos();
+    /** Locais do espaço, na ordem de cadastro, já com categoria e planta (evita uma consulta por local). */
+    @Query("select p from PontoAcessibilidade p left join fetch p.categoria join fetch p.planta "
+            + "where p.espaco.id = :espacoId order by p.id")
+    List<PontoAcessibilidade> listarDoEspaco(@Param("espacoId") Integer espacoId);
+
+    long countByEspacoId(Integer espacoId);
 
     // A comparação de nomes segue a collation do banco (utf8mb4_unicode_ci):
     // ignora maiúsculas e acentos, como a busca do front-end.
-    boolean existsByNome(String nome);
+    boolean existsByEspacoIdAndNome(Integer espacoId, String nome);
 
-    boolean existsByNomeAndIdNot(String nome, Integer id);
+    boolean existsByEspacoIdAndNomeAndIdNot(Integer espacoId, String nome, Integer id);
 
-    Optional<PontoAcessibilidade> findFirstByNome(String nome);
+    Optional<PontoAcessibilidade> findFirstByEspacoIdAndNome(Integer espacoId, String nome);
+
+    // Exclusão direto no banco: as colaborações ligadas ficam com ponto_id nulo (ON DELETE SET NULL)
+    @Modifying
+    @Query("delete from PontoAcessibilidade p where p.espaco.id = :espacoId")
+    void excluirDoEspaco(@Param("espacoId") Integer espacoId);
 }
